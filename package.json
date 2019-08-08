@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/stranga-things/proto/issues"
   },
-  "homepage": "https://github.com/stranga-things/proto#readme"
+  "homepage": "https://github.com/stranga-things/proto#readme",
+  "dependencies": {
+    "http-server": "^0.11.1",
+    "webpack": "^4.39.1"
+  }
 }
