@@ -1,0 +1,19 @@
+{
+  "name": "edu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stranga-things/proto.git"
+  },
+  "author": "Truman Purnell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stranga-things/proto/issues"
+  },
+  "homepage": "https://github.com/stranga-things/proto#readme"
+}
