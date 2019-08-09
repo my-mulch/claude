@@ -8,7 +8,7 @@ import {
     // pair ops
     sin, cos, addition, subtraction,
     multiplication, division, assignment,
-} from '../../ops'
+} from '../../operations'
 
 export default {
     utils: {},

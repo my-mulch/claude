@@ -1,4 +1,4 @@
-import { multiplication, sum } from '../../../ops'
+import { multiplication, sum } from '../../../operations'
 
 export default function () {
     return new Function('args', [

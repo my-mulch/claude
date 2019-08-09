@@ -3,3 +3,4 @@ develop
 test
 webgl
 node_modules
+.DS_Store

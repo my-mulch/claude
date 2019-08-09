@@ -1,4 +1,4 @@
-import radley from 'radley'
+import radley from '../../radley'
 
 import linalg from './linalg'
 import element from './element'

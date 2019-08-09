@@ -1,4 +1,4 @@
-import { division, multiplication, subtraction, assignment } from '../../../ops'
+import { division, multiplication, subtraction, assignment } from '../../../operations'
 import { symIndex } from './utils'
 
 export default function () {

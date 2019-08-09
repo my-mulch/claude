@@ -1,5 +1,5 @@
 import { cofactorHelper, survivors, indexify } from './utils.mjs'
-import { multiplication, division, assignment } from '../../../ops'
+import { multiplication, division, assignment } from '../../../operations'
 
 export default function (args) {
     const size = Math.round(Math.sqrt(args.of.size)),

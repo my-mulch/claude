@@ -1,15 +1,17 @@
+import util from 'util' // node's
+
 import {
-    shapeRaw, shapeAlign,
-    selfAxesAndShape, pairAxesAndShape
+    shapeRaw,
+    shapeAlign,
+    parseComplex,
+    complexString,
+    selfAxesAndShape,
+    pairAxesAndShape
 } from './utils'
 
-import { __Math__ } from '../../resources'
-
-import util from 'util' // node's
-import Complex from 'complex.js'
-
-import Header from '../header'
-import opsSuite from '../ops/suite'
+import Header from './header'
+import { __Math__ } from './resources'
+import opsSuite from './operations/suite'
 
 export default class BigBox {
     constructor({ header, type, init = function () {
@@ -42,7 +44,7 @@ export default class BigBox {
                     }
 
                     for (let i = 0; i < data.real.length; i++) {
-                        const cn = Complex(flatRaw[i])
+                        const cn = parseComplex(flatRaw[i])
 
                         data.real[i] = cn.re
                         data.imag[i] = cn.im
@@ -58,7 +60,7 @@ export default class BigBox {
                     }
 
                     for (let i = 0; i < data.real.length; i++) {
-                        const cn = Complex(args.with)
+                        const cn = parseComplex(args.with)
 
                         data.real[i] = cn.re
                         data.imag[i] = cn.im
@@ -196,7 +198,7 @@ export default class BigBox {
             args.with.constructor === Number)
 
             args.with = BigBox.array({ with: args.with })
-        
+
     }
 
     astype(args) {
@@ -365,9 +367,9 @@ export default class BigBox {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return Complex(
+            return complexString(
                 this.data.real[index],
-                this.data.imag[index]).toString()
+                this.data.imag[index])
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)

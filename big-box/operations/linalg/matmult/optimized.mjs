@@ -1,4 +1,4 @@
-import { assignment, multiplication } from '../../../ops'
+import { assignment, multiplication } from '../../../operations'
 
 export default function (args) {
     const rows = args.of.shape[0],

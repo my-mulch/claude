@@ -1,4 +1,4 @@
-import { multiplication, subtraction, assignment } from '../../../ops'
+import { multiplication, subtraction, assignment } from '../../../operations'
 
 export const cofactorHelper = function cofactorHelper(A) {
     const size = Math.round(Math.sqrt(A.length))

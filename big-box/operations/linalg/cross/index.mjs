@@ -1,4 +1,4 @@
-import { multiplication, subtraction } from '../../../ops'
+import { multiplication, subtraction } from '../../../operations'
 
 export default {
     cross: {

@@ -1,4 +1,4 @@
-import { __Math__ } from '../../resources'
+import { __Math__ } from '../resources'
 
 export const isContiguousSlice = function (index) {
     let lastSeenSLice = -1

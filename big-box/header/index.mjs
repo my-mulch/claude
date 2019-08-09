@@ -2,7 +2,7 @@ import {
     PARTIAL_SLICE_REGEX, NUMBER_REGEX,
     SLICE_CHARACTER, AXIS_INNER_CHARACTER, AXIS_RESULT_CHARACTER,
     SHAPE, OFFSET, CONTIG, STRIDES, __Math__
-} from '../../resources'
+} from '../resources'
 
 import { getStrides, isContiguousSlice, resolveReshape } from './utils'
 
