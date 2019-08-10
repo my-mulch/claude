@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test-big-box": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs"
+    "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
+    "start": "webpack --devtool source-map && open develop/index.html"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,8 @@
   "dependencies": {
     "http-server": "^0.11.1",
     "webpack": "^4.39.1"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.3.6"
   }
 }

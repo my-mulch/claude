@@ -3,6 +3,9 @@ export const SLICE_CHARACTER = ':'
 export const AXIS_INNER_CHARACTER = '-'
 export const AXIS_RESULT_CHARACTER = '*'
 
+export const ARRAY_SPACER = /\]\,(\s*)\[/g
+export const ARRAY_REPLACER = '],\n$1      ['
+
 export const SHAPE = 'shape'
 export const OFFSET = 'offset'
 export const CONTIG = 'contig'

@@ -10,7 +10,7 @@ import {
 } from './utils'
 
 import Header from './header'
-import { __Math__ } from './resources'
+import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from './resources'
 import opsSuite from './operations/suite'
 
 export default class BigBox {
@@ -377,6 +377,12 @@ export default class BigBox {
     }
 
     valueOf() { return this.data.real[this.offset] }
-    toString() { return JSON.stringify(this.toRaw()) }
+
+    toString() {
+        return JSON
+            .stringify(this.toRaw())
+            .replace(ARRAY_SPACER, ARRAY_REPLACER)
+    }
+
     [util.inspect.custom]() { return this.toString() }
 }

@@ -1,4 +1,4 @@
-import bb from 'big-box'
+import bb from '../../../big-box'
 import config from '../../resources'
 
 export default class CameraManager {

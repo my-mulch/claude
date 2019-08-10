@@ -1,4 +1,4 @@
-import bb from 'big-box'
+import bb from '../../big-box'
 
 export default {
     GRAPHICS_ENGINE_2D: '2d',
