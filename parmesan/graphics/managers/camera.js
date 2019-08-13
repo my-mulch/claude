@@ -29,13 +29,15 @@ export default class CameraManager {
         const us = s.divide({ with: s.norm() })
         const uu = uf.cross({ with: us })
 
-        viewMatrix.slice({ with: [':3', 0] }).assign({ with: us })
-        viewMatrix.slice({ with: [':3', 1] }).assign({ with: uu })
-        viewMatrix.slice({ with: [':3', 2] }).assign({ with: uf })
+        viewMatrix
+            .assign({ region: [':3', 0], with: us })
+            .assign({ region: [':3', 1], with: uu })
+            .assign({ region: [':3', 2], with: uf })
 
-        transMatrix
-            .slice({ with: [3, ':3'] })
-            .assign({ with: this.FROM.multiply({ with: -1 }) })
+        transMatrix.assign({
+            region: [3, ':3'],
+            with: this.FROM.multiply({ with: -1 })
+        })
 
         return transMatrix.matMult({ with: viewMatrix })
     }

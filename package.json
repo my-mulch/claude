@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
-    "start": "webpack --devtool source-map && open develop/index.html"
+    "build": "webpack --devtool source-map",
+    "start": "open develop/index.html",
+    "watch": "watch 'npm run build' ."
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,7 @@
   "homepage": "https://github.com/stranga-things/proto#readme",
   "dependencies": {
     "http-server": "^0.11.1",
+    "watch": "^1.0.2",
     "webpack": "^4.39.1"
   },
   "devDependencies": {

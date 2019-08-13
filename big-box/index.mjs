@@ -323,15 +323,15 @@ export default class BigBox {
         this.sanitize(args)
 
         return opsSuite.call({
-            of: this,
+            of: this.slice({ with: args.region }),
             with: args.with,
             result: this,
             meta: {
-                axesSize: this.size,
-                fullSize: this.size,
-                axesShape: [...this.shape.keys()],
-                fullShape: this.shape,
-                method: this.assign.name
+                axesSize: this.slice({ with: args.region }).size,
+                fullSize: this.slice({ with: args.region }).size,
+                axesShape: [...this.slice({ with: args.region }).shape.keys()],
+                fullShape: this.slice({ with: args.region }).shape,
+                method: this.slice({ with: args.region }).assign.name
             }
         })
     }

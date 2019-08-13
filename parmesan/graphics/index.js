@@ -78,7 +78,7 @@ export default class GraphicsEngine3D {
         this.uniformManager.uniforms.u_ProjMatrix(projMatrix)
 
         this.canvas.context.clear(this.canvas.context.COLOR_BUFFER_BIT)
-        this.canvas.context.drawArrays(this.canvas.context.POINTS, 0, this.config.ACTIVE_VERTICES)
+        this.canvas.context.drawArrays(this.canvas.context.LINE_STRIP, 0, this.config.ACTIVE_VERTICES)
     }
 
     pan(direction) {

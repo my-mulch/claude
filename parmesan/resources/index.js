@@ -60,7 +60,7 @@ export default {
     NEAR: 0.1,
     FAR: 100,
 
-    ZOOM_DELTA: 0.1,
+    ZOOM_DELTA: 0.5,
     PAN_DELTA: Math.PI / 64,
     ACTIVE_VERTICES: 0,
 
