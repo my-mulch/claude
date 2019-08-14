@@ -7,7 +7,7 @@
     "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
     "start": "http-server / -p 3000 --cors & npm run watch & open docs/index.html",
     "build": "webpack --devtool source-map",
-    "watch": "watch 'npm run build -d' ."
+    "watch": "watch 'npm run build' ."
   },
   "repository": {
     "type": "git",
