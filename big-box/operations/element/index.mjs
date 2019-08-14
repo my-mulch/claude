@@ -6,13 +6,18 @@ import {
     // axis ops
     min, max, mean, norm, sum,
     // pair ops
-    sin, cos, addition, subtraction,
+    exp, sin, cos, addition, subtraction,
     multiplication, division, assignment,
 } from '../../operations'
 
 export default {
     utils: {},
     operations: {
+        exp: {
+            'args.meta.axesSize <= 20': pointwise(exp),
+            'args.meta.axesSize <= 100': flattened(exp),
+            'args.meta.axesSize > 100': symbolic(exp)
+        },
         sin: {
             'args.meta.axesSize <= 20': pointwise(sin),
             'args.meta.axesSize <= 100': flattened(sin),

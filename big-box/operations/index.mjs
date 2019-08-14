@@ -1,6 +1,19 @@
 
 const noop = function () { return '' }
 
+export const exp = {
+    begin: noop,
+    middle: function ({ ofReal, ofImag, resultReal, resultImag }) {
+        return [
+            `var scale = Math.exp(${ofReal})`,
+
+            `${resultReal} = scale * Math.cos(${ofImag})`,
+            `${resultImag} = scale * Math.sin(${ofImag})`,
+        ].join('\n')
+    },
+    end: noop
+}
+
 export const sin = {
     begin: noop,
     middle: function ({ ofReal, resultReal }) {

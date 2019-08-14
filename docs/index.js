@@ -8,17 +8,11 @@ window.app = parmesan
 
 export default (async function () {
     /** Random points */
-    window.vertices = bb.zeros({ shape: [10000, 3] })
+    window.vertices = bb.zeros({ shape: [10000, 2] })
     const sin = bb
         .arange({ stop: 10000 })
         .divide({ with: 10 })
         .sin()
-        .multiply({ with: 10 })
-
-    const cos = bb
-        .arange({ stop: 10000 })
-        .divide({ with: 10 })
-        .cos()
         .multiply({ with: 10 })
 
     const axis = bb
@@ -26,13 +20,16 @@ export default (async function () {
         .divide({ with: 10 })
 
     vertices
-        .assign({ region: [':', 0], with: sin })
-        .assign({ region: [':', 1], with: cos })
-        .assign({ region: [':', 2], with: axis })
+        .assign({ region: [':', 0], with: axis })
+        .assign({ region: [':', 1], with: sin })
 
-    window.colors = bb.ones({ shape: [10000, 4] }).multiply({ with: 255 })
+    window.colors = bb
+        .zeros({ shape: [10000, 3] })
+        .assign({ region: [':', 1], with: 255 })
+
     window.sizes = bb.ones({ shape: [10000, 1] }).multiply({ with: 1 })
 
+    app.graphics.plot({ vertices, colors, sizes })
 
     // vertices
     //     .slice({ with: [':', 0] })
@@ -95,7 +92,5 @@ export default (async function () {
     // window.sizes = bb
     //     .ones({ shape: [1e6, 1] })
     //     .multiply({ with: 2 })
-
-    app.graphics.plot({ vertices, colors, sizes })
 
 })()

@@ -5,20 +5,20 @@
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
+    "start": "http-server / -p 3000 --cors & npm run watch & open docs/index.html",
     "build": "webpack --devtool source-map",
-    "start": "open develop/index.html",
-    "watch": "watch 'npm run build' ."
+    "watch": "watch 'npm run build -d' ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stranga-things/proto.git"
+    "url": "git+https://github.com/bb-labs/bb-labs.github.io.git"
   },
   "author": "Truman Purnell",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/stranga-things/proto/issues"
+    "url": "https://github.com/bb-labs/bb-labs.github.io.git/issues"
   },
-  "homepage": "https://github.com/stranga-things/proto#readme",
+  "homepage": "https://github.com/bb-labs/bb-labs.github.io.git#readme",
   "dependencies": {
     "http-server": "^0.11.1",
     "watch": "^1.0.2",

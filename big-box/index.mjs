@@ -268,6 +268,7 @@ export default class BigBox {
             .reshape({ shape: meta.resultShape })
     }
 
+    exp() { return this.gpair({ with: { id: '' } }, this.exp.name) }
     sin() { return this.gpair({ with: { id: '' } }, this.sin.name) }
     cos() { return this.gpair({ with: { id: '' } }, this.cos.name) }
 
@@ -322,18 +323,24 @@ export default class BigBox {
     assign(args) {
         this.sanitize(args)
 
-        return opsSuite.call({
-            of: this.slice({ with: args.region }),
+        const region = args.region
+            ? this.slice({ with: args.region })
+            : this
+
+        opsSuite.call({
+            of: region,
             with: args.with,
-            result: this,
+            result: region,
             meta: {
-                axesSize: this.slice({ with: args.region }).size,
-                fullSize: this.slice({ with: args.region }).size,
-                axesShape: [...this.slice({ with: args.region }).shape.keys()],
-                fullShape: this.slice({ with: args.region }).shape,
-                method: this.slice({ with: args.region }).assign.name
+                axesSize: region.size,
+                fullSize: region.size,
+                axesShape: [...region.shape.keys()],
+                fullShape: region.shape,
+                method: region.assign.name
             }
         })
+
+        return this
     }
 
     slice(args, old = this) {

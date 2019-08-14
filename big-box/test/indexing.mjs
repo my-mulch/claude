@@ -45,12 +45,7 @@ export default function () {
             ["49", "8", "4"]
         ])
 
-    jest.expect(A.slice({ with: [':', "0", ':'] })
-        .assign({ with: "1" }))
-        .toEqual([
-            ["1", "1", "1"],
-            ["1", "1", "1"],
-            ["1", "1", "1"]])
+    A.assign({ region: [':', "0", ':'], with: "1" })
 
     jest.expect(A)
         .toEqual([
