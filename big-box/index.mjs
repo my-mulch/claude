@@ -78,10 +78,10 @@ export default class BigBox {
                     args.with.constructor === Uint32Array ||
                     args.with.constructor === Float32Array
                 ) {
-                    this.type = args.with.constructor
+                    this.type = args.type || args.with.constructor
 
                     return {
-                        real: args.with,
+                        real: new this.type(args.with),
                         imag: new this.type(args.with.length)
                     }
                 }

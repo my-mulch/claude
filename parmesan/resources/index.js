@@ -50,9 +50,9 @@ export default {
         '}\n'
     ,
 
-    TO_VECTOR: bb.array({ with: [[100], [0], [0], [1]] }),
+    TO_VECTOR: bb.array({ with: [[0], [0], [0], [1]] }),
     UP_VECTOR: bb.array({ with: [[0], [1], [0], [1]] }),
-    FROM_VECTOR: bb.array({ with: [[100], [2], [75], [1]] }),
+    FROM_VECTOR: bb.array({ with: [[20], [20], [20], [1]] }),
 
 
     VIEWING_ANGLE: 30,
@@ -60,7 +60,7 @@ export default {
     NEAR: 0.1,
     FAR: 100,
 
-    ZOOM_DELTA: 0.5,
+    ZOOM_DELTA: 0.05,
     PAN_DELTA: Math.PI / 64,
     ACTIVE_VERTICES: 0,
 

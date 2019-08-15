@@ -22,7 +22,7 @@ export default class BufferManager {
             size: array.shape[1],
             count: array.shape[0],
             type: numberType,
-            normalize: true,
+            normalize: false,
             offset: array.offset * array.type.BYTES_PER_ELEMENT,
             stride: array.strides[0] * array.type.BYTES_PER_ELEMENT
         }
