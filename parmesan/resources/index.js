@@ -50,9 +50,9 @@ export default {
         '}\n'
     ,
 
-    TO_VECTOR: bb.array({ with: [[1], [1], [1], [1]] }),
+    TO_VECTOR: bb.array({ with: [[100], [0], [0], [1]] }),
     UP_VECTOR: bb.array({ with: [[0], [1], [0], [1]] }),
-    FROM_VECTOR: bb.array({ with: [[2], [2], [2], [1]] }),
+    FROM_VECTOR: bb.array({ with: [[100], [2], [75], [1]] }),
 
 
     VIEWING_ANGLE: 30,

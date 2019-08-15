@@ -9,6 +9,7 @@ import config from '../resources'
 export default class GraphicsEngine3D {
     constructor() {
         this.config = config
+        this.objects = []
 
         this.pan = this.pan.bind(this)
         this.zoom = this.zoom.bind(this)
@@ -60,25 +61,34 @@ export default class GraphicsEngine3D {
         this.config.ASPECT_RATIO = this.canvas.width / this.canvas.height
     }
 
-    plot({ vertices, colors, sizes }) {
-        this.attributeManager.attributes.a_Color(this.bufferManager.createBuffer({ array: colors }))
-        this.attributeManager.attributes.a_PointSize(this.bufferManager.createBuffer({ array: sizes }))
-        this.attributeManager.attributes.a_Position(this.bufferManager.createBuffer({ array: vertices }))
+    plot({ vertices, colors, sizes, mode }) {
+        this.objects.push({
+            sizeBuffer: this.bufferManager.createBuffer({ array: sizes }),
+            colorBuffer: this.bufferManager.createBuffer({ array: colors }),
+            vertexBuffer: this.bufferManager.createBuffer({ array: vertices }),
 
-        this.config.ACTIVE_VERTICES = vertices.shape[0]
+            drawMode: this.canvas.context[mode],
+            drawCount: vertices.shape[0]
+        })
 
         this.render()
     }
 
     render() {
-        const viewMatrix = this.cameraManager.lookAt()
-        const projMatrix = this.cameraManager.project()
-
-        this.uniformManager.uniforms.u_ViewMatrix(viewMatrix)
-        this.uniformManager.uniforms.u_ProjMatrix(projMatrix)
-
         this.canvas.context.clear(this.canvas.context.COLOR_BUFFER_BIT)
-        this.canvas.context.drawArrays(this.canvas.context.LINE_STRIP, 0, this.config.ACTIVE_VERTICES)
+
+        for (const object of this.objects) {
+
+            this.attributeManager.attributes.a_Color(object.colorBuffer)
+            this.attributeManager.attributes.a_PointSize(object.sizeBuffer)
+            this.attributeManager.attributes.a_Position(object.vertexBuffer)
+
+            this.uniformManager.uniforms.u_ViewMatrix(this.cameraManager.lookAt())
+            this.uniformManager.uniforms.u_ProjMatrix(this.cameraManager.project())
+
+
+            this.canvas.context.drawArrays(object.drawMode, 0, object.drawCount)
+        }
     }
 
     pan(direction) {

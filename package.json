@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
-    "start": "http-server / -p 3000 --cors & npm run watch & open docs/index.html",
+    "start": "npm run serve & npm run watch & npm run launch",
+    "launch": "open docs/index.html",
+    "serve": "http-server / -p 3000 --cors ",
     "build": "webpack --devtool source-map",
     "watch": "watch 'npm run build' ."
   },
