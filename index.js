@@ -21,21 +21,21 @@ export default (async function () {
     //     .cos()
     //     .multiply({ with: 3 })
 
-    window.axis = bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' })
+    // window.axis = bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' })
 
-    window.vertices = bb
-        .zeros({ shape: [10000, 3] })
-        .assign({ region: [':', 0], with: axis.exp() })
+    // window.vertices = bb
+    //     .zeros({ shape: [10000, 3] })
+    //     .assign({ region: [':', 0], with: axis.exp() })
 
-    window.colors = bb
-        .zeros({ shape: [10000, 3] })
-        .assign({ region: [':', ':2'], with: 255 })
+    // window.colors = bb
+    //     .zeros({ shape: [10000, 3] })
+    //     .assign({ region: [':', ':2'], with: 255 })
 
-    window.sizes = bb
-        .ones({ shape: [10000, 1] })
-        .multiply({ with: 1 })
+    // window.sizes = bb
+    //     .ones({ shape: [10000, 1] })
+    //     .multiply({ with: 1 })
 
-    app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
+    // app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
 
     /** Image CUBE */
     // const { shape, pixels, binary } = await myio.imread('http://localhost:3000/Users/trumanpurnell/Desktop/tahie.jpg')
@@ -50,13 +50,13 @@ export default (async function () {
 
 
     /** RGB CUBE */
-    // window.vertices = bb.randint({ low: 0, high: 256, shape: [1e6, 3], type: Float32Array })
-    // window.colors = vertices.divide({ with: 255 })
-    // window.sizes = bb
-    //     .ones({ shape: [1e6, 1] })
-    //     .multiply({ with: 10 })
+    window.vertices = bb.randint({ low: 0, high: 256, shape: [1e6, 3], type: Float32Array })
+    window.colors = vertices.divide({ with: 255 })
+    window.sizes = bb
+        .ones({ shape: [1e6, 1] })
+        .multiply({ with: 10 })
 
 
-    // app.graphics.plot({ vertices: vertices.multiply({ with: 0.1 }), colors, sizes })
+    app.graphics.plot({ vertices: vertices.multiply({ with: 0.1 }), colors, sizes })
 
 })()
