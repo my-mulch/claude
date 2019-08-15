@@ -1,6 +1,6 @@
 import { __Math__ } from '../resources'
 
-export const isContiguousSlice = function (index) {
+export const resolveContiguity = function ({ index }) {
     let lastSeenSLice = -1
 
     for (let i = 0; i < index.length; i++) {
@@ -14,10 +14,10 @@ export const isContiguousSlice = function (index) {
     return true
 }
 
-export const getStrides = function (shape, startStride) {
+export const resolveStrides = function ({ shape, type, lastStride }) {
     const strides = new Array(shape.length)
 
-    let stride = startStride || 1
+    let stride = lastStride || (type.name.startsWith('Complex') ? 2 : 1)
     strides[strides.length - 1] = stride
 
     for (let i = shape.length - 1; i > 0; i--)
@@ -26,7 +26,7 @@ export const getStrides = function (shape, startStride) {
     return strides
 }
 
-export const resolveReshape = function (shape, size) {
+export const resolveReshape = function ({ shape, size }) {
     const reshape = new Array(shape.length)
     const product = shape.reduce(__Math__.multiply, 1)
 

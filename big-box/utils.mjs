@@ -113,7 +113,7 @@ export const parseComplex = function (a, b) {
     return z;
 }
 
-export const complexString = function (a, b) {
+export const stringComplex = function (a, b) {
     var ret = '';
 
     if (a !== 0) {
@@ -142,7 +142,31 @@ export const complexString = function (a, b) {
     return ret;
 }
 
+export const initTyped = function ({ meta, rawArray }) {
+    const data = meta.complex ? new meta.type(meta.size * 2) : new meta.type(meta.size)
 
+    for (let i = 0; i < data.length; i++) {
+        const cn = parseComplex(rawArray[i % rawArray.length])
+
+        data[i] = cn.re
+
+        if (meta.complex) {
+            data[i + 1] = cn.im
+            i++
+        }
+    }
+
+    return data
+}
+
+export const initRangeTyped = function ({ meta, start, stop, step }) {
+    const data = new meta.type(meta.size)
+
+    for (let i = start, j = 0; i < stop; i += step, j++)
+        data[j] = i
+
+    return data
+}
 
 export const shapeRaw = function (A, shape = []) {
     if (A.constructor === Number || A.constructor === String)

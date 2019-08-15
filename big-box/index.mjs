@@ -1,12 +1,10 @@
-import util from 'util' // node's
+import util from 'util' // node's utils
 
 import {
-    shapeRaw,
-    shapeAlign,
-    parseComplex,
-    complexString,
-    selfAxesAndShape,
-    pairAxesAndShape
+    stringComplex, // complex utils
+    shapeRaw, shapeAlign, // shape utils
+    initTyped, initRangeTyped, // typed utils
+    selfAxesAndShape, pairAxesAndShape, // operation utils
 } from './utils'
 
 import Header from './header'
@@ -14,140 +12,104 @@ import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from './resources'
 import opsSuite from './operations/suite'
 
 export default class BigBox {
-    constructor({ header, type, init = function () {
-        return {
-            real: new this.type(this.size),
-            imag: new this.type(this.size),
-        }
-    } }) {
-
+    constructor({ header, init }) {
         for (const field in header)
             this[field] = header[field]
 
         this.header = header
-        this.type = type || Float32Array
         this.data = init.call(this)
     }
 
     static array(args) {
         return new BigBox({
-            type: args.type,
-            header: new Header({ shape: shapeRaw(args.with) }),
+            header: new Header({
+                shape: shapeRaw(args.with),
+                type: args.type || BigBox.Float32,
+            }),
             init: function () {
-
                 if (args.with.constructor === Array) {
-                    const flatRaw = args.with.flat(Number.POSITIVE_INFINITY)
-
-                    const data = {
-                        real: new this.type(this.size),
-                        imag: new this.type(this.size),
-                    }
-
-                    for (let i = 0; i < data.real.length; i++) {
-                        const cn = parseComplex(flatRaw[i])
-
-                        data.real[i] = cn.re
-                        data.imag[i] = cn.im
-                    }
-
-                    return data
+                    return initTyped({
+                        meta: this,
+                        rawArray: args.with.flat(Number.POSITIVE_INFINITY),
+                    })
                 }
 
                 else if (args.with.constructor === String || args.with.constructor === Number) {
-                    const data = {
-                        real: new this.type(this.size),
-                        imag: new this.type(this.size),
-                    }
-
-                    for (let i = 0; i < data.real.length; i++) {
-                        const cn = parseComplex(args.with)
-
-                        data.real[i] = cn.re
-                        data.imag[i] = cn.im
-                    }
-
-                    return data
+                    return initTyped({
+                        meta: this,
+                        rawArray: [args.with],
+                    })
                 }
 
-                else if (args.with.constructor === Int8Array ||
-                    args.with.constructor === Uint8Array ||
-                    args.with.constructor === Uint8ClampedArray ||
-                    args.with.constructor === Int16Array ||
-                    args.with.constructor === Uint16Array ||
-                    args.with.constructor === Int32Array ||
-                    args.with.constructor === Uint32Array ||
-                    args.with.constructor === Float32Array
+                else if (args.with.constructor === BigBox.Int8 ||
+                    args.with.constructor === BigBox.Uint8 ||
+                    args.with.constructor === BigBox.Uint8Clamped ||
+                    args.with.constructor === BigBox.Int16 ||
+                    args.with.constructor === BigBox.Uint16 ||
+                    args.with.constructor === BigBox.Int32 ||
+                    args.with.constructor === BigBox.Uint32 ||
+                    args.with.constructor === BigBox.Float32
                 ) {
-                    this.type = args.type || args.with.constructor
+                    if (args.with.constructor !== this.type)
+                        return new this.type(args.with)
 
-                    return {
-                        real: new this.type(args.with),
-                        imag: new this.type(args.with.length)
-                    }
+                    return args.with
                 }
 
-                else throw 'Usage: bb.array({ with: rawArray | typedArray, type: typedArrayConstructor })'
+                else throw 'Usage: bb.array({ with: <String|Number|Array|TypedArray>, type: <Object> })'
             }
         })
     }
 
     static zeros(args) {
         return new BigBox({
-            type: args.type,
-            header: new Header({ shape: args.shape })
+            header: new Header({
+                shape: args.shape,
+                type: args.type || BigBox.Float32
+            }),
+            init: function () { return new this.type(this.size) }
         })
     }
 
     static ones(args) {
         return new BigBox({
-            type: args.type,
-            header: new Header({ shape: args.shape }),
-            init: function () {
-                return {
-                    real: new this.type(this.size).fill(1),
-                    imag: new this.type(this.size),
-                }
-            }
+            header: new Header({
+                shape: args.shape,
+                type: args.type || BigBox.Float32
+            }),
+            init: function () { return new this.type(this.size).fill(1) }
         })
     }
 
     static arange(args) {
+        const stop = args.stop
+        const step = args.step || 1
+        const start = args.start || 0
+
         return new BigBox({
-            type: args.type,
             header: new Header({
-                shape: [__Math__.round((args.stop - (args.start || 0)) / (args.step || 1))]
+                shape: [__Math__.round((stop - start) / step), 1],
+                type: args.type || BigBox.Float32
             }),
             init: function () {
-                const data = {
-                    real: new this.type(this.size),
-                    imag: new this.type(this.size),
-                }
-
-                for (let i = args.start || 0, j = 0; i < args.stop; i += args.step || 1, j++)
-                    data.real[j] = i
-
-                return data
+                return initRangeTyped({ meta: this, start, stop, step })
             }
         })
     }
 
     static linspace(args) {
+        const num = args.num || 50
+        const stop = args.stop
+        const start = args.start
+        const step = (stop - start) / num
+
         return new BigBox({
-            type: args.type,
-            header: new Header({ shape: [args.num, 1] }),
+            header: new Header({
+                shape: [num, 1],
+                type: args.type || BigBox.Float32
+            }),
             init: function () {
-                const data = {
-                    real: new this.type(this.size),
-                    imag: new this.type(this.size),
-                }
-
-                const { start, stop, num } = args
-                const step = (stop - start) / num
-
-                for (let i = args.start, j = 0; i < args.stop; i += step, j++)
-                    data.real[j] = i
-
-                return data
+                return initRangeTyped({ meta: this, start, stop, step })
             }
         })
     }
@@ -155,16 +117,15 @@ export default class BigBox {
 
     static rand(args) {
         return new BigBox({
-            type: Float32Array,
-            header: new Header({ shape: args.shape }),
+            header: new Header({
+                shape: args.shape,
+                type: args.type || BigBox.Float32
+            }),
             init: function () {
-                const data = {
-                    real: new this.type(this.size),
-                    imag: new this.type(this.size),
-                }
+                const data = new this.type(this.size)
 
-                for (let i = 0; i < data.real.length; i++)
-                    data.real[i] = __Math__.random() - 1
+                for (let i = 0; i < data.length; i++)
+                    data[i] = __Math__.random() - 1
 
                 return data
             }
@@ -172,20 +133,19 @@ export default class BigBox {
     }
 
     static randint(args) {
-        return new BigBox({
-            type: args.type || Int32Array,
-            header: new Header({ shape: args.shape }),
-            init: function () {
-                const data = {
-                    real: new this.type(this.size),
-                    imag: new this.type(this.size),
-                }
+        const low = args.low || 0
+        const high = args.high
 
-                for (let i = 0; i < data.real.length; i++)
-                    data.real[i] = opsSuite.utils.randint({
-                        low: args.low,
-                        high: args.high
-                    })
+        return new BigBox({
+            header: new Header({
+                shape: args.shape,
+                type: args.type || BigBox.Int32
+            }),
+            init: function () {
+                const data = new this.type(this.size)
+
+                for (let i = 0; i < data.length; i++)
+                    data[i] = opsSuite.utils.randint({ low, high })
 
                 return data
             }
@@ -194,19 +154,17 @@ export default class BigBox {
 
     static eye(args) {
         return new BigBox({
-            type: args.type,
-            header: new Header({ shape: args.shape }),
+            header: new Header({
+                shape: args.shape,
+                type: args.type || BigBox.Float32
+            }),
             init: function () {
-                const data = {
-                    real: new this.type(this.size),
-                    imag: new this.type(this.size),
-                }
-
+                const data = new this.type(this.size)
                 const diagonal = this.strides.reduce(__Math__.add)
                 const numDiags = __Math__.min(...this.shape)
 
                 for (let i = 0; i < numDiags * diagonal; i += diagonal)
-                    data.real[i] = 1
+                    data[i] = 1
 
                 return data
             }
@@ -219,28 +177,32 @@ export default class BigBox {
             args.with.constructor === Number)
 
             args.with = BigBox.array({ with: args.with })
-
     }
 
-    astype(args) {
-        this.type = args.type
+    astype(args, old = this) {
+        if (args.type.name.startsWith('Complex') &&
+            !old.type.name.startsWith('Complex'))
 
-        this.data.real = new this.type(this.data.real)
-        this.data.imag = new this.type(this.data.imag)
+            if (this.shape[this.shape.length] % 2)
+                throw 'When changing to a complex array, the last axis must be divisible by two'
+            else
+                this.shape[this.shape.length - 1] /= 2
 
-        return this
+        return new BigBox({
+            header: new Header({
+                shape: this.shape,
+                offset: this.offset,
+                contig: this.contig,
+                type: args.type || BigBox.Float32
+            }),
+            init: function () { return new this.type(old.data) }
+        })
     }
 
     copy(old = this) {
         return new BigBox({
-            type: this.type,
             header: this.header,
-            init: function () {
-                return {
-                    real: old.data.real.slice(),
-                    imag: old.data.imag.slice()
-                }
-            }
+            init: function () { return old.data.slice() }
         })
     }
 
@@ -259,15 +221,16 @@ export default class BigBox {
                 delta: this.shape.length - args.with.shape.length
             })
 
-
         const meta = pairAxesAndShape.call(this, args)
 
         return opsSuite.call({
             of: this,
             with: args.with,
             result: args.result || new BigBox({
-                type: this.type,
-                header: new Header({ shape: meta.fullShape })
+                header: new Header({
+                    type: this.type,
+                    shape: meta.fullShape
+                })
             }),
             meta: { method, ...meta }
         })
@@ -281,8 +244,10 @@ export default class BigBox {
                 of: this,
                 with: { id: '' },
                 result: args.result || new BigBox({
-                    type: this.type,
-                    header: new Header({ shape: meta.alignedShape })
+                    header: new Header({
+                        type: this.type,
+                        shape: meta.alignedShape
+                    })
                 }),
                 meta: { method, ...meta }
             })
@@ -311,8 +276,10 @@ export default class BigBox {
             of: this,
             with: args.with,
             result: args.result || new BigBox({
-                type: args.type,
-                header: new Header({ shape: [this.shape[0], args.with.shape[1]] })
+                header: new Header({
+                    type: this.type,
+                    shape: [this.shape[0], args.with.shape[1]]
+                })
             }),
             meta: { method: this.matMult.name }
         })
@@ -325,8 +292,10 @@ export default class BigBox {
             of: this,
             with: args.with,
             result: args.result || new BigBox({
-                type: args.type,
-                header: new Header({ shape: [3, 1] })
+                header: new Header({
+                    type: this.type,
+                    shape: [3, 1]
+                })
             }),
             meta: { method: this.cross.name }
         })
@@ -366,7 +335,6 @@ export default class BigBox {
 
     slice(args, old = this) {
         return new BigBox({
-            type: this.type,
             header: this.header.slice(args.with),
             init: function () { return old.data }
         })
@@ -374,7 +342,6 @@ export default class BigBox {
 
     T(old = this) {
         return new BigBox({
-            type: this.type,
             header: this.header.transpose(),
             init: function () { return old.data }
         })
@@ -387,7 +354,6 @@ export default class BigBox {
                 .reshape({ shape: args.shape })
 
         return new BigBox({
-            type: this.type,
             header: this.header.reshape(args.shape),
             init: function () { return old.data }
         })
@@ -395,16 +361,19 @@ export default class BigBox {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return complexString(
-                this.data.real[index],
-                this.data.imag[index])
+            if (this.type.name.startsWith('Complex'))
+                return stringComplex(
+                    this.data[index],
+                    this.data[index + 1])
+            else
+                return `${this.data[index]}`
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
         }, this)
     }
 
-    valueOf() { return this.data.real[this.offset] }
+    valueOf() { return this.data[this.offset] }
 
     toString() {
         return JSON
@@ -414,3 +383,25 @@ export default class BigBox {
 
     [util.inspect.custom]() { return this.toString() }
 }
+
+/** Complex typed */
+BigBox.ComplexUint8 = class ComplexUint8 extends Uint8Array { constructor(args) { super(args) } }
+BigBox.ComplexUint16 = class ComplexUint16 extends Uint16Array { constructor(args) { super(args) } }
+BigBox.ComplexUint32 = class ComplexUint32 extends Uint32Array { constructor(args) { super(args) } }
+BigBox.ComplexUint8Clamped = class ComplexUint8Clamped extends Uint8ClampedArray { constructor(args) { super(args) } }
+
+BigBox.ComplexInt8 = class ComplexInt8 extends Int8Array { constructor(args) { super(args) } }
+BigBox.ComplexInt16 = class ComplexInt16 extends Int16Array { constructor(args) { super(args) } }
+BigBox.ComplexInt32 = class ComplexInt32 extends Int32Array { constructor(args) { super(args) } }
+
+BigBox.ComplexFloat32 = class ComplexFloat32 extends Float32Array { constructor(args) { super(args) } }
+
+/** Real typed */
+BigBox.Uint8 = Uint8Array
+BigBox.Uint16 = Uint16Array
+BigBox.Uint32 = Uint32Array
+BigBox.Uint8Clamped = Uint8ClampedArray
+BigBox.Int8 = Int8Array
+BigBox.Int16 = Int16Array
+BigBox.Int32 = Int32Array
+BigBox.Float32 = Float32Array
