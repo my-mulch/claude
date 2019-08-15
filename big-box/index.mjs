@@ -131,6 +131,27 @@ export default class BigBox {
         })
     }
 
+    static linspace(args) {
+        return new BigBox({
+            type: args.type,
+            header: new Header({ shape: [args.num, 1] }),
+            init: function () {
+                const data = {
+                    real: new this.type(this.size),
+                    imag: new this.type(this.size),
+                }
+
+                const { start, stop, num } = args
+                const step = (stop - start) / num
+
+                for (let i = args.start, j = 0; i < args.stop; i += step, j++)
+                    data.real[j] = i
+
+                return data
+            }
+        })
+    }
+
 
     static rand(args) {
         return new BigBox({

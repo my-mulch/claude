@@ -52,7 +52,7 @@ export default {
 
     TO_VECTOR: bb.array({ with: [[0], [0], [0], [1]] }),
     UP_VECTOR: bb.array({ with: [[0], [1], [0], [1]] }),
-    FROM_VECTOR: bb.array({ with: [[20], [20], [20], [1]] }),
+    FROM_VECTOR: bb.array({ with: [[0], [0], [20], [1]] }),
 
 
     VIEWING_ANGLE: 30,
