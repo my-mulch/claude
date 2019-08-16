@@ -24,12 +24,12 @@ export default class UniformManager {
 
     createUniform({ type, location }) {
         if (type === this.context.FLOAT_MAT2)
-            return (function (array) { this.context.uniformMatrix2fv(location, false, array.data.real) }).bind(this)
+            return (function (array) { this.context.uniformMatrix2fv(location, false, array.data) }).bind(this)
 
         if (type === this.context.FLOAT_MAT3)
-            return (function (array) { this.context.uniformMatrix3fv(location, false, array.data.real) }).bind(this)
+            return (function (array) { this.context.uniformMatrix3fv(location, false, array.data) }).bind(this)
 
         if (type === this.context.FLOAT_MAT4)
-            return (function (array) { this.context.uniformMatrix4fv(location, false, array.data.real) }).bind(this)
+            return (function (array) { this.context.uniformMatrix4fv(location, false, array.data) }).bind(this)
     }
 }

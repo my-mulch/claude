@@ -1,7 +1,7 @@
 import util from 'util' // node's utils
 
 import {
-    stringComplex, // complex utils
+    stringNumber, // complex utils
     shapeRaw, shapeAlign, // shape utils
     initTyped, initRangeTyped, // typed utils
     selfAxesAndShape, pairAxesAndShape, // operation utils
@@ -12,7 +12,10 @@ import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from './resources'
 import opsSuite from './operations/suite'
 
 export default class BigBox {
-    constructor({ header, init }) {
+    constructor({ header, init = function () {
+        return new this.type(this.size)
+    } }) {
+
         for (const field in header)
             this[field] = header[field]
 
@@ -29,14 +32,16 @@ export default class BigBox {
             init: function () {
                 if (args.with.constructor === Array) {
                     return initTyped({
-                        meta: this,
+                        size: this.size,
+                        type: this.type,
                         rawArray: args.with.flat(Number.POSITIVE_INFINITY),
                     })
                 }
 
                 else if (args.with.constructor === String || args.with.constructor === Number) {
                     return initTyped({
-                        meta: this,
+                        size: this.size,
+                        type: this.type,
                         rawArray: [args.with],
                     })
                 }
@@ -66,8 +71,7 @@ export default class BigBox {
             header: new Header({
                 shape: args.shape,
                 type: args.type || BigBox.Float32
-            }),
-            init: function () { return new this.type(this.size) }
+            })
         })
     }
 
@@ -92,7 +96,11 @@ export default class BigBox {
                 type: args.type || BigBox.Float32
             }),
             init: function () {
-                return initRangeTyped({ meta: this, start, stop, step })
+                return initRangeTyped({
+                    size: this.size,
+                    type: this.type,
+                    start, stop, step
+                })
             }
         })
     }
@@ -109,7 +117,11 @@ export default class BigBox {
                 type: args.type || BigBox.Float32
             }),
             init: function () {
-                return initRangeTyped({ meta: this, start, stop, step })
+                return initRangeTyped({
+                    size: this.size,
+                    type: this.type,
+                    start, stop, step
+                })
             }
         })
     }
@@ -180,17 +192,29 @@ export default class BigBox {
     }
 
     astype(args, old = this) {
+        let shape = old.shape.slice()
+
         if (args.type.name.startsWith('Complex') &&
             !old.type.name.startsWith('Complex'))
 
-            if (this.shape[this.shape.length] % 2)
-                throw 'When changing to a complex array, the last axis must be divisible by two'
+            if (shape[shape.length] % 2)
+                throw 'When changing type to a complex array, the last axis must be divisible by two'
             else
-                this.shape[this.shape.length - 1] /= 2
+                shape[shape.length - 1] /= 2
+
+        if (args.type.name.startsWith('Quat') &&
+            !old.type.name.startsWith('Quat'))
+
+            if (shape[shape.length] % 4)
+                throw 'When changing type to a quaternion array, the last axis must be divisible by four'
+            else
+                shape[shape.length - 1] /= 4
+
+
 
         return new BigBox({
             header: new Header({
-                shape: this.shape,
+                shape: shape,
                 offset: this.offset,
                 contig: this.contig,
                 type: args.type || BigBox.Float32
@@ -361,12 +385,19 @@ export default class BigBox {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            if (this.type.name.startsWith('Complex'))
-                return stringComplex(
+            if (this.type.name.startsWith('Quat'))
+                return stringNumber(
+                    this.data[index],
+                    this.data[index + 1],
+                    this.data[index + 2],
+                    this.data[index + 3])
+
+            else if (this.type.name.startsWith('Complex'))
+                return stringNumber(
                     this.data[index],
                     this.data[index + 1])
             else
-                return `${this.data[index]}`
+                return stringNumber(this.data[index])
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
@@ -383,6 +414,18 @@ export default class BigBox {
 
     [util.inspect.custom]() { return this.toString() }
 }
+
+/** Quaternion typed */
+BigBox.QuatUint8 = class QuatUint8 extends Uint8Array { constructor(args) { super(args) } }
+BigBox.QuatUint16 = class QuatUint16 extends Uint16Array { constructor(args) { super(args) } }
+BigBox.QuatUint32 = class QuatUint32 extends Uint32Array { constructor(args) { super(args) } }
+BigBox.QuatUint8Clamped = class QuatUint8Clamped extends Uint8ClampedArray { constructor(args) { super(args) } }
+
+BigBox.QuatInt8 = class QuatInt8 extends Int8Array { constructor(args) { super(args) } }
+BigBox.QuatInt16 = class QuatInt16 extends Int16Array { constructor(args) { super(args) } }
+BigBox.QuatInt32 = class QuatInt32 extends Int32Array { constructor(args) { super(args) } }
+
+BigBox.QuatFloat32 = class QuatFloat32 extends Float32Array { constructor(args) { super(args) } }
 
 /** Complex typed */
 BigBox.ComplexUint8 = class ComplexUint8 extends Uint8Array { constructor(args) { super(args) } }

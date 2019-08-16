@@ -1,166 +1,133 @@
-import { __Math__ } from './resources'
+import { __Math__, QUATERNION_REGEX } from './resources'
 
-export const parseComplex = function (a, b) {
+export const parseNumber = function (w) {
+    w = String(w)
 
-    var z = { 're': 0, 'im': 0 };
+    let plus = 1
+    let minus = 0
 
-    if (a === undefined || a === null) {
-        z['re'] = z['im'] = 0;
-    } else if (b !== undefined) {
-        z['re'] = a;
-        z['im'] = b;
-    } else
-        switch (typeof a) {
+    const dest = {}
+    const tokens = w.match(QUATERNION_REGEX)
 
-            case 'object':
+    var iMap = { 'i': 'x', 'j': 'y', 'k': 'z' };
+    dest['w'] = dest['x'] = dest['y'] = dest['z'] = 0
 
-                if ('im' in a && 're' in a) {
-                    z['re'] = a['re'];
-                    z['im'] = a['im'];
-                } else if ('abs' in a && 'arg' in a) {
-                    if (!Number.isFinite(a['abs']) && Number.isFinite(a['arg'])) {
-                        return Complex['INFINITY'];
-                    }
-                    z['re'] = a['abs'] * Math.cos(a['arg']);
-                    z['im'] = a['abs'] * Math.sin(a['arg']);
-                } else if ('r' in a && 'phi' in a) {
-                    if (!Number.isFinite(a['r']) && Number.isFinite(a['phi'])) {
-                        return Complex['INFINITY'];
-                    }
-                    z['re'] = a['r'] * Math.cos(a['phi']);
-                    z['im'] = a['r'] * Math.sin(a['phi']);
-                } else if (a.length === 2) { // Quick array check
-                    z['re'] = a[0];
-                    z['im'] = a[1];
+    for (var i = 0; i < tokens.length; i++) {
+
+        var c = tokens[i];
+        var d = tokens[i + 1];
+
+        if (c === ' ' || c === '\t' || c === '\n') {
+            /* void */
+        } else if (c === '+') {
+            plus++;
+        } else if (c === '-') {
+            minus++;
+        } else {
+
+            if (plus + minus === 0) {
+                throw new Error('Parse error' + c);
+            }
+            var g = iMap[c];
+
+            // Is the current token an imaginary sign?
+            if (g !== undefined) {
+
+                // Is the following token a number?
+                if (d !== ' ' && !isNaN(d)) {
+                    c = d;
+                    i++;
                 } else {
-                    parser_exit();
-                }
-                break;
-
-            case 'string':
-
-                z['im'] = /* void */
-                    z['re'] = 0;
-
-                var tokens = a.match(/\d+\.?\d*e[+-]?\d+|\d+\.?\d*|\.\d+|./g);
-                var plus = 1;
-                var minus = 0;
-
-                if (tokens === null) {
-                    parser_exit();
+                    c = '1';
                 }
 
-                for (var i = 0; i < tokens.length; i++) {
+            } else {
 
-                    var c = tokens[i];
 
-                    if (c === ' ' || c === '\t' || c === '\n') {
-                        /* void */
-                    } else if (c === '+') {
-                        plus++;
-                    } else if (c === '-') {
-                        minus++;
-                    } else if (c === 'i' || c === 'I') {
+                g = iMap[d];
 
-                        if (plus + minus === 0) {
-                            parser_exit();
-                        }
-
-                        if (tokens[i + 1] !== ' ' && !isNaN(tokens[i + 1])) {
-                            z['im'] += parseFloat((minus % 2 ? '-' : '') + tokens[i + 1]);
-                            i++;
-                        } else {
-                            z['im'] += parseFloat((minus % 2 ? '-' : '') + '1');
-                        }
-                        plus = minus = 0;
-
-                    } else {
-
-                        if (plus + minus === 0 || isNaN(c)) {
-                            parser_exit();
-                        }
-
-                        if (tokens[i + 1] === 'i' || tokens[i + 1] === 'I') {
-                            z['im'] += parseFloat((minus % 2 ? '-' : '') + c);
-                            i++;
-                        } else {
-                            z['re'] += parseFloat((minus % 2 ? '-' : '') + c);
-                        }
-                        plus = minus = 0;
-                    }
+                if (g !== undefined) {
+                    i++;
                 }
+            }
 
-                // Still something on the stack
-                if (plus + minus > 0) {
-                    parser_exit();
-                }
-                break;
-
-            case 'number':
-                z['im'] = 0;
-                z['re'] = a;
-                break;
-
-            default:
-                parser_exit();
+            dest[g || 'w'] += parseFloat((minus % 2 ? '-' : '') + c);
+            plus = minus = 0;
         }
-
-    if (isNaN(z['re']) || isNaN(z['im'])) {
-        // If a calculation is NaN, we treat it as NaN and don't throw
-        //parser_exit();
     }
 
-    return z;
+
+    return { r: dest['w'], i: dest['x'], j: dest['y'], k: dest['z'] }
 }
 
-export const stringComplex = function (a, b) {
+function stringNumberHelper(n, char, prev) {
+    let ret = ''
+
+    if (n !== 0) {
+
+        if (prev !== '')
+            ret += n < 0 ? ' - ' : ' + '
+
+        else if (n < 0)
+            ret += '-'
+
+        n = Math.abs(n)
+
+        if (1 !== n || char === '')
+            ret += n;
+
+        ret += char
+    }
+
+    return ret
+}
+
+export const stringNumber = function (r, i, j, k) {
     var ret = '';
 
-    if (a !== 0) {
-        ret += a;
-    }
+    ret = stringNumberHelper(r || 0, '', ret);
+    ret += stringNumberHelper(i || 0, 'i', ret);
+    ret += stringNumberHelper(j || 0, 'j', ret);
+    ret += stringNumberHelper(k || 0, 'k', ret);
 
-    if (b !== 0) {
-
-        if (a !== 0) {
-            ret += b < 0 ? ' - ' : ' + ';
-        } else if (b < 0) {
-            ret += '-';
-        }
-
-        b = Math.abs(b);
-
-        if (1 !== b) {
-            ret += b;
-        }
-        ret += 'i';
-    }
-
-    if (!ret)
+    if ('' === ret)
         return '0';
 
     return ret;
 }
 
-export const initTyped = function ({ meta, rawArray }) {
-    const data = meta.complex ? new meta.type(meta.size * 2) : new meta.type(meta.size)
+export const initTyped = function ({ size, type, rawArray }) {
+    let data = null
+
+    if (type.name.startsWith('Quat'))
+        data = new type(size * 4)
+
+    else if (type.name.startsWith('Complex'))
+        data = new type(size * 2)
+
+    else
+        data = new type(size)
 
     for (let i = 0; i < data.length; i++) {
-        const cn = parseComplex(rawArray[i % rawArray.length])
+        const num = parseNumber(rawArray[i % rawArray.length])
 
-        data[i] = cn.re
+        data[i] = num.r
 
-        if (meta.complex) {
-            data[i + 1] = cn.im
-            i++
+        if (type.name.startsWith('Complex'))
+            data[++i] = num.i
+
+        else if (type.name.startsWith('Quat')) {
+            data[++i] = num.i
+            data[++i] = num.j
+            data[++i] = num.k
         }
     }
 
     return data
 }
 
-export const initRangeTyped = function ({ meta, start, stop, step }) {
-    const data = new meta.type(meta.size)
+export const initRangeTyped = function ({ size, type, start, stop, step }) {
+    const data = new type(size)
 
     for (let i = start, j = 0; i < stop; i += step, j++)
         data[j] = i

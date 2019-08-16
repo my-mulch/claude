@@ -15,7 +15,7 @@ export default class BufferManager {
         const bufferType = this.context.ARRAY_BUFFER
 
         this.context.bindBuffer(bufferType, buffer)
-        this.context.bufferData(bufferType, array.data.real, renderType)
+        this.context.bufferData(bufferType, array.data, renderType)
 
         return {
             buffer,

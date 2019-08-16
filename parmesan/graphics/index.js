@@ -100,7 +100,7 @@ export default class GraphicsEngine3D {
         this.cameraManager.zoom(zoomOut)
 
         this.hud.context.clearRect(0, 0, this.hud.width, this.hud.height)
-        this.hud.context.fillText(`loc | r: ${Math.round(this.config.FROM_VECTOR.data.real[0])} g: ${Math.round(this.config.FROM_VECTOR.data.real[1])}, b: ${Math.round(this.config.FROM_VECTOR.data.real[2])}`, 10, 70)
+        this.hud.context.fillText(`loc | r: ${Math.round(this.config.FROM_VECTOR.data[0])} g: ${Math.round(this.config.FROM_VECTOR.data[1])}, b: ${Math.round(this.config.FROM_VECTOR.data[2])}`, 10, 70)
 
         this.render()
     }

@@ -18,10 +18,10 @@ export default function (args) {
                     const wi = c * args.with.strides[1] + s * args.with.strides[0] + args.with.offset
 
                     return multiplication.middle({
-                        ofReal: `args.of.data.real[${oi}]`,
-                        ofImag: `args.of.data.imag[${oi}]`,
-                        withReal: `args.with.data.real[${wi}]`,
-                        withImag: `args.with.data.imag[${wi}]`,
+                        ofReal: `args.of.data[${oi}]`,
+                        ofImag: `args.of.data[${oi + 1}]`,
+                        withReal: `args.with.data[${wi}]`,
+                        withImag: `args.with.data[${wi + 1}]`,
                         resultReal: `var sr${s}`,
                         resultImag: `var si${s}`,
                     })
@@ -30,8 +30,8 @@ export default function (args) {
                 assignment.middle({
                     withReal: [...new Array(shared).keys()].map(function (s) { return `sr${s}` }).join('+'),
                     withImag: [...new Array(shared).keys()].map(function (s) { return `si${s}` }).join('+'),
-                    resultReal: `args.result.data.real[${ri}]`,
-                    resultImag: `args.result.data.imag[${ri}]`,
+                    resultReal: `args.result.data[${ri}]`,
+                    resultImag: `args.result.data[${ri + 1}]`,
                 })
             ].join('\n')
 
