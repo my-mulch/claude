@@ -13,7 +13,14 @@ import opsSuite from './operations/suite'
 
 export default class BigBox {
     constructor({ header, init = function () {
-        return new this.type(this.size)
+        let factor = 1
+
+        if (this.type.name.startsWith('Complex'))
+            factor *= 2
+        else if (this.type.name.startsWith('Quat'))
+            factor *= 4
+
+        return new this.type(this.size * factor)
     } }) {
 
         for (const field in header)
@@ -27,7 +34,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: shapeRaw(args.with),
-                type: args.type || BigBox.Float32,
+                type: args.type || BigBox.RealFloat32,
             }),
             init: function () {
                 if (args.with.constructor === Array) {
@@ -46,14 +53,14 @@ export default class BigBox {
                     })
                 }
 
-                else if (args.with.constructor === BigBox.Int8 ||
-                    args.with.constructor === BigBox.Uint8 ||
-                    args.with.constructor === BigBox.Uint8Clamped ||
-                    args.with.constructor === BigBox.Int16 ||
-                    args.with.constructor === BigBox.Uint16 ||
-                    args.with.constructor === BigBox.Int32 ||
-                    args.with.constructor === BigBox.Uint32 ||
-                    args.with.constructor === BigBox.Float32
+                else if (args.with.constructor === BigBox.RealInt8 ||
+                    args.with.constructor === BigBox.RealUint8 ||
+                    args.with.constructor === BigBox.RealUint8Clamped ||
+                    args.with.constructor === BigBox.RealInt16 ||
+                    args.with.constructor === BigBox.RealUint16 ||
+                    args.with.constructor === BigBox.RealInt32 ||
+                    args.with.constructor === BigBox.RealUint32 ||
+                    args.with.constructor === BigBox.RealFloat32
                 ) {
                     if (args.with.constructor !== this.type)
                         return new this.type(args.with)
@@ -70,7 +77,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type || BigBox.RealFloat32
             })
         })
     }
@@ -79,7 +86,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type || BigBox.RealFloat32
             }),
             init: function () { return new this.type(this.size).fill(1) }
         })
@@ -93,7 +100,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: [__Math__.round((stop - start) / step), 1],
-                type: args.type || BigBox.Float32
+                type: args.type || BigBox.RealFloat32
             }),
             init: function () {
                 return initRangeTyped({
@@ -114,7 +121,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: [num, 1],
-                type: args.type || BigBox.Float32
+                type: args.type || BigBox.RealFloat32
             }),
             init: function () {
                 return initRangeTyped({
@@ -131,7 +138,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type || BigBox.RealFloat32
             }),
             init: function () {
                 const data = new this.type(this.size)
@@ -168,7 +175,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type || BigBox.RealFloat32
             }),
             init: function () {
                 const data = new this.type(this.size)
@@ -217,7 +224,7 @@ export default class BigBox {
                 shape: shape,
                 offset: this.offset,
                 contig: this.contig,
-                type: args.type || BigBox.Float32
+                type: args.type || BigBox.RealFloat32
             }),
             init: function () { return new this.type(old.data) }
         })
@@ -440,11 +447,13 @@ BigBox.ComplexInt32 = class ComplexInt32 extends Int32Array { constructor(args) 
 BigBox.ComplexFloat32 = class ComplexFloat32 extends Float32Array { constructor(args) { super(args) } }
 
 /** Real typed */
-BigBox.Uint8 = Uint8Array
-BigBox.Uint16 = Uint16Array
-BigBox.Uint32 = Uint32Array
-BigBox.Uint8Clamped = Uint8ClampedArray
-BigBox.Int8 = Int8Array
-BigBox.Int16 = Int16Array
-BigBox.Int32 = Int32Array
-BigBox.Float32 = Float32Array
+BigBox.RealUint8 = class RealUint8Array extends Uint8Array { constructor(args) { super(args) } }
+BigBox.RealUint16 = class RealUint16Array extends Uint16Array { constructor(args) { super(args) } }
+BigBox.RealUint32 = class RealUint32Array extends Uint32Array { constructor(args) { super(args) } }
+BigBox.RealUint8Clamped = class RealUint8ClampedArray extends Uint8ClampedArray { constructor(args) { super(args) } }
+
+BigBox.RealInt8 = class RealInt8Array extends Int8Array { constructor(args) { super(args) } }
+BigBox.RealInt16 = class RealInt16Array extends Int16Array { constructor(args) { super(args) } }
+BigBox.RealInt32 = class RealInt32Array extends Int32Array { constructor(args) { super(args) } }
+
+BigBox.RealFloat32 = class RealFloat32Array extends Float32Array { constructor(args) { super(args) } }

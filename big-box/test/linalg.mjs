@@ -49,6 +49,14 @@ export default function () {
         ["21", "2", "2"]]]
     })
 
+    const F = bb.array({ with: [["72 + 91i + 13j + 57k"]], type: bb.QuatFloat32 })
+    const G = bb.array({ with: [["10 + 72i + 91j + 13k"]], type: bb.QuatFloat32 })
+
+    jest.expect(F.matMult({ with: G, type: bb.QuatFloat32 })).toEqual([["-7756 + 1076i + 9603j + 8851k"]])
+    jest.expect(G.matMult({ with: F, type: bb.QuatFloat32 })).toEqual([["-7756 + 11112i + 3761j - 5839k"]])
+
+    jest.expect(A.astype({ type: bb.QuatFloat32 })).toEqual([["10 + 72i + 91j + 13k"], ["72 + 91i + 13j + 57k"], ["91 + 13i + 57j + 44k"]])
+
     jest.expect(B.matMult({ with: A })).toEqual(([["2507", "2962", "2523", "983"], ["2255", "4338", "4719", "1259"], ["2308", "2758", "2487", "985"]]))
     jest.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])
 

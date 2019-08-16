@@ -1,145 +1,237 @@
+const noOp = function () { return '' }
 
-const noop = function () { return '' }
+const realOp = function ({ oR, wR }) {
+    return oR !== undefined
+        || wR !== undefined
+}
+
+const complexOp = function ({ oR, oI, wR, wI }) {
+    return (oR !== undefined && oI !== undefined)
+        || (wR !== undefined && wI !== undefined)
+}
+
+const quatOp = function ({ oR, oI, oJ, oK, wR, wI, wJ, wK }) {
+    return (oR !== undefined && oI !== undefined && oJ !== undefined && oK !== undefined)
+        || (wR !== undefined && wI !== undefined && wJ !== undefined && wK !== undefined)
+}
+
 
 export const exp = {
-    begin: noop,
-    middle: function ({ ofReal, ofImag, resultReal, resultImag }) {
+    preOp: noOp,
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
         return [
-            `var scale = Math.exp(${ofReal})`,
+            `var scale = Math.exp(${oR})`,
 
-            `${resultReal} = scale * Math.cos(${ofImag})`,
-            `${resultImag} = scale * Math.sin(${ofImag})`,
+            `${rR} = scale * Math.cos(${oI})`,
+            `${rI} = scale * Math.sin(${oI})`,
         ].join('\n')
     },
-    end: noop
+    postOp: noOp
 }
 
 export const sin = {
-    begin: noop,
-    middle: function ({ ofReal, resultReal }) {
-        return `${resultReal} = Math.sin(${ofReal})`
+    preOp: noOp,
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
+        return `${rR} = Math.sin(${oR})`
     },
-    end: noop
+    postOp: noOp
 }
 
 export const cos = {
-    begin: noop,
-    middle: function ({ ofReal, resultReal }) {
-        return `${resultReal} = Math.cos(${ofReal})`
+    preOp: noOp,
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
+        return `${rR} = Math.cos(${oR})`
     },
-    end: noop
+    postOp: noOp
 }
 
 export const addition = {
-    begin: noop,
-    middle: function ({ ofReal, ofImag, withReal, withImag, resultReal, resultImag }) {
+    preOp: noOp,
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
         return [
-            `${resultReal} = ${ofReal} + ${withReal}`,
-            `${resultImag} = ${ofImag} + ${withImag}`,
+            `${rR} = ${oR} + ${wR}`,
+            `${rI} = ${oI} + ${wI}`,
         ].join('\n')
     },
-    end: noop
+    postOp: noOp
 }
 
 export const subtraction = {
-    begin: noop,
-    middle: function ({ ofReal, ofImag, withReal, withImag, resultReal, resultImag }) {
+    preOp: noOp,
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
         return [
-            `${resultReal} = ${ofReal} - ${withReal}`,
-            `${resultImag} = ${ofImag} - ${withImag}`,
+            `${rR} = ${oR} - ${wR}`,
+            `${rI} = ${oI} - ${wI}`,
         ].join('\n')
     },
-    end: noop
+    postOp: noOp
 }
 
 export const multiplication = {
-    begin: noop,
-    middle: function ({ ofReal, ofImag, withReal, withImag, resultReal, resultImag }) {
-        return [
-            `var ac = ${ofReal} * ${withReal}`,
-            `var bd = ${ofImag} * ${withImag}`,
-            `var apb = (${ofReal} + ${ofImag})`,
-            `var cpd = (${withReal} + ${withImag})`,
+    preOp: noOp,
+    op: function (args) {
+        const {
+            oR, oI, oJ, oK,
+            wR, wI, wJ, wK,
+            rR, rI, rJ, rK,
+        } = args
 
-            `${resultReal} = ac - bd`,
-            `${resultImag} = apb * cpd - ac - bd`,
-        ].join('\n')
+        if (quatOp(args))
+            return [
+                `${rR} = ${oR} * ${wR} - ${oI} * ${wI} - ${oJ} * ${wJ} - ${oK} * ${wK}`,
+                `${rI} = ${oR} * ${wI} + ${oI} * ${wR} + ${oJ} * ${wK} - ${oK} * ${wJ}`,
+                `${rJ} = ${oR} * ${wJ} - ${oI} * ${wK} + ${oJ} * ${wR} + ${oK} * ${wI}`,
+                `${rK} = ${oR} * ${wK} + ${oI} * ${wJ} - ${oJ} * ${wI} + ${oK} * ${wR}`,
+            ].join('\n')
+
+        if (complexOp(args))
+            return [
+                `${rR} = ${oR} * ${wR} - ${oI} * ${wI}`,
+                `${rI} = ${oR} * ${wI} + ${oI} * ${wR}`,
+            ].join('\n')
+
+        if (realOp(args))
+            return `${rR} = ${oR} * ${wR}`
+
     },
-    end: noop
+    postOp: noOp
 }
 
 export const division = {
-    begin: noop,
-    middle: function ({ ofReal, ofImag, withReal, withImag, resultReal, resultImag }) {
+    preOp: noOp,
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
         return [
-            `var mod = ${withReal} === 0 && ${withImag} === 0 ? 1 : ${withReal} * ${withReal} + ${withImag} * ${withImag}`,
+            `var mod = ${wR} === 0 && ${wI} === 0 ? 1 : ${wR} * ${wR} + ${wI} * ${wI}`,
 
-            `${resultReal} = (${ofReal} * ${withReal} + ${ofImag} * ${withImag}) / mod`,
-            `${resultImag} = (${ofImag} * ${withReal} - ${ofReal} * ${withImag}) / mod`,
+            `${rR} = (${oR} * ${wR} + ${oI} * ${wI}) / mod`,
+            `${rI} = (${oI} * ${wR} - ${oR} * ${wI}) / mod`,
         ].join('\n')
     },
-    end: noop
+    postOp: noOp
 }
 
 export const assignment = {
-    begin: noop,
-    middle: function ({ withReal, withImag, resultReal, resultImag }) {
-        return [
-            `${resultReal} = ${withReal}`,
-            `${resultImag} = ${withImag}`,
-        ].join('\n')
+    preOp: noOp,
+    op: function (args) {
+        const {
+            oR, oI, oJ, oK,
+            wR, wI, wJ, wK,
+            rR, rI, rJ, rK,
+        } = args
+
+        if (quatOp(args))
+            return [
+                `${rR} = ${wR}`,
+                `${rI} = ${wI}`,
+                `${rJ} = ${wJ}`,
+                `${rK} = ${wK}`,
+            ].join('\n')
+
+        if (complexOp(args))
+            return [
+                `${rR} = ${wR}`,
+                `${rI} = ${wI}`,
+            ].join('\n')
+
+        if (realOp(args))
+            return `${rR} = ${wR}`
+
     },
-    end: noop
+    postOp: noOp
 }
 
 export const min = {
-    begin: function () { return `args.result.data.fill(Number.POSITIVE_INFINITY)` },
-    middle: function ({ ofReal, ofImag, resultReal, resultImag }) {
+    preOp: function () {
+        return `args.result.data.fill(Number.POSITIVE_INFINITY)`
+    },
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
         return [
-            `if(${ofReal} < ${resultReal}) {`,
-            `   ${resultReal} = ${ofReal}`,
-            `   ${resultImag} = ${ofImag}`,
+            `if(${oR} < ${rR}) {`,
+            `   ${rR} = ${oR}`,
+            `   ${rI} = ${oI}`,
             `}`
         ].join('\n')
     },
-    end: noop
+    postOp: noOp
 }
 
 export const max = {
-    begin: function () { return `args.result.data.fill(Number.NEGATIVE_INFINITY)` },
-    middle: function ({ ofReal, ofImag, resultReal, resultImag }) {
+    preOp: function () {
+        return `args.result.data.fill(Number.NEGATIVE_INFINITY)`
+    },
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
         return [
-            `if(${ofReal} > ${resultReal}) {`,
-            `   ${resultReal} = ${ofReal}`,
-            `   ${resultImag} = ${ofImag}`,
+            `if(${oR} > ${rR}) {`,
+            `   ${rR} = ${oR}`,
+            `   ${rI} = ${oI}`,
             `}`
         ].join('\n')
     },
-    end: noop
+    postOp: noOp
 }
 
 export const sum = {
-    begin: function () {
+    preOp: function () {
         return [
             `args.result.data.fill(0)`,
             `args.result.data.fill(0)`,
         ]
     },
-    middle: function ({ ofReal, ofImag, resultReal, resultImag }) {
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
         return [
-            `${resultReal} += ${ofReal}`,
-            `${resultImag} += ${ofImag}`,
+            `${rR} += ${oR}`,
+            `${rI} += ${oI}`,
         ].join('\n')
     },
-    end: noop
+    postOp: noOp
 }
 
 export const norm = {
-    begin: sum.begin,
-    middle: function ({ ofReal, ofImag, resultReal }) {
-        return `${resultReal} += ${ofReal} * ${ofReal} + ${ofImag} * ${ofImag}`
+    preOp: sum.preOp,
+    op: function ({
+        oR, oI, oJ, oK,
+        wR, wI, wJ, wK,
+        rR, rI, rJ, rK,
+    }) {
+        return `${rR} += ${oR} * ${oR} + ${oI} * ${oI}`
     },
-    end: function () {
+    postOp: function () {
         return `
             for (let i = 0; i < args.result.data.length; i++) 
                 args.result.data[i] = Math.sqrt(args.result.data[i])
@@ -148,9 +240,9 @@ export const norm = {
 }
 
 export const mean = {
-    begin: sum.begin,
-    middle: sum.middle,
-    end: function () {
+    preOp: sum.preOp,
+    op: sum.op,
+    postOp: function () {
         return `
             for (let i = 0; i < args.result.data.length; i++){
                 args.result.data[i] /= args.meta.axesSize
