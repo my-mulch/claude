@@ -1,27 +1,34 @@
+import { flatToN } from './utils.mjs'
 import { assignment, multiplication } from '../../../operations'
 
 export default function (args) {
     const rows = args.of.shape[0],
         cols = args.with.shape[1],
-        shared = args.of.shape[1]
+        shared = args.of.shape[1],
+        dotOps = [...new Array(rows * cols).keys()]
 
     return new Function('args', [
-        [...new Array(rows * cols).keys()].map(function (i) {
-            const r = Math.floor(i / cols) % rows
-            const c = Math.floor(i / 1) % cols
+        dotOps.map(function (i) {
+            const offsets = flatToN({
+                indices: [
+                    Math.floor(i / cols) % rows,
+                    Math.floor(i / 1) % cols
+                ]
+            })
 
-            const ri = args.result.offset +
-                r * args.result.strides[0] +
-                c * args.result.strides[1]
+
+            const ri = args.result.offset
+                + r * args.result.strides[0]
+                + c * args.result.strides[1]
 
             const innerDots = [...new Array(shared).keys()].map(function (s) {
-                const ofIndex = args.of.offset +
-                    r * args.of.strides[0] +
-                    s * args.of.strides[1]
+                const ofIndex = args.of.offset
+                    + r * args.of.strides[0]
+                    + s * args.of.strides[1]
 
-                const withIndex = args.with.offset +
-                    c * args.with.strides[1] +
-                    s * args.with.strides[0]
+                const withIndex = args.with.offset
+                    + c * args.with.strides[1]
+                    + s * args.with.strides[0]
 
                 if (args.of.type.name.startsWith('Real'))
                     return multiplication.op({

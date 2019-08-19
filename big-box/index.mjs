@@ -8,19 +8,13 @@ import {
 } from './utils'
 
 import Header from './header'
-import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from './resources'
 import opsSuite from './operations/suite'
+import { Complex, Real, Quat } from './types'
+import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from './resources'
 
 export default class BigBox {
     constructor({ header, init = function () {
-        let factor = 1
-
-        if (this.type.name.startsWith('Complex'))
-            factor *= 2
-        else if (this.type.name.startsWith('Quat'))
-            factor *= 4
-
-        return new this.type(this.size * factor)
+        return new this.type.array(this.size * this.type.size)
     } }) {
 
         for (const field in header)
@@ -34,7 +28,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: shapeRaw(args.with),
-                type: args.type || BigBox.RealFloat32,
+                type: args.type || BigBox.Float32,
             }),
             init: function () {
                 if (args.with.constructor === Array) {
@@ -53,17 +47,17 @@ export default class BigBox {
                     })
                 }
 
-                else if (args.with.constructor === BigBox.RealInt8 ||
-                    args.with.constructor === BigBox.RealUint8 ||
-                    args.with.constructor === BigBox.RealUint8Clamped ||
-                    args.with.constructor === BigBox.RealInt16 ||
-                    args.with.constructor === BigBox.RealUint16 ||
-                    args.with.constructor === BigBox.RealInt32 ||
-                    args.with.constructor === BigBox.RealUint32 ||
-                    args.with.constructor === BigBox.RealFloat32
+                else if (args.with.constructor === BigBox.Int8 ||
+                    args.with.constructor === BigBox.Uint8 ||
+                    args.with.constructor === BigBox.Uint8Clamped ||
+                    args.with.constructor === BigBox.Int16 ||
+                    args.with.constructor === BigBox.Uint16 ||
+                    args.with.constructor === BigBox.Int32 ||
+                    args.with.constructor === BigBox.Uint32 ||
+                    args.with.constructor === BigBox.Float32
                 ) {
-                    if (args.with.constructor !== this.type)
-                        return new this.type(args.with)
+                    if (args.with.type !== this.type)
+                        return new this.type.array(args.with)
 
                     return args.with
                 }
@@ -77,7 +71,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.RealFloat32
+                type: args.type || BigBox.Float32
             })
         })
     }
@@ -86,7 +80,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.RealFloat32
+                type: args.type || BigBox.Float32
             }),
             init: function () { return new this.type(this.size).fill(1) }
         })
@@ -100,7 +94,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: [__Math__.round((stop - start) / step), 1],
-                type: args.type || BigBox.RealFloat32
+                type: args.type || BigBox.Float32
             }),
             init: function () {
                 return initRangeTyped({
@@ -121,7 +115,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: [num, 1],
-                type: args.type || BigBox.RealFloat32
+                type: args.type || BigBox.Float32
             }),
             init: function () {
                 return initRangeTyped({
@@ -138,7 +132,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.RealFloat32
+                type: args.type || BigBox.Float32
             }),
             init: function () {
                 const data = new this.type(this.size)
@@ -175,7 +169,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.RealFloat32
+                type: args.type || BigBox.Float32
             }),
             init: function () {
                 const data = new this.type(this.size)
@@ -224,7 +218,7 @@ export default class BigBox {
                 shape: shape,
                 offset: this.offset,
                 contig: this.contig,
-                type: args.type || BigBox.RealFloat32
+                type: args.type || BigBox.Float32
             }),
             init: function () { return new this.type(old.data) }
         })
@@ -392,19 +386,7 @@ export default class BigBox {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            if (this.type.name.startsWith('Quat'))
-                return stringNumber(
-                    this.data[index],
-                    this.data[index + 1],
-                    this.data[index + 2],
-                    this.data[index + 3])
-
-            else if (this.type.name.startsWith('Complex'))
-                return stringNumber(
-                    this.data[index],
-                    this.data[index + 1])
-            else
-                return stringNumber(this.data[index])
+            this.type.asString({ data: this.data, index })
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
@@ -422,38 +404,32 @@ export default class BigBox {
     [util.inspect.custom]() { return this.toString() }
 }
 
-/** Quaternion typed */
-BigBox.QuatUint8 = class QuatUint8 extends Uint8Array { constructor(args) { super(args) } }
-BigBox.QuatUint16 = class QuatUint16 extends Uint16Array { constructor(args) { super(args) } }
-BigBox.QuatUint32 = class QuatUint32 extends Uint32Array { constructor(args) { super(args) } }
-BigBox.QuatUint8Clamped = class QuatUint8Clamped extends Uint8ClampedArray { constructor(args) { super(args) } }
+/** Quaternion types */
+BigBox.QuatInt8 = Quat(Int8Array)
+BigBox.QuatInt16 = Quat(Int16Array)
+BigBox.QuatInt32 = Quat(Int32Array)
+BigBox.QuatUint8 = Quat(Uint8Array)
+BigBox.QuatUint16 = Quat(Uint16Array)
+BigBox.QuatUint32 = Quat(Uint32Array)
+BigBox.QuatFloat32 = Quat(Float32Array)
+BigBox.QuatUint8Clamped = Quat(Uint8ClampedArray)
 
-BigBox.QuatInt8 = class QuatInt8 extends Int8Array { constructor(args) { super(args) } }
-BigBox.QuatInt16 = class QuatInt16 extends Int16Array { constructor(args) { super(args) } }
-BigBox.QuatInt32 = class QuatInt32 extends Int32Array { constructor(args) { super(args) } }
+/** Complex types */
+BigBox.ComplexInt8 = Complex(Int8Array)
+BigBox.ComplexInt16 = Complex(Int16Array)
+BigBox.ComplexInt32 = Complex(Int32Array)
+BigBox.ComplexUint8 = Complex(Uint8Array)
+BigBox.ComplexUint16 = Complex(Uint16Array)
+BigBox.ComplexUint32 = Complex(Uint32Array)
+BigBox.ComplexFloat32 = Complex(Float32Array)
+BigBox.ComplexUint8Clamped = Complex(Uint8ClampedArray)
 
-BigBox.QuatFloat32 = class QuatFloat32 extends Float32Array { constructor(args) { super(args) } }
-
-/** Complex typed */
-BigBox.ComplexUint8 = class ComplexUint8 extends Uint8Array { constructor(args) { super(args) } }
-BigBox.ComplexUint16 = class ComplexUint16 extends Uint16Array { constructor(args) { super(args) } }
-BigBox.ComplexUint32 = class ComplexUint32 extends Uint32Array { constructor(args) { super(args) } }
-BigBox.ComplexUint8Clamped = class ComplexUint8Clamped extends Uint8ClampedArray { constructor(args) { super(args) } }
-
-BigBox.ComplexInt8 = class ComplexInt8 extends Int8Array { constructor(args) { super(args) } }
-BigBox.ComplexInt16 = class ComplexInt16 extends Int16Array { constructor(args) { super(args) } }
-BigBox.ComplexInt32 = class ComplexInt32 extends Int32Array { constructor(args) { super(args) } }
-
-BigBox.ComplexFloat32 = class ComplexFloat32 extends Float32Array { constructor(args) { super(args) } }
-
-/** Real typed */
-BigBox.RealUint8 = class RealUint8Array extends Uint8Array { constructor(args) { super(args) } }
-BigBox.RealUint16 = class RealUint16Array extends Uint16Array { constructor(args) { super(args) } }
-BigBox.RealUint32 = class RealUint32Array extends Uint32Array { constructor(args) { super(args) } }
-BigBox.RealUint8Clamped = class RealUint8ClampedArray extends Uint8ClampedArray { constructor(args) { super(args) } }
-
-BigBox.RealInt8 = class RealInt8Array extends Int8Array { constructor(args) { super(args) } }
-BigBox.RealInt16 = class RealInt16Array extends Int16Array { constructor(args) { super(args) } }
-BigBox.RealInt32 = class RealInt32Array extends Int32Array { constructor(args) { super(args) } }
-
-BigBox.RealFloat32 = class RealFloat32Array extends Float32Array { constructor(args) { super(args) } }
+/** Real types */
+BigBox.Int8 = Real(Int8Array)
+BigBox.Int16 = Real(Int16Array)
+BigBox.Int32 = Real(Int32Array)
+BigBox.Uint8 = Real(Uint8Array)
+BigBox.Uint16 = Real(Uint16Array)
+BigBox.Uint32 = Real(Uint32Array)
+BigBox.Float32 = Real(Float32Array)
+BigBox.Uint8Clamped = Real(Uint8ClampedArray)
