@@ -7,7 +7,7 @@
     "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
     "start": "npm run serve & npm run watch & npm run launch",
     "launch": "open docs/index.html",
-    "serve": "http-server / -p 3000 --cors ",
+    "serve": "http-server / -p 3000 --cors",
     "build": "webpack --devtool source-map",
     "watch": "nodemon --ignore docs --exec 'npm run build'"
   },

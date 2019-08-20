@@ -1,15 +1,15 @@
 import util from 'util' // node's utils
 
 import {
-    stringNumber, // complex utils
     shapeRaw, shapeAlign, // shape utils
     initTyped, initRangeTyped, // typed utils
     selfAxesAndShape, pairAxesAndShape, // operation utils
 } from './utils'
 
+import Types from './types'
 import Header from './header'
-import opsSuite from './operations/suite'
-import { Complex, Real, Quat } from './types'
+import Operations from './operations'
+
 import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from './resources'
 
 export default class BigBox {
@@ -386,7 +386,7 @@ export default class BigBox {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            this.type.asString({ data: this.data, index })
+            return this.type.string({ o: index, data: this.data })
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
@@ -405,31 +405,31 @@ export default class BigBox {
 }
 
 /** Quaternion types */
-BigBox.QuatInt8 = Quat(Int8Array)
-BigBox.QuatInt16 = Quat(Int16Array)
-BigBox.QuatInt32 = Quat(Int32Array)
-BigBox.QuatUint8 = Quat(Uint8Array)
-BigBox.QuatUint16 = Quat(Uint16Array)
-BigBox.QuatUint32 = Quat(Uint32Array)
-BigBox.QuatFloat32 = Quat(Float32Array)
-BigBox.QuatUint8Clamped = Quat(Uint8ClampedArray)
+BigBox.QuatInt8 = Types.Quat(Int8Array)
+BigBox.QuatInt16 = Types.Quat(Int16Array)
+BigBox.QuatInt32 = Types.Quat(Int32Array)
+BigBox.QuatUint8 = Types.Quat(Uint8Array)
+BigBox.QuatUint16 = Types.Quat(Uint16Array)
+BigBox.QuatUint32 = Types.Quat(Uint32Array)
+BigBox.QuatFloat32 = Types.Quat(Float32Array)
+BigBox.QuatUint8Clamped = Types.Quat(Uint8ClampedArray)
 
 /** Complex types */
-BigBox.ComplexInt8 = Complex(Int8Array)
-BigBox.ComplexInt16 = Complex(Int16Array)
-BigBox.ComplexInt32 = Complex(Int32Array)
-BigBox.ComplexUint8 = Complex(Uint8Array)
-BigBox.ComplexUint16 = Complex(Uint16Array)
-BigBox.ComplexUint32 = Complex(Uint32Array)
-BigBox.ComplexFloat32 = Complex(Float32Array)
-BigBox.ComplexUint8Clamped = Complex(Uint8ClampedArray)
+BigBox.ComplexInt8 = Types.Complex(Int8Array)
+BigBox.ComplexInt16 = Types.Complex(Int16Array)
+BigBox.ComplexInt32 = Types.Complex(Int32Array)
+BigBox.ComplexUint8 = Types.Complex(Uint8Array)
+BigBox.ComplexUint16 = Types.Complex(Uint16Array)
+BigBox.ComplexUint32 = Types.Complex(Uint32Array)
+BigBox.ComplexFloat32 = Types.Complex(Float32Array)
+BigBox.ComplexUint8Clamped = Types.Complex(Uint8ClampedArray)
 
 /** Real types */
-BigBox.Int8 = Real(Int8Array)
-BigBox.Int16 = Real(Int16Array)
-BigBox.Int32 = Real(Int32Array)
-BigBox.Uint8 = Real(Uint8Array)
-BigBox.Uint16 = Real(Uint16Array)
-BigBox.Uint32 = Real(Uint32Array)
-BigBox.Float32 = Real(Float32Array)
-BigBox.Uint8Clamped = Real(Uint8ClampedArray)
+BigBox.Int8 = Types.Real(Int8Array)
+BigBox.Int16 = Types.Real(Int16Array)
+BigBox.Int32 = Types.Real(Int32Array)
+BigBox.Uint8 = Types.Real(Uint8Array)
+BigBox.Uint16 = Types.Real(Uint16Array)
+BigBox.Uint32 = Types.Real(Uint32Array)
+BigBox.Float32 = Types.Real(Float32Array)
+BigBox.Uint8Clamped = Types.Real(Uint8ClampedArray)

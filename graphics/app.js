@@ -1,4 +1,4 @@
-import Graphics from './graphics'
+import Graphics from '.'
 import Mouse from './peripherals/mouse'
 import Keyboard from './peripherals/keyboard'
 

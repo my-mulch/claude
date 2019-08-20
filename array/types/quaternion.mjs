@@ -1,9 +1,32 @@
+import { stringNumber } from '../utils'
 
 export default function (type) {
     return {
         size: 4,
         array: type,
-        add: function ({ oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK }) {
+        _o_: function (o) { return `args.of.data[${o}]` },
+        _w_: function (w) { return `args.with.data[${w}]` },
+        _r_: function (r) { return `args.result.data[${r}]` },
+        spread: function ({ o, w, r }) {
+            return {
+                oR: o && this._o_(o),
+                oI: o && this._o_(o + 1),
+                oJ: o && this._o_(o + 2),
+                oK: o && this._o_(o + 3),
+
+                wR: w && this._w_(w),
+                wI: w && this._w_(w + 1),
+                wJ: w && this._w_(w + 2),
+                wK: w && this._w_(w + 3),
+
+                rR: r && this._r_(r),
+                rI: r && this._r_(r + 1),
+                rJ: r && this._r_(r + 2),
+                rK: r && this._r_(r + 3),
+            }
+        },
+        add: function (indices) {
+            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
             return [
                 `${rR} = ${oR} + ${wR}`,
                 `${rI} = ${oI} + ${wI}`,
@@ -11,7 +34,8 @@ export default function (type) {
                 `${rK} = ${oK} + ${wK}`,
             ].join('\n')
         },
-        subtract: function ({ oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK }) {
+        subtract: function (indices) {
+            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
             return [
                 `${rR} = ${oR} - ${wR}`,
                 `${rI} = ${oI} - ${wI}`,
@@ -19,7 +43,8 @@ export default function (type) {
                 `${rK} = ${oK} - ${wK}`,
             ].join('\n')
         },
-        multiply: function ({ oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK }) {
+        multiply: function (indices) {
+            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
             return [
                 `${rR} = ${oR} * ${wR} - ${oI} * ${wI} - ${oJ} * ${wJ} - ${oK} * ${wK}`,
                 `${rI} = ${oR} * ${wI} + ${oI} * ${wR} + ${oJ} * ${wK} - ${oK} * ${wJ}`,
@@ -27,7 +52,8 @@ export default function (type) {
                 `${rK} = ${oR} * ${wK} + ${oI} * ${wJ} - ${oJ} * ${wI} + ${oK} * ${wR}`,
             ].join('\n')
         },
-        divide: function ({ oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK }) {
+        divide: function (indices) {
+            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
             return [
                 `var mod = ${wR} * ${wR} + ${wI} * ${wI} + ${wJ} * ${wJ} + ${wK} * ${wK}`,
 
@@ -37,7 +63,8 @@ export default function (type) {
                 `${rK} = (${wR} * ${oK} - ${wI} * ${oJ} + ${wJ} * ${oI} - ${wK} * ${oR}) / mod`,
             ].join('\n')
         },
-        assign: function ({ wR, wI, wJ, wK, rR, rI, rJ, rK }) {
+        assign: function (indices) {
+            const { wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
             return [
                 `${rR} = ${wR}`,
                 `${rI} = ${wI}`,
@@ -45,8 +72,8 @@ export default function (type) {
                 `${rK} = ${wK}`,
             ].join('\n')
         },
-        asString: function ({ oR, oI, oJ, oK }) {
-
+        asString: function ({ o, data }) {
+            return stringNumber(data[o], data[o + 1], data[o + 2], data[o + 3])
         }
     }
 }
