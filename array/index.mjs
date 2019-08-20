@@ -2,7 +2,6 @@ import util from 'util' // node's utils
 
 import {
     shapeRaw, shapeAlign, // shape utils
-    initTyped, initRangeTyped, // typed utils
     selfAxesAndShape, pairAxesAndShape, // operation utils
 } from './utils'
 
@@ -28,41 +27,24 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: shapeRaw(args.with),
-                type: args.type || BigBox.Float32,
+                type: args.type,
             }),
             init: function () {
-                if (args.with.constructor === Array) {
-                    return initTyped({
-                        size: this.size,
-                        type: this.type,
-                        rawArray: args.with.flat(Number.POSITIVE_INFINITY),
-                    })
-                }
+                const data = new this.type.array(this.size * this.type.size)
 
-                else if (args.with.constructor === String || args.with.constructor === Number) {
-                    return initTyped({
-                        size: this.size,
-                        type: this.type,
-                        rawArray: [args.with],
-                    })
-                }
+                for (let i = 0, j = 0; i < data.length; i += this.type.size, j++)
+                    switch (args.with.constructor) {
+                        case Array: this.type.strIn({ num: rawArray[j], o: i, data }); break
+                        case String: this.type.strIn({ num: args.with, o: i, data }); break
+                        case Number: this.type.strIn({ num: args.with, o: i, data }); break
+                        case Object:
+                            if (args.with.type !== this.type)
+                                return new this.type.array(args.with)
 
-                else if (args.with.constructor === BigBox.Int8 ||
-                    args.with.constructor === BigBox.Uint8 ||
-                    args.with.constructor === BigBox.Uint8Clamped ||
-                    args.with.constructor === BigBox.Int16 ||
-                    args.with.constructor === BigBox.Uint16 ||
-                    args.with.constructor === BigBox.Int32 ||
-                    args.with.constructor === BigBox.Uint32 ||
-                    args.with.constructor === BigBox.Float32
-                ) {
-                    if (args.with.type !== this.type)
-                        return new this.type.array(args.with)
+                            return args.with
+                    }
 
-                    return args.with
-                }
-
-                else throw 'Usage: bb.array({ with: <String|Number|Array|TypedArray>, type: <Object> })'
+                return data
             }
         })
     }
@@ -71,7 +53,7 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type,
             })
         })
     }
@@ -80,9 +62,11 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type,
             }),
-            init: function () { return new this.type(this.size).fill(1) }
+            init: function () {
+                return new this.type(this.size * this.type.size).fill(1)
+            }
         })
     }
 
@@ -94,14 +78,12 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: [__Math__.round((stop - start) / step), 1],
-                type: args.type || BigBox.Float32
+                type: args.type,
             }),
             init: function () {
-                return initRangeTyped({
-                    size: this.size,
-                    type: this.type,
-                    start, stop, step
-                })
+                const data = new this.type.array(this.size * this.type.size)
+                for (let i = start, j = 0; i < stop; i += step, j++) data[j] = i
+                return data
             }
         })
     }
@@ -115,14 +97,12 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: [num, 1],
-                type: args.type || BigBox.Float32
+                type: args.type,
             }),
             init: function () {
-                return initRangeTyped({
-                    size: this.size,
-                    type: this.type,
-                    start, stop, step
-                })
+                const data = new this.type.array(this.size * this.type.size)
+                for (let i = start, j = 0; i < stop; i += step, j++) data[j] = i
+                return data
             }
         })
     }
@@ -132,10 +112,10 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type,
             }),
             init: function () {
-                const data = new this.type(this.size)
+                const data = new this.type(this.size * this.type.size)
 
                 for (let i = 0; i < data.length; i++)
                     data[i] = __Math__.random() - 1
@@ -145,20 +125,20 @@ export default class BigBox {
         })
     }
 
-    static randint(args) {
+    static randrange(args) {
         const low = args.low || 0
         const high = args.high
 
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Int32
+                type: args.type,
             }),
             init: function () {
-                const data = new this.type(this.size)
+                const data = new this.type(this.size * this.type.size)
 
                 for (let i = 0; i < data.length; i++)
-                    data[i] = opsSuite.utils.randint({ low, high })
+                    data[i] = Operations.utils.randrange({ low, high })
 
                 return data
             }
@@ -169,10 +149,10 @@ export default class BigBox {
         return new BigBox({
             header: new Header({
                 shape: args.shape,
-                type: args.type || BigBox.Float32
+                type: args.type,
             }),
             init: function () {
-                const data = new this.type(this.size)
+                const data = new this.type(this.size * this.type.size)
                 const diagonal = this.strides.reduce(__Math__.add)
                 const numDiags = __Math__.min(...this.shape)
 
@@ -218,7 +198,7 @@ export default class BigBox {
                 shape: shape,
                 offset: this.offset,
                 contig: this.contig,
-                type: args.type || BigBox.Float32
+                type: args.type,
             }),
             init: function () { return new this.type(old.data) }
         })
@@ -330,7 +310,7 @@ export default class BigBox {
         return opsSuite.call({
             of: this,
             with: { id: '' },
-            result: args.result || BigBox.eye({ shape: this.shape }),
+            result: args.result({ shape: this.shape }),
             meta: { method: this.inverse.name }
         })
     }
@@ -386,7 +366,7 @@ export default class BigBox {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return this.type.string({ o: index, data: this.data })
+            return this.type.strOut({ o: index, data: this.data })
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
@@ -405,31 +385,31 @@ export default class BigBox {
 }
 
 /** Quaternion types */
-BigBox.QuatInt8 = Types.Quat(Int8Array)
-BigBox.QuatInt16 = Types.Quat(Int16Array)
-BigBox.QuatInt32 = Types.Quat(Int32Array)
+BigBox.QuatUint8Clamped = Types.Quat(Uint8ClampedArray)
 BigBox.QuatUint8 = Types.Quat(Uint8Array)
 BigBox.QuatUint16 = Types.Quat(Uint16Array)
 BigBox.QuatUint32 = Types.Quat(Uint32Array)
+BigBox.QuatInt8 = Types.Quat(Int8Array)
+BigBox.QuatInt16 = Types.Quat(Int16Array)
+BigBox.QuatInt32 = Types.Quat(Int32Array)
 BigBox.QuatFloat32 = Types.Quat(Float32Array)
-BigBox.QuatUint8Clamped = Types.Quat(Uint8ClampedArray)
 
 /** Complex types */
-BigBox.ComplexInt8 = Types.Complex(Int8Array)
-BigBox.ComplexInt16 = Types.Complex(Int16Array)
-BigBox.ComplexInt32 = Types.Complex(Int32Array)
+BigBox.ComplexUint8Clamped = Types.Complex(Uint8ClampedArray)
 BigBox.ComplexUint8 = Types.Complex(Uint8Array)
 BigBox.ComplexUint16 = Types.Complex(Uint16Array)
 BigBox.ComplexUint32 = Types.Complex(Uint32Array)
+BigBox.ComplexInt8 = Types.Complex(Int8Array)
+BigBox.ComplexInt16 = Types.Complex(Int16Array)
+BigBox.ComplexInt32 = Types.Complex(Int32Array)
 BigBox.ComplexFloat32 = Types.Complex(Float32Array)
-BigBox.ComplexUint8Clamped = Types.Complex(Uint8ClampedArray)
 
 /** Real types */
-BigBox.Int8 = Types.Real(Int8Array)
-BigBox.Int16 = Types.Real(Int16Array)
-BigBox.Int32 = Types.Real(Int32Array)
+BigBox.Uint8Clamped = Types.Real(Uint8ClampedArray)
 BigBox.Uint8 = Types.Real(Uint8Array)
 BigBox.Uint16 = Types.Real(Uint16Array)
 BigBox.Uint32 = Types.Real(Uint32Array)
+BigBox.Int8 = Types.Real(Int8Array)
+BigBox.Int16 = Types.Real(Int16Array)
+BigBox.Int32 = Types.Real(Int32Array)
 BigBox.Float32 = Types.Real(Float32Array)
-BigBox.Uint8Clamped = Types.Real(Uint8ClampedArray)

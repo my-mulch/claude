@@ -96,45 +96,6 @@ export const stringNumber = function (r, i, j, k) {
     return ret;
 }
 
-export const initTyped = function ({ size, type, rawArray }) {
-    let data = null
-
-    if (type.name.startsWith('Quat'))
-        data = new type(size * 4)
-
-    else if (type.name.startsWith('Complex'))
-        data = new type(size * 2)
-
-    else
-        data = new type(size)
-
-    for (let i = 0; i < data.length; i++) {
-        const num = parseNumber(rawArray[i % rawArray.length])
-
-        data[i] = num.r
-
-        if (type.name.startsWith('Complex'))
-            data[++i] = num.i
-
-        else if (type.name.startsWith('Quat')) {
-            data[++i] = num.i
-            data[++i] = num.j
-            data[++i] = num.k
-        }
-    }
-
-    return data
-}
-
-export const initRangeTyped = function ({ size, type, start, stop, step }) {
-    const data = new type(size)
-
-    for (let i = start, j = 0; i < stop; i += step, j++)
-        data[j] = i
-
-    return data
-}
-
 export const shapeRaw = function (A, shape = []) {
     if (A.constructor === Number || A.constructor === String)
         return shape

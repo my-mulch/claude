@@ -56,7 +56,10 @@ export default function (type) {
                 `${rI} = ${wI}`,
             ].join('\n')
         },
-        string: function ({ o, data }) {
+        strOut: function ({ o, data }) {
+            return stringNumber(data[o], data[o + 1])
+        },
+        strIn: function ({ o, data }) {
             return stringNumber(data[o], data[o + 1])
         }
     }
