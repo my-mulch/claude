@@ -1,5 +1,5 @@
-import bb from '..'
-import jest from '../../test'
+import bb from '../../big-box'
+import jest from '..'
 
 export default function () {
     let A, B

@@ -1,10 +1,10 @@
 {
-  "name": "edu",
+  "name": "genghis",
   "version": "1.0.0",
-  "description": "",
+  "description": "A sally style summit-blazing visualization engine",
   "main": "index.js",
   "scripts": {
-    "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
+    "test": "node --experimental-modules --es-module-specifier-resolution=node test/big-box/index.mjs",
     "start": "npm run serve & npm run watch & npm run launch",
     "launch": "open docs/index.html",
     "serve": "http-server / -p 3000 --cors",
