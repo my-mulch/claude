@@ -31,6 +31,7 @@ export default class BigBox {
             }),
             init: function () {
                 const data = new this.type.array(this.size * this.type.size)
+                const rawArray = args.with.constructor === Array && args.with.flat(Number.POSITIVE_INFINITY)
 
                 for (let i = 0, j = 0; i < data.length; i += this.type.size, j++)
                     switch (args.with.constructor) {
@@ -61,7 +62,7 @@ export default class BigBox {
                 type: args.type,
             }),
             init: function () {
-                return new this.type(this.size * this.type.size).fill(1)
+                return new this.type.array(this.size * this.type.size).fill(1)
             }
         })
     }
@@ -111,7 +112,7 @@ export default class BigBox {
                 type: args.type,
             }),
             init: function () {
-                const data = new this.type(this.size * this.type.size)
+                const data = new this.type.array(this.size * this.type.size)
 
                 for (let i = 0; i < data.length; i++)
                     data[i] = __Math__.random() - 1
@@ -131,7 +132,7 @@ export default class BigBox {
                 type: args.type,
             }),
             init: function () {
-                const data = new this.type(this.size * this.type.size)
+                const data = new this.type.array(this.size * this.type.size)
 
                 for (let i = 0; i < data.length; i++)
                     data[i] = Operations.utils.randrange({ low, high })
@@ -148,7 +149,7 @@ export default class BigBox {
                 type: args.type,
             }),
             init: function () {
-                const data = new this.type(this.size)
+                const data = new this.type.array(this.size)
                 const diagonal = this.strides.reduce(__Math__.add)
                 const numDiags = __Math__.min(...this.shape)
 
@@ -181,7 +182,7 @@ export default class BigBox {
                 contig: this.contig,
                 type: args.type,
             }),
-            init: function () { return new this.type(old.data) }
+            init: function () { return new this.type.array(old.data) }
         })
     }
 

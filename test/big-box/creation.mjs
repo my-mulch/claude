@@ -11,7 +11,8 @@ export default function () {
             [10, 72, 91, 13],
             [57, 44, 49, 33],
             [90, 66, 23, 21],
-        ]
+        ],
+        type: bb.Int32,
     })
 
     B = bb.array({
@@ -20,7 +21,8 @@ export default function () {
             [2],
             [3],
             [4]
-        ]
+        ],
+        type: bb.Int32,
     })
 
     let C = bb.array({
@@ -28,7 +30,8 @@ export default function () {
             [10, 4],
             [42, 6],
             [1, 1]
-        ]
+        ],
+        type: bb.Int32,
     })
 
     jest.expect(A).toEqual([['10', '72', '91', '13'], ['57', '44', '49', '33'], ['90', '66', '23', '21']])
@@ -39,7 +42,7 @@ export default function () {
     jest.expect(B.shape).toEqual([4, 1])
 
     jest.expect(A.astype({ type: bb.ComplexFloat32 })).toEqual([['10 + 72i', '91 + 13i'], ['57 + 44i', '49 + 33i'], ['90 + 66i', '23 + 21i']])
-    jest.expect(A.astype({ type: bb.QuatFloat32 })).toEqual([["10 + 72i + 91j + 13k"], ["72 + 91i + 13j + 57k"], ["91 + 13i + 57j + 44k"]])
+    jest.expect(A.astype({ type: bb.QuatFloat32 })).toEqual([["10 + 72i + 91j + 13k"], ["57 + 44i + 49j + 33k"], ["90 + 66i + 23j + 21k"]])
 
     jest.expect(C.astype({ type: bb.ComplexInt8 })).toEqual([['10 + 4i'], ['42 + 6i'], ['1 + i']])
 

@@ -1,6 +1,6 @@
 import {
     __Math__, // misc resources
-    SHAPE, OFFSET, CONTIG, STRIDES, TYPE, // init resources
+    SHAPE, OFFSET, CONTIG, STRIDES, // init resources
     PARTIAL_SLICE_REGEX, NUMBER_REGEX, SLICE_CHARACTER, // slice resources
 } from '../../resources/big-box'
 
@@ -10,11 +10,11 @@ export default class Header {
 
     constructor(opts) {
         this.type = opts.type
-        
+
         this.shape = SHAPE in opts
             ? opts.shape
             : []
-        
+
         this.offset = OFFSET in opts
             ? opts.offset
             : 0
@@ -25,7 +25,10 @@ export default class Header {
 
         this.strides = STRIDES in opts
             ? opts.strides
-            : resolveStrides({ shape: this.shape, type: this.type })
+            : resolveStrides({
+                shape: this.shape,
+                type: this.type
+            })
 
         this.id = `${this.type.name}|${this.shape}|${this.strides}|${this.offset}`
         this.size = this.shape.reduce(__Math__.multiply, 1)

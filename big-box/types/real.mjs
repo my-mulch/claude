@@ -34,11 +34,11 @@ export default function (type) {
             const { wR, rR } = this.spread(indices)
             return `${rR} = ${wR}`
         },
-        strIn: function ({ o, data }) {
+        strOut: function ({ o, data }) {
             return stringNumber(data[o])
         },
-        strOut: function ({ num, o, data }) {
-            data[0] = parseNumber(num).r
+        strIn: function ({ num, o, data }) {
+            data[o] = parseNumber(num).r
         }
     }
 }
