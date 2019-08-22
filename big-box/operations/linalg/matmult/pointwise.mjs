@@ -7,6 +7,9 @@ export default function (args) {
 
     return new Function('args', [
         dotOps.map(function (i) {
+            const r = Math.floor(i / cols) % rows
+            const c = Math.floor(i / 1) % cols
+
             const resultIndex = args.result.offset
                 + r * args.result.strides[0]
                 + c * args.result.strides[1]

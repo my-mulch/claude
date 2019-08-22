@@ -1,10 +1,12 @@
 const FAIL = '\x1b[31m%s\x1b[0m'
 const PASS = '\x1b[32m%s\x1b[0m'
 
-export default class Jest {
+class Jest {
     static expect(stuff) {
         return {
             toEqual: function (otherStuff) {
+                Jest.spec++
+
                 if (stuff.header) stuff = stuff.toRaw()
                 if (otherStuff.header) otherStuff = otherStuff.toRaw()
 
@@ -17,10 +19,14 @@ export default class Jest {
                     : otherStuff
 
                 if (stuff == otherStuff)
-                    console.log(PASS, 'Passed!')
+                    console.log(PASS, Jest.spec, 'Passed!')
                 else
-                    console.log(FAIL, `Failed: expected ${stuff} to equal ${otherStuff}`)
+                    console.log(FAIL, Jest.spec, `Failed: expected ${stuff} to equal ${otherStuff}`)
             }
         }
     }
 }
+
+Jest.spec = 0
+
+export default Jest

@@ -11,10 +11,12 @@ export default function () {
             ["10", "72", "91", "13"],
             ["57", "44", "49", "33"],
             ["90", "66", "23", "21"]
-        ]
+        ],
+        type: bb.Float32
     })
 
     B = bb.array({
+        type: bb.Float32,
         with: [
             ["17", "11", "19"],
             ["41", "15", "11"],
@@ -23,6 +25,7 @@ export default function () {
     })
 
     D = bb.array({
+        type: bb.Float32,
         with: [
             ["2", "2", "1"],
             ["4", "2", "6"],
@@ -30,7 +33,7 @@ export default function () {
         ]
     })
 
-    C = bb.array({ with: [["1"], ["2"], ["3"]] })
+    C = bb.array({ with: [["1"], ["2"], ["3"]], type: bb.Float32 })
 
     E = bb.array({
         with: [[["10", "5", "2"],
@@ -46,7 +49,8 @@ export default function () {
         [["90", "2", "5"],
         ["66", "4", "3"],
         ["23", "1", "2"],
-        ["21", "2", "2"]]]
+        ["21", "2", "2"]]],
+        type: bb.Float32
     })
 
     const F = bb.array({ with: [["72 + 91i + 13j + 57k"]], type: bb.QuatFloat32 })
