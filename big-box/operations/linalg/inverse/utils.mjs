@@ -1,27 +1,51 @@
-export const cofactors = function ({ data, r, c }) {
-    if (Math.sqrt(data.length) === 1) return data
-    if (Math.sqrt(data.length) === 2) return data
+export const cofactors = function ({ indices, array }) {
+    if (indices.length === 1)
+        return array.offset + array.strides[0] * indices[0][0] + array.strides[1] * indices[0][1]
 
-    data = survivors({ data, r, c })
-
+    const size = Math.sqrt(indices.length)
     const allCofactors = []
-    for (let i = 0; i < Math.sqrt(data.length); i++) {
-        const survivorsRC = survivors({ r: 0, c: i, data })
-        const cofactorsRC = cofactors({ r, c, data: survivorsRC })
 
-        allCofactors.push(cofactorsRC)
+    for (let i = 0; i < size; i++) {
+        const sign = Math.pow(-1, i % 2)
+        const cofactor = cofactors({ array, indices: survivors({ r: 0, c: i, indices }) })
+        const factor = array.offset + array.strides[0] * indices[i][0] + array.strides[1] * indices[i][1]
+
+        switch (cofactor.constructor) {
+            case Array:
+                const sum = array.type.dimSum({ dim: cofactor })
+                allCofactors.push(sum)
+                break
+
+            case Number:
+                const product = array.type.multiply({ oi: factor, wi: cofactor })
+                allCofactors.push(sign > 0 ? product : product.negate())
+                break
+
+        }
+
+
     }
 
     return allCofactors
 }
 
-export const survivors = function ({ data, r, c }) {
-    const size = Math.sqrt(data.length)
+export const survivors = function ({ indices, r, c }) {
+    const size = Math.sqrt(indices.length)
 
-    return data.filter(function (_, index) {
+    return indices.filter(function (_, index) {
         if (index % size === c) return false // in column
         if (Math.floor(index / size) === r) return false // in row
 
         return true
     })
+}
+
+export const template = function ({ size }) {
+    const result = []
+
+    for (let r = 0; r < size; r++)
+        for (let c = 0; c < size; c++)
+            result.push([r, c])
+
+    return result
 }

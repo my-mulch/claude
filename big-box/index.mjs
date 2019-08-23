@@ -279,7 +279,10 @@ export default class BigBox {
         return Operations.call({
             of: this,
             with: { id: '' },
-            result: args.result({ shape: this.shape }),
+            result: args.result || BigBox.eye({
+                shape: this.shape,
+                type: this.type
+            }),
             meta: { method: this.inverse.name }
         })
     }
