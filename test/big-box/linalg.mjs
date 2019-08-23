@@ -56,11 +56,11 @@ export default jest.suite(function () {
     const F = bb.array({ with: [["72 + 91i + 13j + 57k"]], type: bb.QuatFloat32 })
     const G = bb.array({ with: [["10 + 72i + 91j + 13k"]], type: bb.QuatFloat32 })
 
-    
-    
+
+
     this.expect(F.matMult({ with: G, type: bb.QuatFloat32 })).toEqual([["-7756 + 1076i + 9603j + 8851k"]])
     this.expect(G.matMult({ with: F, type: bb.QuatFloat32 })).toEqual([["-7756 + 11112i + 3761j - 5839k"]])
-    this.expect(A.astype({ type: bb.QuatFloat32 })).toEqual([["10 + 72i + 91j + 13k"], ["72 + 91i + 13j + 57k"], ["91 + 13i + 57j + 44k"]])
+    this.expect(A.astype({ type: bb.QuatFloat32 })).toEqual([["10 + 72i + 91j + 13k"], ["57 + 44i + 49j + 33k"], ["90 + 66i + 23j + 21k"]])
     this.expect(B.matMult({ with: A })).toEqual(([["2507", "2962", "2523", "983"], ["2255", "4338", "4719", "1259"], ["2308", "2758", "2487", "985"]]))
     this.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])
     this.expect(A.T()).toEqual([["10", "57", "90"], ["72", "44", "66"], ["91", "49", "23"], ["13", "33", "21"]])
