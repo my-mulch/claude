@@ -1,91 +1,112 @@
 import { stringNumber, parseNumber } from '../utils'
 
-export default function (type) {
-    return {
-        size: 4,
-        array: type,
-        _o_: function (o) { return `args.of.data[${o}]` },
-        _w_: function (w) { return `args.with.data[${w}]` },
-        _r_: function (r) { return `args.result.data[${r}]` },
-        spread: function ({ o, w, r }) {
-            return {
-                oR: o && this._o_(o),
-                oI: o && this._o_(o + 1),
-                oJ: o && this._o_(o + 2),
-                oK: o && this._o_(o + 3),
+class Quaternion {
+    constructor(array) {
+        this.size = 4
+        this.array = array
+    }
 
-                wR: w && this._w_(w),
-                wI: w && this._w_(w + 1),
-                wJ: w && this._w_(w + 2),
-                wK: w && this._w_(w + 3),
+    _o_(oi) { return `args.of.data[${oi}]` }
+    _w_(wi) { return `args.with.data[${wi}]` }
+    _r_(ri) { return `args.result.data[${ri}]` }
 
-                rR: r && this._r_(r),
-                rI: r && this._r_(r + 1),
-                rJ: r && this._r_(r + 2),
-                rK: r && this._r_(r + 3),
-            }
-        },
-        add: function (indices) {
-            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
-            return [
-                `${rR} = ${oR} + ${wR}`,
-                `${rI} = ${oI} + ${wI}`,
-                `${rJ} = ${oJ} + ${wJ}`,
-                `${rK} = ${oK} + ${wK}`,
-            ].join('\n')
-        },
-        subtract: function (indices) {
-            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
-            return [
-                `${rR} = ${oR} - ${wR}`,
-                `${rI} = ${oI} - ${wI}`,
-                `${rJ} = ${oJ} - ${wJ}`,
-                `${rK} = ${oK} - ${wK}`,
-            ].join('\n')
-        },
-        multiply: function (indices) {
-            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
-            return [
-                `${rR} = ${oR} * ${wR} - ${oI} * ${wI} - ${oJ} * ${wJ} - ${oK} * ${wK}`,
-                `${rI} = ${oR} * ${wI} + ${oI} * ${wR} + ${oJ} * ${wK} - ${oK} * ${wJ}`,
-                `${rJ} = ${oR} * ${wJ} - ${oI} * ${wK} + ${oJ} * ${wR} + ${oK} * ${wI}`,
-                `${rK} = ${oR} * ${wK} + ${oI} * ${wJ} - ${oJ} * ${wI} + ${oK} * ${wR}`,
-            ].join('\n')
-        },
-        divide: function (indices) {
-            const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
-            return [
-                `var mod = ${wR} * ${wR} + ${wI} * ${wI} + ${wJ} * ${wJ} + ${wK} * ${wK}`,
+    spread({ oi, wi, ri }) {
+        return {
+            oR: oi && this._o_(oi),
+            oI: oi && this._o_(oi + 1),
+            oJ: oi && this._o_(oi + 2),
+            oK: oi && this._o_(oi + 3),
 
-                `${rR} = (${wR} * ${oR} + ${wI} * ${oI} + ${wJ} * ${oJ} + ${wK} * ${oK}) / mod`,
-                `${rI} = (${wR} * ${oI} - ${wI} * ${oR} - ${wJ} * ${oK} + ${wK} * ${oJ}) / mod`,
-                `${rJ} = (${wR} * ${oJ} + ${wI} * ${oK} - ${wJ} * ${oR} - ${wK} * ${oI}) / mod`,
-                `${rK} = (${wR} * ${oK} - ${wI} * ${oJ} + ${wJ} * ${oI} - ${wK} * ${oR}) / mod`,
-            ].join('\n')
-        },
-        assign: function (indices) {
-            const { wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
-            return [
-                `${rR} = ${wR}`,
-                `${rI} = ${wI}`,
-                `${rJ} = ${wJ}`,
-                `${rK} = ${wK}`,
-            ].join('\n')
-        },
-        strOut: function ({ o, data }) {
-            return stringNumber(
-                data[o + 0],
-                data[o + 1],
-                data[o + 2],
-                data[o + 3])
-        },
-        strIn: function ({ num, o, data }) {
-            const number = parseNumber(num)
+            wR: wi && this._w_(wi),
+            wI: wi && this._w_(wi + 1),
+            wJ: wi && this._w_(wi + 2),
+            wK: wi && this._w_(wi + 3),
 
-            data[o + 0] = number.r
-            data[o + 1] = number.i
-            data[o + 2] = number.j
-            data[o + 3] = number.k
+            rR: ri && this._r_(ri),
+            rI: ri && this._r_(ri + 1),
+            rJ: ri && this._r_(ri + 2),
+            rK: ri && this._r_(ri + 3),
         }
     }
+
+    add(indices) {
+        const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
+        return [
+            `${rR} = ${oR} + ${wR}`,
+            `${rI} = ${oI} + ${wI}`,
+            `${rJ} = ${oJ} + ${wJ}`,
+            `${rK} = ${oK} + ${wK}`,
+        ].join('\n')
+    }
+
+    subtract(indices) {
+        const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
+        return [
+            `${rR} = ${oR} - ${wR}`,
+            `${rI} = ${oI} - ${wI}`,
+            `${rJ} = ${oJ} - ${wJ}`,
+            `${rK} = ${oK} - ${wK}`,
+        ].join('\n')
+    }
+
+    multiply(indices) {
+        const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
+        return [
+            `${rR} = ${oR} * ${wR} - ${oI} * ${wI} - ${oJ} * ${wJ} - ${oK} * ${wK}`,
+            `${rI} = ${oR} * ${wI} + ${oI} * ${wR} + ${oJ} * ${wK} - ${oK} * ${wJ}`,
+            `${rJ} = ${oR} * ${wJ} - ${oI} * ${wK} + ${oJ} * ${wR} + ${oK} * ${wI}`,
+            `${rK} = ${oR} * ${wK} + ${oI} * ${wJ} - ${oJ} * ${wI} + ${oK} * ${wR}`,
+        ].join('\n')
+    }
+
+    divide(indices) {
+        const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
+        return [
+            `var mod = ${wR} * ${wR} + ${wI} * ${wI} + ${wJ} * ${wJ} + ${wK} * ${wK}`,
+
+            `${rR} = (${wR} * ${oR} + ${wI} * ${oI} + ${wJ} * ${oJ} + ${wK} * ${oK}) / mod`,
+            `${rI} = (${wR} * ${oI} - ${wI} * ${oR} - ${wJ} * ${oK} + ${wK} * ${oJ}) / mod`,
+            `${rJ} = (${wR} * ${oJ} + ${wI} * ${oK} - ${wJ} * ${oR} - ${wK} * ${oI}) / mod`,
+            `${rK} = (${wR} * ${oK} - ${wI} * ${oJ} + ${wJ} * ${oI} - ${wK} * ${oR}) / mod`,
+        ].join('\n')
+    }
+
+    assign(indices) {
+        const { wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
+        return [
+            `${rR} = ${wR}`,
+            `${rI} = ${wI}`,
+            `${rJ} = ${wJ}`,
+            `${rK} = ${wK}`,
+        ].join('\n')
+    }
+
+    strOut({ i, data }) {
+        return stringNumber(
+            data[i + 0],
+            data[i + 1],
+            data[i + 2],
+            data[i + 3])
+    }
+
+    strIn({ num, i, data }) {
+        const number = parseNumber(num)
+
+        data[i + 0] = number.r
+        data[i + 1] = number.i
+        data[i + 2] = number.j
+        data[i + 3] = number.k
+    }
+
+}
+
+export default {
+    Uint8Clamped: new Quaternion(Uint8ClampedArray),
+    Uint8: new Quaternion(Uint8Array),
+    Uint16: new Quaternion(Uint16Array),
+    Uint32: new Quaternion(Uint32Array),
+    Int8: new Quaternion(Int8Array),
+    Int16: new Quaternion(Int16Array),
+    Int32: new Quaternion(Int32Array),
+    Float32: new Quaternion(Float32Array),
 }

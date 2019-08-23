@@ -25,10 +25,7 @@ export default class Header {
 
         this.strides = STRIDES in opts
             ? opts.strides
-            : resolveStrides({
-                shape: this.shape,
-                type: this.type
-            })
+            : resolveStrides({ shape: this.shape, type: this.type })
 
         this.id = `${this.type.name}|${this.shape}|${this.strides}|${this.offset}`
         this.size = this.shape.reduce(__Math__.multiply, 1)

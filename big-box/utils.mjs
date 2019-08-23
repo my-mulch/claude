@@ -96,12 +96,25 @@ export const stringNumber = function (r, i, j, k) {
     return ret;
 }
 
-export const shapeRaw = function (A, shape = []) {
-    if (A.constructor === Number || 
-        A.constructor === String)
+export const isTypedArray = function ({ data }) {
+    return data.constructor === Float32Array
+        || data.constructor === Int8Array
+        || data.constructor === Int16Array
+        || data.constructor === Int32Array
+        || data.constructor === Uint8Array
+        || data.constructor === Uint16Array
+        || data.constructor === Uint32Array
+        || data.constructor === Uint8ClampedArray
+}
+
+export const shapeRaw = function ({ data, shape = [] }) {
+    if (data.constructor !== Array)
         return shape
 
-    return shapeRaw(A[0], shape.concat(A.length))
+    return shapeRaw({
+        data: data[0],
+        shape: shape.concat(data.length)
+    })
 }
 
 export const shapeAlign = function ({ short, delta }) {

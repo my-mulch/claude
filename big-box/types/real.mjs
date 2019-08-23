@@ -1,44 +1,64 @@
 import { stringNumber, parseNumber } from '../utils'
 
-export default function (type) {
-    return {
-        size: 1,
-        array: type,
-        _o_: function (o) { return `args.of.data[${o}]` },
-        _w_: function (w) { return `args.with.data[${w}]` },
-        _r_: function (r) { return `args.result.data[${r}]` },
-        spread: function ({ o, w, r }) {
-            return {
-                oR: o && this._o_(o),
-                wR: w && this._w_(w),
-                rR: r && this._r_(r),
-            }
-        },
-        add: function (indices) {
-            const { oR, wR, rR } = this.spread(indices)
-            return `${rR} = ${oR} + ${wR}`
-        },
-        subtract: function (indices) {
-            const { oR, wR, rR } = this.spread(indices)
-            return `${rR} = ${oR} - ${wR}`
-        },
-        divide: function (indices) {
-            const { oR, wR, rR } = this.spread(indices)
-            return `${rR} = ${oR} / ${wR}`
-        },
-        multiply: function (indices) {
-            const { oR, wR, rR } = this.spread(indices)
-            return `${rR} = ${oR} * ${wR}`
-        },
-        assign: function (indices) {
-            const { wR, rR } = this.spread(indices)
-            return `${rR} = ${wR}`
-        },
-        strOut: function ({ o, data }) {
-            return stringNumber(data[o])
-        },
-        strIn: function ({ num, o, data }) {
-            data[o] = parseNumber(num).r
+class Real {
+    constructor(array) {
+        this.size = 1
+        this.array = array
+    }
+
+    _o_(oi) { return `args.of.data[${oi}]` }
+    _w_(wi) { return `args.with.data[${wi}]` }
+    _r_(ri) { return `args.result.data[${ri}]` }
+
+    spread({ oi, wi, ri }) {
+        return {
+            oR: oi && this._o_(oi),
+            wR: wi && this._w_(wi),
+            rR: ri && this._r_(ri),
         }
     }
+
+    add(indices) {
+        const { oR, wR, rR } = this.spread(indices)
+        return `${rR} = ${oR} + ${wR}`
+    }
+
+    subtract(indices) {
+        const { oR, wR, rR } = this.spread(indices)
+        return `${rR} = ${oR} - ${wR}`
+    }
+
+    divide(indices) {
+        const { oR, wR, rR } = this.spread(indices)
+        return `${rR} = ${oR} / ${wR}`
+    }
+
+    multiply(indices) {
+        const { oR, wR, rR } = this.spread(indices)
+        return `${rR} = ${oR} * ${wR}`
+    }
+
+    assign(indices) {
+        const { wR, rR } = this.spread(indices)
+        return `${rR} = ${wR}`
+    }
+
+    strOut({ i, data }) {
+        return stringNumber(data[i])
+    }
+
+    strIn({ num, i, data }) {
+        data[i] = parseNumber(num).r
+    }
+}
+
+export default {
+    Uint8Clamped: new Real(Uint8ClampedArray),
+    Uint8: new Real(Uint8Array),
+    Uint16: new Real(Uint16Array),
+    Uint32: new Real(Uint32Array),
+    Int8: new Real(Int8Array),
+    Int16: new Real(Int16Array),
+    Int32: new Real(Int32Array),
+    Float32: new Real(Float32Array),
 }
