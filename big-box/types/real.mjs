@@ -4,6 +4,7 @@ class Real {
     constructor(array) {
         this.size = 1
         this.array = array
+        this.name = Real.name
     }
 
     _o_(oi) { return `args.of.data[${oi}]` }
@@ -12,9 +13,9 @@ class Real {
 
     spread({ oi, wi, ri }) {
         return {
-            oR: oi && this._o_(oi),
-            wR: wi && this._w_(wi),
-            rR: ri && this._r_(ri),
+            oR: oi !== undefined && this._o_(oi),
+            wR: wi !== undefined && this._w_(wi),
+            rR: ri !== undefined && this._r_(ri),
         }
     }
 
@@ -36,6 +37,11 @@ class Real {
     multiply(indices) {
         const { oR, wR, rR } = this.spread(indices)
         return `${rR} = ${oR} * ${wR}`
+    }
+
+    sumMultiply(indices) {
+        const { oR, wR, rR } = this.spread(indices)
+        return `${rR} += ${oR} * ${wR}`
     }
 
     assign(indices) {

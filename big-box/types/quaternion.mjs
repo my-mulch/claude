@@ -4,6 +4,7 @@ class Quaternion {
     constructor(array) {
         this.size = 4
         this.array = array
+        this.name = Quaternion.name
     }
 
     _o_(oi) { return `args.of.data[${oi}]` }
@@ -12,20 +13,20 @@ class Quaternion {
 
     spread({ oi, wi, ri }) {
         return {
-            oR: oi && this._o_(oi),
-            oI: oi && this._o_(oi + 1),
-            oJ: oi && this._o_(oi + 2),
-            oK: oi && this._o_(oi + 3),
+            oR: oi !== undefined && this._o_(oi),
+            oI: oi !== undefined && this._o_(oi + 1),
+            oJ: oi !== undefined && this._o_(oi + 2),
+            oK: oi !== undefined && this._o_(oi + 3),
 
-            wR: wi && this._w_(wi),
-            wI: wi && this._w_(wi + 1),
-            wJ: wi && this._w_(wi + 2),
-            wK: wi && this._w_(wi + 3),
+            wR: wi !== undefined && this._w_(wi),
+            wI: wi !== undefined && this._w_(wi + 1),
+            wJ: wi !== undefined && this._w_(wi + 2),
+            wK: wi !== undefined && this._w_(wi + 3),
 
-            rR: ri && this._r_(ri),
-            rI: ri && this._r_(ri + 1),
-            rJ: ri && this._r_(ri + 2),
-            rK: ri && this._r_(ri + 3),
+            rR: ri !== undefined && this._r_(ri),
+            rI: ri !== undefined && this._r_(ri + 1),
+            rJ: ri !== undefined && this._r_(ri + 2),
+            rK: ri !== undefined && this._r_(ri + 3),
         }
     }
 
@@ -56,6 +57,16 @@ class Quaternion {
             `${rI} = ${oR} * ${wI} + ${oI} * ${wR} + ${oJ} * ${wK} - ${oK} * ${wJ}`,
             `${rJ} = ${oR} * ${wJ} - ${oI} * ${wK} + ${oJ} * ${wR} + ${oK} * ${wI}`,
             `${rK} = ${oR} * ${wK} + ${oI} * ${wJ} - ${oJ} * ${wI} + ${oK} * ${wR}`,
+        ].join('\n')
+    }
+
+    sumMultiply(indices) {
+        const { oR, oI, oJ, oK, wR, wI, wJ, wK, rR, rI, rJ, rK } = this.spread(indices)
+        return [
+            `${rR} += ${oR} * ${wR} - ${oI} * ${wI} - ${oJ} * ${wJ} - ${oK} * ${wK}`,
+            `${rI} += ${oR} * ${wI} + ${oI} * ${wR} + ${oJ} * ${wK} - ${oK} * ${wJ}`,
+            `${rJ} += ${oR} * ${wJ} - ${oI} * ${wK} + ${oJ} * ${wR} + ${oK} * ${wI}`,
+            `${rK} += ${oR} * ${wK} + ${oI} * ${wJ} - ${oJ} * ${wI} + ${oK} * ${wR}`,
         ].join('\n')
     }
 

@@ -4,6 +4,7 @@ class Complex {
     constructor(array) {
         this.size = 2
         this.array = array
+        this.name = Complex.name
     }
 
     _o_(oi) { return `args.of.data[${oi}]` }
@@ -12,14 +13,14 @@ class Complex {
 
     spread({ oi, wi, ri }) {
         return {
-            oR: oi && this._o_(oi),
-            oI: oi && this._o_(oi + 1),
+            oR: oi !== undefined && this._o_(oi),
+            oI: oi !== undefined && this._o_(oi + 1),
 
-            wR: wi && this._w_(wi),
-            wI: wi && this._w_(wi + 1),
+            wR: wi !== undefined && this._w_(wi),
+            wI: wi !== undefined && this._w_(wi + 1),
 
-            rR: ri && this._r_(ri),
-            rI: ri && this._r_(ri + 1),
+            rR: ri !== undefined && this._r_(ri),
+            rI: ri !== undefined && this._r_(ri + 1),
         }
     }
 
@@ -44,6 +45,14 @@ class Complex {
         return [
             `${rR} = ${oR} * ${wR} - ${oI} * ${wI}`,
             `${rI} = ${oR} * ${wI} + ${oI} * ${wR}`,
+        ].join('\n')
+    }
+
+    sumMultiply(indices) {
+        const { oR, oI, wR, wI, rR, rI } = this.spread(indices)
+        return [
+            `${rR} += ${oR} * ${wR} - ${oI} * ${wI}`,
+            `${rI} += ${oR} * ${wI} + ${oI} * ${wR}`,
         ].join('\n')
     }
 
