@@ -61,7 +61,9 @@ export default class BigBox {
                 type: args.type,
             }),
             init: function () {
-                return new this.type.array(this.size * this.type.size).fill(1)
+                return new this.type
+                    .array(this.size * this.type.size)
+                    .fill(1)
             }
         })
     }

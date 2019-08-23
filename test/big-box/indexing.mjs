@@ -1,7 +1,7 @@
 import bb from '../../big-box'
 import jest from '..'
 
-export default function () {
+export default jest.suite(function () {
     let A
 
     console.log('\n\n-------- Indexing Suite --------\n\n')
@@ -23,22 +23,22 @@ export default function () {
         [21, 2, 2]]]
     })
 
-    jest.expect(A.slice({ with: [0, 0, 0] })).toEqual("10")
+    this.expect(A.slice({ with: [0, 0, 0] })).toEqual("10")
 
-    jest.expect(A.slice({ with: [':', "0", ':'] }))
+    this.expect(A.slice({ with: [':', "0", ':'] }))
         .toEqual([
             ["10", "5", "2"],
             ["57", "7", "1"],
             ["90", "2", "5"]
         ])
 
-    jest.expect(A.slice({ with: [':', "0", ':'] }).T())
+    this.expect(A.slice({ with: [':', "0", ':'] }).T())
         .toEqual([
             ["10", "57", "90"],
             ["5", "7", "2"],
             ["2", "1", "5"]])
 
-    jest.expect(A.slice({ with: ["1", ':3', ':'] }))
+    this.expect(A.slice({ with: ["1", ':3', ':'] }))
         .toEqual([
             ["57", "7", "1"],
             ["44", "2", "2"],
@@ -47,7 +47,7 @@ export default function () {
 
     A.assign({ region: [':', "0", ':'], with: "1" })
 
-    jest.expect(A)
+    this.expect(A)
         .toEqual([
             [["1", "1", "1"],
             ["72", "6", "3"],
@@ -66,4 +66,4 @@ export default function () {
 
 
     console.log('\n\n-------- End Indexing Suite --------\n\n')
-}
+})
