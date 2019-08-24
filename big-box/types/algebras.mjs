@@ -8,7 +8,6 @@ class CDE extends Number {
         if (n.length === 1) {
             this.a = n[0].a || null
             this.b = n[0].b || null
-
             return
         }
 
@@ -17,55 +16,40 @@ class CDE extends Number {
     }
 
     add(element) {
-        if (this.size === 1)
-            return new CDE(this + element)
+        if (this.size === 1) return new CDE(this + element)
 
         return new CDE(this.a.add(element.a), this.b.add(element.b))
     }
 
     subtract(element) {
-        if (this.size === 1)
-            return new CDE(this - element)
+        if (this.size === 1) return new CDE(this - element)
 
         return new CDE(this.a.subtract(element.a), this.b.subtract(element.b))
     }
 
     multiply(element) {
-        if (this.size === 1)
-            return new CDE(this * element)
+        if (this.size === 1) return new CDE(this * element)
 
         return new CDE(
-            this.a
-                .multiply(element.a)
-                .subtract(
-                    element.b
-                        .conjugate()
-                        .multiply(this.b)
-                ),
-
-            element.b
-                .multiply(this.a)
-                .add(this.b.multiply(element.a.conjugate())),
+            this.a.multiply(element.a).subtract(element.b.conjugate().multiply(this.b)),
+            element.b.multiply(this.a).add(this.b.multiply(element.a.conjugate())),
         )
     }
 
     negate() {
-        if (this.size === 1)
-            return new CDE(-this)
+        if (this.size === 1) return new CDE(-this)
 
         return new CDE(this.a.negate(), this.b.negate())
     }
 
     conjugate() {
-        if (this.size === 1)
-            return new CDE(this)
+        if (this.size === 1) return new CDE(this)
 
         return new CDE(this.a.conjugate(), this.b.negate())
     }
 
     toString() {
-        if (this.size === 1)
-            return this + 0
+        if (this.size === 1) return this + 0
 
         return [this.a.toString(), this.b.toString()].flat(Number.POSITIVE_INFINITY)
     }
