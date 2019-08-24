@@ -1,72 +1,95 @@
 
-class CaleyDicksonElement {
-    constructor(a, b) {
-        this.a = a
-        this.b = b
+
+class CayleyDicksonElement extends Number {
+    constructor(...n) {
+        super(n)
+
+        this.size = n.reduce(function (size, element) {
+            return size + (element.size ? element.size : 1)
+        }, 0)
+
+        if (n.length === 1 && this.size === 1) {
+            this.a = this
+            this.b = 0
+
+            return
+        }
+
+        if (n.length === 1 && this.size > 1) {
+            this.a = n[0].a
+            this.b = n[0].b
+
+            return
+        }
+
+        this.a = new CayleyDicksonElement(...n.slice(0, n.length / 2))
+        this.b = new CayleyDicksonElement(...n.slice(n.length / 2))
     }
 
-    add(c, d) {
-        return new CaleyDicksonElement(
-            this.a.map(function (a, i) { return a + c[i] }),
-            this.b.map(function (b, i) { return b + d[i] }),
+    add(element) {
+        if (this.size === 1)
+            return new CayleyDicksonElement(this + element)
+
+        return new CayleyDicksonElement(
+            this.a.add(element.a),
+            this.b.add(element.b),
+        )
+    }
+
+    subtract(element) {
+        if (this.size === 1)
+            return new CayleyDicksonElement(this - element)
+
+        return new CayleyDicksonElement(
+            this.a.subtract(element.a),
+            this.b.subtract(element.b)
+        )
+    }
+
+    multiply(element) {
+        if (this.size === 1)
+            return new CayleyDicksonElement(this * element)
+
+        return new CayleyDicksonElement(
+            this.a.multiply(element.a).subtract(element.b.conjugate().multiply(this.b)),
+            element.b.multiply(this.a).add(this.b.multiply(element.a.conjugate())),
+        )
+    }
+
+    negate() {
+        if (this.size === 1)
+            return new CayleyDicksonElement(-this)
+
+        return new CayleyDicksonElement(
+            this.a.negate(),
+            this.b.negate(),
+        )
+    }
+
+    conjugate() {
+        if (this.size === 1)
+            return new CayleyDicksonElement(this)
+
+        return new CayleyDicksonElement(
+            this.a.conjugate(),
+            this.b.negate(),
         )
     }
 }
 
-class CaleyDicksonAlgebra {
-    static addition(a, b, c, d) {
-        return new CaleyDicksonElement(
-            a.add(c),
-            b.add(d)
-        )
-    }
+const real1 = new CayleyDicksonElement(12)
+const real2 = new CayleyDicksonElement(15)
 
-    static subtraction(a, b, c, d) {
-        return new CaleyDicksonElement(
-            a.subtract(c),
-            b.subtract(d)
-        )
-    }
+console.log(real1.multiply(real2))
 
-    static multiplication(a, b, c, d) {
-        return new CaleyDicksonElement(
-            a.multiply(c).subtract(d.conjugate().multiply(b)),
-            d.multiply(a).add(b.multiply(c.conjugate()))
-        )
-    }
+const complex1 = new CayleyDicksonElement(12, 7)
+const complex2 = new CayleyDicksonElement(15, 13)
 
-    static division(a, b, c, d) {
-        const modulus = c.conjugate().multiply(c).add(d.conjugate().multiply(d))
+console.log(complex1.multiply(complex2))
 
-        return new CaleyDicksonElement(
-            a.multiply(c.conjugate().add(d.conjugate().multiply(b))),
-            b.multiply(c).subtract(d.multiply(a))
-        ).scale(1 / modulus)
-    }
+const quat1 = new CayleyDicksonElement(12, 10, 40, 7)
+const quat2 = new CayleyDicksonElement(15, 13, 42, 5)
 
-    static conjugation() {
-        return new CaleyDicksonElement(
-            a.conjugate(),
-            b.negate()
-        )
-    }
+console.log(quat1.multiply(quat2))
 
-    static negation() {
-        return new CaleyDicksonElement(
-            a.negate(),
-            b.negate()
-        )
-    }
 
-    static scalarMultiplication(lambda) {
-        return new CaleyDicksonElement(
-            a.scale(lambda),
-            b.scale(lambda)
-        )
-    }
-}
-
-const quat1 = new CaleyDicksonElement([12, 10], [40, 7])
-const quat2 = new CaleyDicksonElement([15, 13], [42, 5])
-
-CaleyDicksonAlgebra.addition()
