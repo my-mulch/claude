@@ -6,8 +6,8 @@ class CDE extends Number {
         this.size = n.length * (n[0].size || 1)
 
         if (n.length === 1) {
-            this.a = n[0].a || null
-            this.b = n[0].b || null
+            this.a = n[0].a || this
+            this.b = n[0].b || 0
             return
         }
 
@@ -15,24 +15,24 @@ class CDE extends Number {
         this.b = new CDE(...n.slice(n.length / 2))
     }
 
-    add(element) {
-        if (this.size === 1) return new CDE(this + element)
+    add({ a, b }) {
+        if (this.size === 1) return new CDE(this + a)
 
-        return new CDE(this.a.add(element.a), this.b.add(element.b))
+        return new CDE(this.a.add(a), this.b.add(b))
     }
 
-    subtract(element) {
-        if (this.size === 1) return new CDE(this - element)
+    subtract({ a, b }) {
+        if (this.size === 1) return new CDE(this - a)
 
-        return new CDE(this.a.subtract(element.a), this.b.subtract(element.b))
+        return new CDE(this.a.subtract(a), this.b.subtract(b))
     }
 
-    multiply(element) {
-        if (this.size === 1) return new CDE(this * element)
+    multiply({ a, b }) {
+        if (this.size === 1) return new CDE(this * a)
 
         return new CDE(
-            this.a.multiply(element.a).subtract(element.b.conjugate().multiply(this.b)),
-            element.b.multiply(this.a).add(this.b.multiply(element.a.conjugate())),
+            this.a.multiply(a).subtract(b.conjugate().multiply(this.b)),
+            b.multiply(this.a).add(this.b.multiply(a.conjugate())),
         )
     }
 
@@ -48,6 +48,22 @@ class CDE extends Number {
         return new CDE(this.a.conjugate(), this.b.negate())
     }
 
+    square() {
+        if (this.size === 1) return new CDE(this * this)
+
+        return new CDE(this.a.square(), this.b.square())
+    }
+
+    sum() {
+        if (this.size === 1) return new CDE(this)
+
+        return this.a.sum().add(this.b.sum())
+    }
+
+    norm(){
+        return Math.sqrt(this.square().sum())
+    }
+
     toString() {
         if (this.size === 1) return this + 0
 
@@ -58,24 +74,24 @@ class CDE extends Number {
 const real1 = new CDE(12)
 const real2 = new CDE(15)
 
-console.log(real1.multiply(real2).toString())
+console.log(real1.norm().toString())
 
 const complex1 = new CDE(12, 7)
 const complex2 = new CDE(15, 13)
 
-console.log(complex1.multiply(complex2).toString())
+console.log(complex1.norm().toString())
 
 const quat1 = new CDE(12, 10, 40, 7)
 const quat2 = new CDE(15, 13, 42, 5)
 
-console.log(quat1.multiply(quat2).toString())
+console.log(quat1.norm().toString())
 
 const oct1 = new CDE(2, 3, 1, 2, 4, 3, 4, 2)
 const oct2 = new CDE(2, 3, 1, 2, 4, 3, 4, 2)
 
-console.log(oct1.multiply(oct2).toString())
+console.log(oct1.norm().toString())
 
 const sed1 = new CDE(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53)
 const sed2 = new CDE(2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53)
 
-console.log(sed1.multiply(sed2).toString())
+console.log(sed1.norm().toString())
