@@ -6,8 +6,8 @@ import {
     selfAxesAndShape, pairAxesAndShape, // operation utils
 } from './utils'
 
-import Types from './types'
 import Header from './header'
+import Algebras from './algebras'
 import Operations from './operations'
 
 import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from '../resources/big-box'
@@ -356,32 +356,42 @@ export default class BigBox {
     [util.inspect.custom]() { return this.toString() }
 }
 
+/** Octonion types */
+BigBox.OctUint8Clamped = { ...Algebras.OCTONION, array: Uint8ClampedArray }
+BigBox.OctUint8 = { ...Algebras.OCTONION, array: Uint8Array }
+BigBox.OctUint16 = { ...Algebras.OCTONION, array: Uint16Array }
+BigBox.OctUint32 = { ...Algebras.OCTONION, array: Uint32Array }
+BigBox.OctInt8 = { ...Algebras.OCTONION, array: Int8Array }
+BigBox.OctInt16 = { ...Algebras.OCTONION, array: Int16Array }
+BigBox.OctInt32 = { ...Algebras.OCTONION, array: Int32Array }
+BigBox.OctFloat32 = { ...Algebras.OCTONION, array: Float32Array }
+
 /** Quaternion types */
-BigBox.QuatUint8Clamped = Types.Quaternion.Uint8Clamped
-BigBox.QuatUint8 = Types.Quaternion.Uint8
-BigBox.QuatUint16 = Types.Quaternion.Uint16
-BigBox.QuatUint32 = Types.Quaternion.Uint32
-BigBox.QuatInt8 = Types.Quaternion.Int8
-BigBox.QuatInt16 = Types.Quaternion.Int16
-BigBox.QuatInt32 = Types.Quaternion.Int32
-BigBox.QuatFloat32 = Types.Quaternion.Float32
+BigBox.QuatUint8Clamped = { ...Algebras.QUATERNION, array: Uint8ClampedArray }
+BigBox.QuatUint8 = { ...Algebras.QUATERNION, array: Uint8Array }
+BigBox.QuatUint16 = { ...Algebras.QUATERNION, array: Uint16Array }
+BigBox.QuatUint32 = { ...Algebras.QUATERNION, array: Uint32Array }
+BigBox.QuatInt8 = { ...Algebras.QUATERNION, array: Int8Array }
+BigBox.QuatInt16 = { ...Algebras.QUATERNION, array: Int16Array }
+BigBox.QuatInt32 = { ...Algebras.QUATERNION, array: Int32Array }
+BigBox.QuatFloat32 = { ...Algebras.QUATERNION, array: Float32Array }
 
 /** Complex types */
-BigBox.ComplexUint8Clamped = Types.Complex.Uint8Clamped
-BigBox.ComplexUint8 = Types.Complex.Uint8
-BigBox.ComplexUint16 = Types.Complex.Uint16
-BigBox.ComplexUint32 = Types.Complex.Uint32
-BigBox.ComplexInt8 = Types.Complex.Int8
-BigBox.ComplexInt16 = Types.Complex.Int16
-BigBox.ComplexInt32 = Types.Complex.Int32
-BigBox.ComplexFloat32 = Types.Complex.Float32
+BigBox.ComplexUint8Clamped = { ...Algebras.COMPLEX, array: Uint8ClampedArray }
+BigBox.ComplexUint8 = { ...Algebras.COMPLEX, array: Uint8Array }
+BigBox.ComplexUint16 = { ...Algebras.COMPLEX, array: Uint16Array }
+BigBox.ComplexUint32 = { ...Algebras.COMPLEX, array: Uint32Array }
+BigBox.ComplexInt8 = { ...Algebras.COMPLEX, array: Int8Array }
+BigBox.ComplexInt16 = { ...Algebras.COMPLEX, array: Int16Array }
+BigBox.ComplexInt32 = { ...Algebras.COMPLEX, array: Int32Array }
+BigBox.ComplexFloat32 = { ...Algebras.COMPLEX, array: Float32Array }
 
 /** Real types */
-BigBox.Uint8Clamped = Types.Real.Uint8Clamped
-BigBox.Uint8 = Types.Real.Uint8
-BigBox.Uint16 = Types.Real.Uint16
-BigBox.Uint32 = Types.Real.Uint32
-BigBox.Int8 = Types.Real.Int8
-BigBox.Int16 = Types.Real.Int16
-BigBox.Int32 = Types.Real.Int32
-BigBox.Float32 = Types.Real.Float32
+BigBox.Uint8Clamped = { ...Algebras.REAL, array: Uint8ClampedArray }
+BigBox.Uint8 = { ...Algebras.REAL, array: Uint8Array }
+BigBox.Uint16 = { ...Algebras.REAL, array: Uint16Array }
+BigBox.Uint32 = { ...Algebras.REAL, array: Uint32Array }
+BigBox.Int8 = { ...Algebras.REAL, array: Int8Array }
+BigBox.Int16 = { ...Algebras.REAL, array: Int16Array }
+BigBox.Int32 = { ...Algebras.REAL, array: Int32Array }
+BigBox.Float32 = { ...Algebras.REAL, array: Float32Array }
