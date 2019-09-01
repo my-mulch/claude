@@ -10,6 +10,7 @@ class Algebra {
         this.sum = this.fn('{ oi, ri }', this.o.sum())
         this.negate = this.fn('{ oi, ri }', this.o.negate())
         this.square = this.fn('{ oi, ri }', this.o.square())
+        this.assign = this.fn('{ oi, ri }', this.o.assign())
         this.scale = this.fn('{ oi, ri, c }', this.o.scale('c'))
         this.conjugate = this.fn('{ oi, ri }', this.o.conjugate())
 
@@ -17,6 +18,9 @@ class Algebra {
         this.divide = this.fn('{ oi, wi, ri }', this.o.divide(this.w))
         this.subtract = this.fn('{ oi, wi, ri }', this.o.subtract(this.w))
         this.multiply = this.fn('{ oi, wi, ri }', this.o.multiply(this.w))
+
+        this.strIn = this.strIn.bind(this)
+        this.strOut = this.strOut.bind(this)
     }
 
     fn(args, body) {
@@ -29,6 +33,21 @@ class Algebra {
             .join('\n')
             .concat('\n')
             .concat('return this.result'))
+    }
+
+    strOut({ i, data }) {
+        const string =  new Element(...data.slice(i, i + this.size)).display()
+
+        if(string.startsWith('+')) return string.slice(1)
+
+        return string
+    }
+
+    strIn({ value, i, data }) {
+        return this.assign.call({
+            of: { data: value },
+            result: { data },
+        }, { oi: 0, ri: i })
     }
 }
 

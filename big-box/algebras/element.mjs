@@ -80,4 +80,22 @@ export default class Element extends String {
     norm() {
         return Math.sqrt(this.square().sum())
     }
+
+    assign() {
+        if (this.size === 1)
+            return new Element(`${this}`)
+
+        return new Element(this.a.assign(), this.b.assign())
+    }
+
+    display() {
+        if (this.size === 1) {
+            const value = Number(this)
+            const sign = Math.sign(value) < 0 ? '-' : '+'
+
+            return new Element(`${sign}${Math.abs(value)}`)
+        }
+
+        return [this.a.display(), this.b.display()].toString().split(',').join('')
+    }
 }

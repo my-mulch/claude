@@ -38,7 +38,11 @@ export default class BigBox {
                 const raw = [args.with].flat(Number.POSITIVE_INFINITY)
 
                 for (let i = 0, j = 0; i < data.length; i += this.type.size, j++)
-                    this.type.strIn({ num: raw[j % raw.length], i, data })
+                    this.type.strIn({
+                        value: String(raw[j % raw.length]).match(/(\+|-)*\s*\d+(\.\d*)?/g).map(_ => _.replace(/ +/g, "")),
+                        i,
+                        data
+                    })
 
                 return data
             }
