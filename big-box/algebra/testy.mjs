@@ -1,16 +1,20 @@
 import { __split__ } from './utils.mjs'
 
 export default class Algebra {
-    constructor({ dimension, prefix }) {
+    constructor({ dimensions, prefix }) {
         this.prefix = prefix
-        this.dimension = dimension
+        this.dimensions = dimensions
 
-        this.o1 = [...new Array(this.dimension).keys()].map(function (e) { return `this.of.data[oi + ${e}]` })
-        this.o2 = [...new Array(this.dimension).keys()].map(function (e) { return `this.with.data[wi + ${e}]` })
+        this.o = function (_, d) { return `this.of.data[oi + ${d}]` }
+        this.w = function (_, d) { return `this.with.data[wi + ${d}]` }
+        this.r = function (expression, d) { return `this.result.data[ri + ${d}] = ${expression}` }
 
-        this.add = this.__add__(this.o1, this.o2)
-        this.subtract = this.__subtract__(this.o1, this.o2)
-        this.multiply = this.__multiply__(this.o1, this.o2)
+        this.o1 = new Array(this.dimensions).fill(null).map(this.o)
+        this.o2 = new Array(this.dimensions).fill(null).map(this.w)
+
+        this.add = this.__add__(this.o1, this.o2).flat(this.dimensions).map(this.r)
+        this.sub = this.__subtract__(this.o1, this.o2).flat(this.dimensions).map(this.r)
+        this.mul = this.__multiply__(this.o1, this.o2).flat(this.dimensions).map(this.r)
     }
 
     __add__(o1, o2) {
@@ -81,6 +85,11 @@ export default class Algebra {
     }
 }
 
-const Quaternion = new Algebra({ dimension: 4, prefix: 'Quat' })
+const Complex = new Algebra({ dimensions: 4, prefix: 'Complex' })
 
-console.log(Quaternion.multiply)
+console.log(Complex.mul)
+
+const data = {
+    of: { data: [-5, 2] },
+    with: { data: [10, 13] }
+}
