@@ -1,8 +1,8 @@
 import {
-    __Math__, Algebras, // misc resources
+    __Math__, // misc resources
     SHAPE, OFFSET, CONTIG, STRIDES, // init resources
-    PARTIAL_SLICE_REGEX, NUMBER_REGEX, SLICE_CHARACTER, // slice resources
-} from '../../resources/big-box'
+    PARTIAL_SLICE_REGEX, NUMBER_REGEX, SLICE_CHARACTER_REGEX, // slice resources
+} from '../resources'
 
 import { resolveStrides, resolveContiguity, resolveReshape } from './utils'
 
@@ -48,7 +48,7 @@ export default class Header {
              *  If the index is a ':', the user wants that entire dimension 
              */
 
-            if (index[i] === SLICE_CHARACTER || index[i] === undefined)
+            if (index[i] === SLICE_CHARACTER_REGEX || index[i] === undefined)
                 shape.push(this.shape[i]), strides.push(this.strides[i])
 
             /** 
@@ -56,7 +56,7 @@ export default class Header {
             */
 
             else if (PARTIAL_SLICE_REGEX.test(index[i])) {
-                let [low, high] = index[i].split(SLICE_CHARACTER).map(Number)
+                let [low, high] = index[i].split(SLICE_CHARACTER_REGEX).map(Number)
 
                 if (high === 0)
                     high = this.shape[i]

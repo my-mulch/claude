@@ -6,10 +6,10 @@ import {
     selfAxesAndShape, pairAxesAndShape, // operation utils
 } from './utils'
 
-import Header from './header'
-import Operations from './operations'
+import Header from '../header'
+import Operations from '../operations'
 
-import { __Math__, ARRAY_SPACER, ARRAY_REPLACER } from '../resources/big-box'
+import { __Math__, ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX } from '../resources'
 
 export default class Tensor {
     constructor({ header, init = function () {
@@ -36,10 +36,10 @@ export default class Tensor {
                 const raw = [args.with].flat(Number.POSITIVE_INFINITY)
 
                 for (let i = 0, j = 0; i < data.length; i += this.type.size, j++)
-                    this.type.strIn({
-                        value: String(raw[j % raw.length]).match(/(\+|-)*\s*\d+(\.\d*)?/g).map(_ => _.replace(/ +/g, "")),
-                        i,
-                        data
+                    this.type.dataIn({
+                        index: i,
+                        value: raw[j % raw.length],
+                        destination: data
                     })
 
                 return data
@@ -352,7 +352,7 @@ export default class Tensor {
     toString() {
         return JSON
             .stringify(this.toRaw())
-            .replace(ARRAY_SPACER, ARRAY_REPLACER)
+            .replace(ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX)
     }
 
     [util.inspect.custom]() { return this.toString() }

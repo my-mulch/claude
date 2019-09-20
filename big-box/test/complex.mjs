@@ -1,5 +1,5 @@
-import bb from '../../big-box'
-import jest from '..'
+import bb from '..'
+import jest from '../../test'
 
 export default jest.suite(function () {
 

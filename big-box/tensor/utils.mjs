@@ -1,4 +1,4 @@
-import { __Math__ } from '../resources/big-box'
+import { __Math__ } from '../resources'
 
 export const isTypedArray = function ({ data }) {
     return data.constructor === Float32Array

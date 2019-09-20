@@ -1,4 +1,4 @@
-import { __Math__ } from '../../resources/big-box'
+import { __Math__ } from '../resources'
 
 export const resolveContiguity = function ({ index }) {
     let lastSeenSLice = -1
