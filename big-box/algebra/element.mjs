@@ -99,3 +99,8 @@ export default class Element extends String {
         return [this.a.display(), this.b.display()].toString().split(',').join('')
     }
 }
+
+const a = new Element('a', 'b')
+const b = new Element('c', 'd')
+
+console.log(a.multiply(b).toString().split(','))

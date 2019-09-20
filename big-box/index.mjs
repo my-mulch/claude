@@ -360,42 +360,9 @@ export default class BigBox {
     [util.inspect.custom]() { return this.toString() }
 }
 
-/** Octonion types */
-BigBox.OctUint8Clamped = { ...Algebras.OCTONION, array: Uint8ClampedArray }
-BigBox.OctUint8 = { ...Algebras.OCTONION, array: Uint8Array }
-BigBox.OctUint16 = { ...Algebras.OCTONION, array: Uint16Array }
-BigBox.OctUint32 = { ...Algebras.OCTONION, array: Uint32Array }
-BigBox.OctInt8 = { ...Algebras.OCTONION, array: Int8Array }
-BigBox.OctInt16 = { ...Algebras.OCTONION, array: Int16Array }
-BigBox.OctInt32 = { ...Algebras.OCTONION, array: Int32Array }
-BigBox.OctFloat32 = { ...Algebras.OCTONION, array: Float32Array }
-
-/** Quaternion types */
-BigBox.QuatUint8Clamped = { ...Algebras.QUATERNION, array: Uint8ClampedArray }
-BigBox.QuatUint8 = { ...Algebras.QUATERNION, array: Uint8Array }
-BigBox.QuatUint16 = { ...Algebras.QUATERNION, array: Uint16Array }
-BigBox.QuatUint32 = { ...Algebras.QUATERNION, array: Uint32Array }
-BigBox.QuatInt8 = { ...Algebras.QUATERNION, array: Int8Array }
-BigBox.QuatInt16 = { ...Algebras.QUATERNION, array: Int16Array }
-BigBox.QuatInt32 = { ...Algebras.QUATERNION, array: Int32Array }
-BigBox.QuatFloat32 = { ...Algebras.QUATERNION, array: Float32Array }
-
-/** Complex types */
-BigBox.ComplexUint8Clamped = { ...Algebras.COMPLEX, array: Uint8ClampedArray }
-BigBox.ComplexUint8 = { ...Algebras.COMPLEX, array: Uint8Array }
-BigBox.ComplexUint16 = { ...Algebras.COMPLEX, array: Uint16Array }
-BigBox.ComplexUint32 = { ...Algebras.COMPLEX, array: Uint32Array }
-BigBox.ComplexInt8 = { ...Algebras.COMPLEX, array: Int8Array }
-BigBox.ComplexInt16 = { ...Algebras.COMPLEX, array: Int16Array }
-BigBox.ComplexInt32 = { ...Algebras.COMPLEX, array: Int32Array }
-BigBox.ComplexFloat32 = { ...Algebras.COMPLEX, array: Float32Array }
-
-/** Real types */
-BigBox.Uint8Clamped = { ...Algebras.REAL, array: Uint8ClampedArray }
-BigBox.Uint8 = { ...Algebras.REAL, array: Uint8Array }
-BigBox.Uint16 = { ...Algebras.REAL, array: Uint16Array }
-BigBox.Uint32 = { ...Algebras.REAL, array: Uint32Array }
-BigBox.Int8 = { ...Algebras.REAL, array: Int8Array }
-BigBox.Int16 = { ...Algebras.REAL, array: Int16Array }
-BigBox.Int32 = { ...Algebras.REAL, array: Int32Array }
-BigBox.Float32 = { ...Algebras.REAL, array: Float32Array }
+BigBox.types = [
+    new Algebra({ size: 1, prefix: 'Real' }),
+    new Algebra({ size: 2, prefix: 'Complex' }),
+    new Algebra({ size: 4, prefix: 'Quat' }),
+    new Algebra({ size: 8, prefix: 'Oct' }),
+]
