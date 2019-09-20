@@ -1,4 +1,5 @@
-import { PARSE_NUMBER_REGEX, REMOVE_SPACES } from '../resources'
+import { removeSpaces } from './utils'
+import { PARSE_NUMBER_REGEX, NUMERIC_SYMBOLS } from '../resources'
 
 export default class DataType {
     constructor({ algebra, array }) {
@@ -7,17 +8,28 @@ export default class DataType {
         this.size = this.algebra.dimensions
     }
 
-    dataOut({ i, data }) {
-        
+    parseNumber(number) {
+        return String(number)
+            .match(PARSE_NUMBER_REGEX)
+            .map(removeSpaces)
+            .map(Number)
     }
 
-    dataIn({ value, index, destination }) {
-        value = String(value)
-            .match(PARSE_NUMBER_REGEX)
-            .map(REMOVE_SPACES)
-            .map(Number)
+    stringNumber({ index, data }) {
+        let string = ''
 
-        for (let i = 0; i < this.value.length; i++)
-            destination[index + i] = value[i]
+        for (let i = 0; i < this.size; i++) {
+            const number = data[index + i]
+            const sign = Math.sign(number) < 0 ? '-' : '+'
+
+            if (i === 0 && sign === '+') {
+                string += data[index]
+                continue
+            }
+            
+            string += `${sign}${data[index]}${NUMERIC_SYMBOLS[i]}`
+        }
+
+        return string
     }
 }

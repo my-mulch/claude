@@ -6,10 +6,12 @@ import {
     selfAxesAndShape, pairAxesAndShape, // operation utils
 } from './utils'
 
+import {
+    __Math__, ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX
+} from '../resources'
+
 import Header from '../header'
 import Operations from '../operations'
-
-import { __Math__, ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX } from '../resources'
 
 export default class Tensor {
     constructor({ header, init = function () {
@@ -33,14 +35,10 @@ export default class Tensor {
                     return args.with
 
                 const data = new this.type.array(this.size * this.type.size)
-                const raw = [args.with].flat(Number.POSITIVE_INFINITY)
 
-                for (let i = 0, j = 0; i < data.length; i += this.type.size, j++)
-                    this.type.dataIn({
-                        index: i,
-                        value: raw[j % raw.length],
-                        destination: data
-                    })
+                data.set([args.with]
+                    .flat(Number.POSITIVE_INFINITY)
+                    .map(this.type.parseNumber))
 
                 return data
             }
@@ -340,9 +338,9 @@ export default class Tensor {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return this.type.strOut({ i: index, data: this.data })
+            return this.type.stringNumber({ index, data: this.data })
 
-        return [...new Tensor(this.shape[depth]).keys()].map(function (i) {
+        return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
         }, this)
     }

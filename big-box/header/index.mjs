@@ -8,7 +8,7 @@ import { resolveStrides, resolveContiguity, resolveReshape } from './utils'
 
 export default class Header {
     constructor(opts) {
-        this.type = Header[opts.type.name]
+        this.type = opts.type
 
         this.shape = SHAPE in opts
             ? opts.shape
