@@ -1,59 +1,97 @@
-import Element from './element.mjs'
 
-class Algebra {
-    constructor(size) {
-        this.size = size
+export default class Algebra {
+    constructor({ dimensions, prefix = '' }) {
+        this.prefix = prefix
+        this.dimensions = dimensions
+        this.precisions = {}
 
-        this.o = new Element(...[...new Array(size).keys()].map(function (e) { return `this.of.data[oi + ${e}]` }))
-        this.w = new Element(...[...new Array(size).keys()].map(function (e) { return `this.with.data[wi + ${e}]` }))
+        /** Elements */
+        this.o1 = new Array(this.dimensions).fill(null).map(this.__of__)
+        this.o2 = new Array(this.dimensions).fill(null).map(this.__with__)
 
-        this.sum = this.fn('{ oi, ri }', this.o.sum())
-        this.negate = this.fn('{ oi, ri }', this.o.negate())
-        this.square = this.fn('{ oi, ri }', this.o.square())
-        this.assign = this.fn('{ oi, ri }', this.o.assign())
-        this.scale = this.fn('{ oi, ri, c }', this.o.scale('c'))
-        this.conjugate = this.fn('{ oi, ri }', this.o.conjugate())
+        /** Operations */
+        this.neg = this.__format__(Algebra.negation(this.o1, this.o2))
+        this.cnj = this.__format__(Algebra.conjugatation(this.o1, this.o2))
 
-        this.add = this.fn('{ oi, wi, ri }', this.o.add(this.w))
-        this.divide = this.fn('{ oi, wi, ri }', this.o.divide(this.w))
-        this.subtract = this.fn('{ oi, wi, ri }', this.o.subtract(this.w))
-        this.multiply = this.fn('{ oi, wi, ri }', this.o.multiply(this.w))
+        this.add = this.__format__(Algebra.addition(this.o1, this.o2))
+        this.sub = this.__format__(Algebra.subtraction(this.o1, this.o2))
+        this.mul = this.__format__(Algebra.multiplication(this.o1, this.o2))
 
-        this.strIn = this.strIn.bind(this)
-        this.strOut = this.strOut.bind(this)
+        this.mac = this.__format__(Algebra.multiplication(this.o1, this.o2), '+=')
     }
 
-    fn(args, body) {
-        return new Function(args, body
-            .toString()
-            .split(',')
-            .map(function (computation, i) {
-                return `this.result.data[ri + ${i}] = ${computation}`
-            })
-            .join('\n')
-            .concat('\n')
-            .concat('return this.result'))
+    __of__(_, dimension) { return `this.of.data[ofIndex+${dimension}]` }
+    __with__(_, dimension) { return `this.with.data[withIndex+${dimension}]` }
+
+    __result__(assignmentType) {
+        return function (value, dimension) {
+            return `this.result.data[resultIndex+${dimension}]${assignmentType}${value}`
+        }
     }
 
-    strOut({ i, data }) {
-        const string =  new Element(...data.slice(i, i + this.size)).display()
-
-        if(string.startsWith('+')) return string.slice(1)
-
-        return string
+    __format__(operation, assignmentType = '=') {
+        return new Function('{oi,wi,ri}', `return "${
+            operation
+                .map(this.__result__(assignmentType))
+                .join(';')}"
+            .replace(/ofIndex/g, oi)
+            .replace(/withIndex/g, wi)
+            .replace(/resultIndex/g, ri)`)
     }
 
-    strIn({ value, i, data }) {
-        return this.assign.call({
-            of: { data: value },
-            result: { data },
-        }, { oi: 0, ri: i })
+    static split(o1 = [], o2 = []) {
+        return [
+            o1.slice(0, o1.length / 2), o1.slice(o1.length / 2),
+            o2.slice(0, o2.length / 2), o2.slice(o2.length / 2),
+        ]
     }
-}
 
-export default {
-    REAL: new Algebra(1),
-    COMPLEX: new Algebra(2),
-    OCTONION: new Algebra(8),
-    QUATERNION: new Algebra(4),
+    static addition(o1, o2) {
+        if (o1.length === 1) return [`(${o1}+${o2})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.addition(a, c), Algebra.addition(b, d)].flat(this.dimensions)
+    }
+
+    static subtraction(o1, o2) {
+        if (o1.length === 1) return [`(${o1}-${o2})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.subtraction(a, c), Algebra.subtraction(b, d)].flat(this.dimensions)
+    }
+
+    static multiplication(o1, o2) {
+        if (o1.length === 1) return [`(${o1}*${o2})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [
+            Algebra.subtraction(
+                Algebra.multiplication(a, c),
+                Algebra.multiplication(Algebra.conjugatation(d), b)
+            ),
+            Algebra.addition(
+                Algebra.multiplication(d, a),
+                Algebra.multiplication(b, Algebra.conjugatation(c))
+            )
+        ].flat(this.dimensions)
+    }
+
+    static conjugatation(o1) {
+        if (o1.length === 1) return [`(${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.conjugatation(a), Algebra.negation(b)].flat(this.dimensions)
+    }
+
+    static negation(o1) {
+        if (o1.length === 1) return [`-(${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.negation(a), Algebra.negation(b)].flat(this.dimensions)
+    }
 }

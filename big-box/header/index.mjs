@@ -1,5 +1,5 @@
 import {
-    __Math__, // misc resources
+    __Math__, Algebras, // misc resources
     SHAPE, OFFSET, CONTIG, STRIDES, // init resources
     PARTIAL_SLICE_REGEX, NUMBER_REGEX, SLICE_CHARACTER, // slice resources
 } from '../../resources/big-box'
@@ -7,9 +7,8 @@ import {
 import { resolveStrides, resolveContiguity, resolveReshape } from './utils'
 
 export default class Header {
-
     constructor(opts) {
-        this.type = opts.type
+        this.type = Header[opts.type.name]
 
         this.shape = SHAPE in opts
             ? opts.shape

@@ -19,3 +19,4 @@ export const __Math__ = Object.assign(Math, {
     divide: function (a, b) { return a / b },
     multiply: function (a, b) { return a * b },
 })
+
