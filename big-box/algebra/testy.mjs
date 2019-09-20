@@ -1,95 +1,96 @@
-import { __split__ } from './utils.mjs'
 
 export default class Algebra {
     constructor({ dimensions, prefix }) {
         this.prefix = prefix
         this.dimensions = dimensions
 
-        this.o = function (_, d) { return `this.of.data[oi + ${d}]` }
-        this.w = function (_, d) { return `this.with.data[wi + ${d}]` }
-        this.r = function (expression, d) { return `this.result.data[ri + ${d}] = ${expression}` }
+        /** Elements */
+        this.o1 = new Array(this.dimensions).fill(null).map(this.__of__)
+        this.o2 = new Array(this.dimensions).fill(null).map(this.__with__)
 
-        this.o1 = new Array(this.dimensions).fill(null).map(this.o)
-        this.o2 = new Array(this.dimensions).fill(null).map(this.w)
+        /** Operations */
+        this.neg = this.__format__(Algebra.negation(this.o1, this.o2))
+        this.cnj = this.__format__(Algebra.conjugatation(this.o1, this.o2))
 
-        this.add = this.__add__(this.o1, this.o2).flat(this.dimensions).map(this.r)
-        this.sub = this.__subtract__(this.o1, this.o2).flat(this.dimensions).map(this.r)
-        this.mul = this.__multiply__(this.o1, this.o2).flat(this.dimensions).map(this.r)
+        this.add = this.__format__(Algebra.addition(this.o1, this.o2))
+        this.sub = this.__format__(Algebra.subtraction(this.o1, this.o2))
+        this.mul = this.__format__(Algebra.multiplication(this.o1, this.o2))
     }
 
-    __add__(o1, o2) {
-        if (o1.length === 1)
-            return [`(${o1} + ${o2})`]
+    __of__(_, dimension) { return `this.of.data[ofIndex+${dimension}]` }
+    __with__(_, dimension) { return `this.with.data[withIndex+${dimension}]` }
 
-        const [a, b, c, d] = __split__(o1, o2)
+    __result__(assignmentType) {
+        return function (value, dimension) {
+            return `this.result.data[resultIndex+${dimension}]${assignmentType}${value}`
+        }
+    }
 
+    __format__(operation, assignmentType = '=') {
+        return new Function('{oi,wi,ri}', `return "${
+            operation
+                .flat(this.dimensions)
+                .map(this.__result__(assignmentType))
+                .join(';')}"
+            .replace(/ofIndex/g, oi)
+            .replace(/withIndex/g, wi)
+            .replace(/resultIndex/g, ri)`)
+    }
+
+    static split(o1 = [], o2 = []) {
         return [
-            this.__add__(a, c),
-            this.__add__(b, d),
+            o1.slice(0, o1.length / 2), o1.slice(o1.length / 2),
+            o2.slice(0, o2.length / 2), o2.slice(o2.length / 2),
         ]
     }
 
-    __subtract__(o1, o2) {
-        if (o1.length === 1)
-            return [`(${o1} - ${o2})`]
+    static addition(o1, o2) {
+        if (o1.length === 1) return [`(${o1}+${o2})`]
 
-        const [a, b, c, d] = __split__(o1, o2)
+        const [a, b, c, d] = Algebra.split(o1, o2)
 
-        return [
-            this.__subtract__(a, c),
-            this.__subtract__(b, d),
-        ]
+        return [Algebra.addition(a, c), Algebra.addition(b, d)]
     }
 
-    __multiply__(o1, o2) {
-        if (o1.length === 1)
-            return [`(${o1} * ${o2})`]
+    static subtraction(o1, o2) {
+        if (o1.length === 1) return [`(${o1}-${o2})`]
 
-        const [a, b, c, d] = __split__(o1, o2)
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.subtraction(a, c), Algebra.subtraction(b, d)]
+    }
+
+    static multiplication(o1, o2) {
+        if (o1.length === 1) return [`(${o1}*${o2})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
 
         return [
-            this.__subtract__(
-                this.__multiply__(a, c),
-                this.__multiply__(this.__conjugate__(d), b)
+            Algebra.subtraction(
+                Algebra.multiplication(a, c),
+                Algebra.multiplication(Algebra.conjugatation(d), b)
             ),
-
-            this.__add__(
-                this.__multiply__(d, a),
-                this.__multiply__(b, this.__conjugate__(c))
+            Algebra.addition(
+                Algebra.multiplication(d, a),
+                Algebra.multiplication(b, Algebra.conjugatation(c))
             )
         ]
     }
 
-    __conjugate__(o1) {
-        if (o1.length === 1)
-            return [`(${o1})`]
+    static conjugatation(o1) {
+        if (o1.length === 1) return [`(${o1})`]
 
-        const [a, b] = __split__(o1)
+        const [a, b] = Algebra.split(o1)
 
-        return [
-            this.__conjugate__(a),
-            this.__negate__(b)
-        ]
+        return [Algebra.conjugatation(a), Algebra.negation(b)]
     }
 
-    __negate__(o1) {
-        if (o1.length === 1)
-            return [`-(${o1})`]
+    static negation(o1) {
+        if (o1.length === 1) return [`-(${o1})`]
 
-        const [a, b] = __split__(o1)
+        const [a, b] = Algebra.split(o1)
 
-        return [
-            this.__negate__(a),
-            this.__negate__(b)
-        ]
+        return [Algebra.negation(a), Algebra.negation(b)]
     }
 }
 
-const Complex = new Algebra({ dimensions: 4, prefix: 'Complex' })
-
-console.log(Complex.mul)
-
-const data = {
-    of: { data: [-5, 2] },
-    with: { data: [10, 13] }
-}

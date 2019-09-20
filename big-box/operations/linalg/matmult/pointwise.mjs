@@ -7,8 +7,8 @@ export default function (args) {
         shared = args.of.shape[1]
 
     for (let i = 0; i < rows * cols; i++) {
+        const c = Math.floor(i) % cols
         const r = Math.floor(i / cols) % rows
-        const c = Math.floor(i / 1) % cols
 
         for (let s = 0; s < shared; s++) {
             const oi = args.of.offset + r * args.of.strides[0] + s * args.of.strides[1]
