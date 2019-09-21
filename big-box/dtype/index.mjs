@@ -23,11 +23,11 @@ export default class DataType {
             const sign = Math.sign(number) < 0 ? '-' : '+'
 
             if (i === 0 && sign === '+') {
-                string += data[index]
+                string += number
                 continue
             }
             
-            string += `${sign}${data[index]}${NUMERIC_SYMBOLS[i]}`
+            string += `${sign}${number}${NUMERIC_SYMBOLS[i]}`
         }
 
         return string
