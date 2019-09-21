@@ -15,7 +15,7 @@ export default function (args) {
             const wi = args.with.offset + c * args.with.strides[1] + s * args.with.strides[0]
             const ri = args.result.offset + r * args.result.strides[0] + c * args.result.strides[1]
 
-            operations.push(type.sumMultiply({ oi, wi, ri }))
+            operations.push(type.algebra.mac({ oi, wi, ri }))
         }
     }
 

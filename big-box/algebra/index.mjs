@@ -20,12 +20,12 @@ export default class Algebra {
         this.mac = this.__format__(Algebra.multiplication(this.o1, this.o2), '+=')
     }
 
-    __of__(_, dimension) { return `this.of.data[ofIndex+${dimension}]` }
-    __with__(_, dimension) { return `this.with.data[withIndex+${dimension}]` }
+    __of__(_, dimension) { return `args.of.data[ofIndex+${dimension}]` }
+    __with__(_, dimension) { return `args.with.data[withIndex+${dimension}]` }
 
     __result__(assignmentType) {
         return function (value, dimension) {
-            return `this.result.data[resultIndex+${dimension}]${assignmentType}${value}`
+            return `args.result.data[resultIndex+${dimension}]${assignmentType}${value}`
         }
     }
 

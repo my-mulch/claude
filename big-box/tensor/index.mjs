@@ -38,7 +38,8 @@ export default class Tensor {
 
                 data.set([args.with]
                     .flat(Number.POSITIVE_INFINITY)
-                    .map(this.type.parseNumber))
+                    .map(this.type.parseNumber)
+                    .flat())
 
                 return data
             }

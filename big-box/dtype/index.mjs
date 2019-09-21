@@ -19,14 +19,15 @@ export default class DataType {
         let string = ''
 
         for (let i = 0; i < this.size; i++) {
-            const number = data[index + i]
+            let number = data[index + i]
             const sign = Math.sign(number) < 0 ? '-' : '+'
+            number = Math.abs(number)
 
-            if (i === 0 && sign === '+') {
-                string += number
+            if (i === 0) {
+                string += `${sign === '-' ? sign : ''}${number}`
                 continue
             }
-            
+
             string += `${sign}${number}${NUMERIC_SYMBOLS[i]}`
         }
 
