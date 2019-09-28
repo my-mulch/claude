@@ -6,37 +6,24 @@ export default class Algebra {
         this.precisions = {}
 
         /** Elements */
-        this.o1 = new Array(this.dimensions).fill(null).map(this.__of__)
-        this.o2 = new Array(this.dimensions).fill(null).map(this.__with__)
+        this.o1 = new Array(this.dimensions).fill(null).map(function (_, dimension) { return `o${dimension}` })
+        this.o2 = new Array(this.dimensions).fill(null).map(function (_, dimension) { return `w${dimension}` })
 
-        /** Operations */
-        this.neg = this.__format__(Algebra.negation(this.o1, this.o2))
-        this.cnj = this.__format__(Algebra.conjugatation(this.o1, this.o2))
+        /** Unary */
+        this.nrm = Algebra.norm(this.o1)
+        this.sca = Algebra.scaling(this.o1, 'c')
+        this.squ = Algebra.squaring(this.o1)
+        this.neg = Algebra.negation(this.o1)
+        this.sum = Algebra.summation(this.o1)
+        this.sqt = Algebra.squareRooting(this.o1)
+        this.cnj = Algebra.conjugatation(this.o1)
+        this.ssq = Algebra.squareSummation(this.o1)
 
-        this.add = this.__format__(Algebra.addition(this.o1, this.o2))
-        this.sub = this.__format__(Algebra.subtraction(this.o1, this.o2))
-        this.mul = this.__format__(Algebra.multiplication(this.o1, this.o2))
-
-        this.mac = this.__format__(Algebra.multiplication(this.o1, this.o2), '+=')
-    }
-
-    __of__(_, dimension) { return `args.of.data[ofIndex+${dimension}]` }
-    __with__(_, dimension) { return `args.with.data[withIndex+${dimension}]` }
-
-    __result__(assignmentType) {
-        return function (value, dimension) {
-            return `args.result.data[resultIndex+${dimension}]${assignmentType}${value}`
-        }
-    }
-
-    __format__(operation, assignmentType = '=') {
-        return new Function('{oi,wi,ri}', `return "${
-            operation
-                .map(this.__result__(assignmentType))
-                .join(';')}"
-            .replace(/ofIndex/g, oi)
-            .replace(/withIndex/g, wi)
-            .replace(/resultIndex/g, ri)`)
+        /** Binary */
+        this.add = Algebra.addition(this.o1, this.o2)
+        this.div = Algebra.division(this.o1, this.o2)
+        this.sub = Algebra.subtraction(this.o1, this.o2)
+        this.mul = Algebra.multiplication(this.o1, this.o2)
     }
 
     static split(o1 = [], o2 = []) {
@@ -77,6 +64,57 @@ export default class Algebra {
                 Algebra.multiplication(b, Algebra.conjugatation(c))
             )
         ].flat(this.dimensions)
+    }
+
+    static division(o1, o2) {
+        if (o1.length === 1) return [`(${o1}/${o2})`]
+
+        return Algebra.scaling(
+            Algebra.multiplication(o1, Algebra.conjugatation(o2)),
+            `(1/${Algebra.summation(Algebra.squaring(o2))})`
+        )
+    }
+
+    static squareRooting(o1) {
+        if (o1.length === 1) return [`Math.sqrt(${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.squareRooting(a), Algebra.squareRooting(b)].flat(this.dimensions)
+    }
+
+    static norm(o1) {
+        if (o1.length === 1) return [`(${o1})`]
+
+        return Algebra.squareRooting(Algebra.squareSummation(o1))
+    }
+
+    static squareSummation(o1) {
+        return Algebra.summation(Algebra.squaring(o1))
+    }
+
+    static summation(o1) {
+        if (o1.length === 1) return [`(${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return Algebra.addition(Algebra.summation(a), Algebra.summation(b))
+    }
+
+    static scaling(o1, c) {
+        if (o1.length === 1) return [`(${o1}*${c})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.scaling(a, c), Algebra.scaling(b, c)].flat(this.dimensions)
+    }
+
+    static squaring(o1) {
+        if (o1.length === 1) return [`(${o1}*${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.squaring(a), Algebra.squaring(b)].flat(this.dimensions)
     }
 
     static conjugatation(o1) {
