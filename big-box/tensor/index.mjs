@@ -1,7 +1,8 @@
 import util from 'util' // node's utils
 
 import {
-    isTypedArray,
+    isTypedArray, // init utils
+    parseNumber, stringNumber, // io utils
     shapeRaw, shapeAlign, // shape utils
     selfAxesAndShape, pairAxesAndShape, // operation utils
 } from './utils'
@@ -38,7 +39,7 @@ export default class Tensor {
 
                 data.set([args.with]
                     .flat(Number.POSITIVE_INFINITY)
-                    .map(this.type.parseNumber)
+                    .map(parseNumber)
                     .flat())
 
                 return data
@@ -339,7 +340,7 @@ export default class Tensor {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return this.type.stringNumber({ index, data: this.data })
+            return stringNumber({ index, array: this })
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
@@ -355,4 +356,16 @@ export default class Tensor {
     }
 
     [util.inspect.custom]() { return this.toString() }
+}
+
+/** Init data types */
+for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
+    Tensor[prefix + 'Uint8Clamped'] = { size, array: Uint8ClampedArray }
+    Tensor[prefix + 'Uint8'] = { size, array: Uint8Array }
+    Tensor[prefix + 'Uint16'] = { size, array: Uint16Array }
+    Tensor[prefix + 'Uint32'] = { size, array: Uint32Array }
+    Tensor[prefix + 'Int8'] = { size, array: Int8Array }
+    Tensor[prefix + 'Int16'] = { size, array: Int16Array }
+    Tensor[prefix + 'Int32'] = { size, array: Int32Array }
+    Tensor[prefix + 'Float32'] = { size, array: Float32Array }
 }

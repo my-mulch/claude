@@ -1,4 +1,4 @@
-import bb from '..'
+import bb from '../tensor'
 import jest from '../../test'
 
 export default jest.suite(function () {
