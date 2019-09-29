@@ -121,3 +121,5 @@ export default class Algebra {
         return [Algebra.assign(a, c), Algebra.assign(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 }
+
+console.log(Algebra.multiply(["0", "57", "7", "1"], ["0", "1", "2", "3"]))

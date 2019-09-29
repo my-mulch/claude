@@ -329,7 +329,7 @@ export default class Tensor {
     reshape(args, old = this) {
         if (!this.contig)
             return Tensor
-                .array({ with: this.toRaw() })
+                .array({ with: this.toRaw(), type: old.type })
                 .reshape({ shape: args.shape })
 
         return new Tensor({
