@@ -1,5 +1,5 @@
 
-export default function () {
+export default function (args) {
     return new Function('args', [
         `for (let r = 0; 
             r < args.of.shape[0]; 
@@ -12,6 +12,8 @@ export default function () {
         `for (let s = 0; 
             s < args.of.shape[1]; 
             s++) {`,
+
+            
 
         `}`,
 

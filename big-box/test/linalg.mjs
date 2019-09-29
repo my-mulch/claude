@@ -65,7 +65,7 @@ export default jest.suite(function () {
     this.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])
     this.expect(A.T()).toEqual([["10", "57", "90"], ["72", "44", "66"], ["91", "49", "23"], ["13", "33", "21"]])
     this.expect(D.inverse()).toEqual([["-0.5", "-0.125", "0.625"], ['1', '0', "-0.5"], ['0', "0.25", "-0.25"]])
-    this.expect(bb.array({ with: [[6, 4], [5, 2]] }).inverse()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
+    this.expect(bb.array({ with: [[6, 4], [5, 2]], type: bb.Float32 }).inverse()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
     this.expect(bb.array({ with: [[4, 1, 3, 3], [4, 0, 0, 1], [2, 3, 4, 2], [0, 0, 4, 4]], type: bb.Float32 }).inverse()).toEqual([["1.5", '-1', "-0.5", "-0.625"], ['-5', '4', '2', "1.75"], ['6', '-5', '-2', "-2.25"], ['-6', '5', '2', "2.5"]])
     this.expect(E.slice({ with: ['1:2', 0, ':'] }).cross({ with: C })).toEqual([['19'], ['-170'], ['107']])
     this.expect(E.slice({ with: [':', 0, ':'] }).matMult({ with: C })).toEqual([['26'], ['74'], ['109']])

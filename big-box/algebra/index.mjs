@@ -7,103 +7,117 @@ export default class Algebra {
         ]
     }
 
-    static addition(o1, o2) {
+    static variable({ symbol, size, index }) {
+        return new Array(size).fill(null).map(function (_, i) {
+            return `${symbol}[${index}+${i}]`
+        })
+    }
+
+    static add(o1, o2) {
         if (o1.length === 1) return [`(${o1}+${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
 
-        return [Algebra.addition(a, c), Algebra.addition(b, d)].flat(this.dimensions)
+        return [Algebra.add(a, c), Algebra.add(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static subtraction(o1, o2) {
+    static subtract(o1, o2) {
         if (o1.length === 1) return [`(${o1}-${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
 
-        return [Algebra.subtraction(a, c), Algebra.subtraction(b, d)].flat(this.dimensions)
+        return [Algebra.subtract(a, c), Algebra.subtract(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static multiplication(o1, o2) {
-        if (o1.length === 1) return [`(${o1}*${o2})`]
+    static multiply(o1, o2) {
+        if (o1.length === 1) return [`${o1}*${o2}`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
 
         return [
-            Algebra.subtraction(
-                Algebra.multiplication(a, c),
-                Algebra.multiplication(Algebra.conjugatation(d), b)
+            Algebra.subtract(
+                Algebra.multiply(a, c),
+                Algebra.multiply(Algebra.conjugate(d), b)
             ),
-            Algebra.addition(
-                Algebra.multiplication(d, a),
-                Algebra.multiplication(b, Algebra.conjugatation(c))
+            Algebra.add(
+                Algebra.multiply(d, a),
+                Algebra.multiply(b, Algebra.conjugate(c))
             )
-        ].flat(this.dimensions)
+        ].flat(Number.POSITIVE_INFINITY)
     }
 
-    static division(o1, o2) {
+    static divide(o1, o2) {
         if (o1.length === 1) return [`(${o1}/${o2})`]
 
-        return Algebra.scaling(
-            Algebra.multiplication(o1, Algebra.conjugatation(o2)),
-            `(1/${Algebra.summation(Algebra.squaring(o2))})`
+        return Algebra.scale(
+            Algebra.multiply(o1, Algebra.conjugate(o2)),
+            `(1/${Algebra.sum(Algebra.square(o2))})`
         )
     }
 
-    static squareRooting(o1) {
+    static squareRoot(o1) {
         if (o1.length === 1) return [`Math.sqrt(${o1})`]
 
         const [a, b] = Algebra.split(o1)
 
-        return [Algebra.squareRooting(a), Algebra.squareRooting(b)].flat(this.dimensions)
+        return [Algebra.squareRoot(a), Algebra.squareRoot(b)].flat(Number.POSITIVE_INFINITY)
     }
 
     static norm(o1) {
         if (o1.length === 1) return [`(${o1})`]
 
-        return Algebra.squareRooting(Algebra.squareSummation(o1))
+        return Algebra.squareRoot(Algebra.squareSum(o1))
     }
 
-    static squareSummation(o1) {
-        return Algebra.summation(Algebra.squaring(o1))
+    static squareSum(o1) {
+        return Algebra.sum(Algebra.square(o1))
     }
 
-    static summation(o1) {
+    static sum(o1) {
         if (o1.length === 1) return [`(${o1})`]
 
         const [a, b] = Algebra.split(o1)
 
-        return Algebra.addition(Algebra.summation(a), Algebra.summation(b))
+        return Algebra.add(Algebra.sum(a), Algebra.sum(b))
     }
 
-    static scaling(o1, c) {
+    static scale(o1, c) {
         if (o1.length === 1) return [`(${o1}*${c})`]
 
         const [a, b] = Algebra.split(o1)
 
-        return [Algebra.scaling(a, c), Algebra.scaling(b, c)].flat(this.dimensions)
+        return [Algebra.scale(a, c), Algebra.scale(b, c)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static squaring(o1) {
+    static square(o1) {
         if (o1.length === 1) return [`(${o1}*${o1})`]
 
         const [a, b] = Algebra.split(o1)
 
-        return [Algebra.squaring(a), Algebra.squaring(b)].flat(this.dimensions)
+        return [Algebra.square(a), Algebra.square(b)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static conjugatation(o1) {
+    static conjugate(o1) {
         if (o1.length === 1) return [`(${o1})`]
 
         const [a, b] = Algebra.split(o1)
 
-        return [Algebra.conjugatation(a), Algebra.negation(b)].flat(this.dimensions)
+        return [Algebra.conjugate(a), Algebra.negate(b)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static negation(o1) {
+    static negate(o1) {
         if (o1.length === 1) return [`-(${o1})`]
 
         const [a, b] = Algebra.split(o1)
 
-        return [Algebra.negation(a), Algebra.negation(b)].flat(this.dimensions)
+        return [Algebra.negate(a), Algebra.negate(b)].flat(Number.POSITIVE_INFINITY)
+    }
+
+    static assign(o1, o2, type = '=') {
+        if (o1.length === 1) return [`${o1}${type}${o2}`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.assign(a, c), Algebra.assign(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 }
