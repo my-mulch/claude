@@ -35,6 +35,15 @@ export default class Header {
         return new Header(JSON.parse(JSON.stringify(this)))
     }
 
+    flatIndex(index) {
+        let flatIndex = this.offset
+
+        for (let i = 0; i < index.length; i++)
+            flatIndex += index[i] * this.strides[i]
+
+        return flatIndex
+    }
+
     slice(index) {
         const shape = new Array()
         const strides = new Array()

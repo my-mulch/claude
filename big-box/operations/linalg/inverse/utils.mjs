@@ -5,25 +5,19 @@ export const cofactors = function (indices, array) {
         return Algebra.variable({
             symbol: 'args.of.data',
             size: array.type.size,
-            index: array.offset +
-                array.strides[0] * indices[0][0] +
-                array.strides[1] * indices[0][1]
+            index: array.header.flatIndex(indices[0])
         })
 
-    const size = Math.sqrt(indices.length)
     const allCofactors = []
+    const size = Math.sqrt(indices.length)
 
     for (let i = 0; i < size; i++) {
         const sign = Math.pow(-1, i % 2)
-
         const cofactor = cofactors(survivors(indices, 0, i), array)
-
         const factor = Algebra.variable({
             symbol: 'args.of.data',
             size: array.type.size,
-            index: array.offset +
-                array.strides[0] * indices[i][0] +
-                array.strides[1] * indices[i][1]
+            index: array.header.flatIndex(indices[i])
         })
 
         const product = Algebra.multiply(factor, cofactor)
@@ -44,7 +38,7 @@ export const survivors = function (indices, r, c) {
     })
 }
 
-export const template = function ({ size }) {
+export const template = function (size) {
     const result = []
 
     for (let r = 0; r < size; r++)
