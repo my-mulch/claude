@@ -3,8 +3,7 @@ import util from 'util' // node's utils
 import {
     isTypedArray, // init utils
     parseNumber, stringNumber, // io utils
-    shapeRaw, shapeAlign, // shape utils
-    selfAxesAndShape, pairAxesAndShape, // operation utils
+    shapeRaw,  // shape utils
 } from './utils'
 
 import {
@@ -217,21 +216,12 @@ export default class Tensor {
     }
 
     gself(args, method) {
-        const meta = selfAxesAndShape.call(this, args)
-
-        return Operations
-            .call({
-                of: this,
-                with: { id: '' },
-                result: args.result || new Tensor({
-                    header: new Header({
-                        type: this.type,
-                        shape: meta.alignedShape
-                    })
-                }),
-                meta: { method, ...meta }
-            })
-            .reshape({ shape: meta.resultShape })
+        return Operations.call({
+            of: this,
+            with: { id: '' },
+            result: args.result,
+            meta: { method }
+        })
     }
 
     exp() { return this.gpair({ with: { id: '' } }, this.exp.name) }

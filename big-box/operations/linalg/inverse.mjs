@@ -1,5 +1,5 @@
-import Algebra from '../../../algebra/index.mjs'
-import { cofactors, template, survivors } from './utils.mjs'
+import Algebra from '../../algebra'
+import { cofactors, template, survivors } from './cofactors.mjs'
 
 export default function (args) {
     const size = Math.sqrt(args.of.size),

@@ -122,4 +122,17 @@ export default class Algebra {
     }
 }
 
-console.log(Algebra.multiply(["0", "57", "7", "1"], ["0", "1", "2", "3"]))
+const temp = Algebra.variable({
+    symbol: 'temp',
+    index: 0,
+    size: 4
+})
+
+const R = Algebra.variable({
+    symbol: 'args.result.data',
+    index: 'resultIndex',
+    size: 4
+})
+
+
+console.log(Algebra.assign(temp, R))

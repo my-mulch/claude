@@ -1,4 +1,4 @@
-import Algebra from '../../../algebra'
+import Algebra from '../../algebra'
 
 export const cofactors = function (indices, array) {
     if (indices.length === 1)
