@@ -1,23 +1,15 @@
 import radley from '../../radley'
 
-import min from './elemental/min'
+import * as linalgOperations from './linalg'
+import * as elementalOperations from './elemental'
+import * as probabilityOperations from './probability'
 
-import cross from './linalg/cross'
-import inverse from './linalg/inverse'
-import matmult from './linalg/matmult'
-
-import randrange from './probability/randrange'
-
-export default radley.suite({
-    min: { ...min },
+const suite = radley.suite({
+    ...linalgOperations,
+    ...elementalOperations,
+    ...probabilityOperations,
     
-    cross: { ...cross },
-    inverse: { ...inverse },
-    matmult: { ...matmult },
-    cofactors: { ...cofactors },
-
-    randrange: { ...randrange },
-
     hash: ['args.of.id', 'args.with.id', 'args.result.id']
 })
 
+export default suite

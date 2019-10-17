@@ -59,12 +59,10 @@ export default class Tensor {
         return new Tensor({
             header: new Header({
                 shape: args.shape,
-                type: args.type,
+                type: args.type
             }),
             init: function () {
-                return new this.type
-                    .array(this.size * this.type.size)
-                    .fill(1)
+                return new this.type.array(this.size * this.type.size).fill(1)
             }
         })
     }
@@ -193,115 +191,6 @@ export default class Tensor {
             .reshape({ shape: [-1] })
     }
 
-    gpair(args, method) {
-        if (args.with.shape)
-            args.with = shapeAlign({
-                short: args.with,
-                delta: this.shape.length - args.with.shape.length
-            })
-
-        const meta = pairAxesAndShape.call(this, args)
-
-        return Operations.call({
-            of: this,
-            with: args.with,
-            result: args.result || new Tensor({
-                header: new Header({
-                    type: this.type,
-                    shape: meta.fullShape
-                })
-            }),
-            meta: { method, ...meta }
-        })
-    }
-
-    gself(args, method) {
-        return Operations.call({
-            of: this,
-            with: { id: '' },
-            result: args.result,
-            meta: { method }
-        })
-    }
-
-    exp() { return this.gpair({ with: { id: '' } }, this.exp.name) }
-    sin() { return this.gpair({ with: { id: '' } }, this.sin.name) }
-    cos() { return this.gpair({ with: { id: '' } }, this.cos.name) }
-
-    add(args) { return this.gpair(args, this.add.name) }
-    divide(args) { return this.gpair(args, this.divide.name) }
-    subtract(args) { return this.gpair(args, this.subtract.name) }
-    multiply(args) { return this.gpair(args, this.multiply.name) }
-
-    sum(args = {}) { return this.gself(args, this.sum.name) }
-    min(args = {}) { return this.gself(args, this.min.name) }
-    max(args = {}) { return this.gself(args, this.max.name) }
-    norm(args = {}) { return this.gself(args, this.norm.name) }
-    mean(args = {}) { return this.gself(args, this.mean.name) }
-
-    matMult(args) {
-        return Operations.call({
-            of: this,
-            with: args.with,
-            result: args.result || new Tensor({
-                header: new Header({
-                    type: this.type,
-                    shape: [this.shape[0], args.with.shape[1]]
-                })
-            }),
-            meta: { method: this.matMult.name }
-        })
-    }
-
-    cross(args) {
-        return Operations.call({
-            of: this,
-            with: args.with,
-            result: args.result || new Tensor({
-                header: new Header({
-                    type: this.type,
-                    shape: [3, 1]
-                })
-            }),
-            meta: { method: this.cross.name }
-        })
-    }
-
-    inverse(args = {}) {
-        return Operations.call({
-            of: this,
-            with: { id: '' },
-            result: args.result || Tensor.eye({
-                shape: this.shape,
-                type: this.type
-            }),
-            meta: { method: this.inverse.name }
-        })
-    }
-
-    assign(args) {
-        this.sanitize(args)
-
-        const region = args.region
-            ? this.slice({ with: args.region })
-            : this
-
-        Operations.call({
-            of: region,
-            with: args.with,
-            result: region,
-            meta: {
-                axesSize: region.size,
-                fullSize: region.size,
-                axesShape: [...region.shape.keys()],
-                fullShape: region.shape,
-                method: region.assign.name
-            }
-        })
-
-        return this
-    }
-
     slice(args, old = this) {
         return new Tensor({
             header: this.header.slice(args.with),
@@ -359,3 +248,6 @@ for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
     Tensor[prefix + 'Int32'] = { size, array: Int32Array }
     Tensor[prefix + 'Float32'] = { size, array: Float32Array }
 }
+
+/** Init operations */
+

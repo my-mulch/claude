@@ -121,18 +121,3 @@ export default class Algebra {
         return [Algebra.assign(a, c), Algebra.assign(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 }
-
-const temp = Algebra.variable({
-    symbol: 'temp',
-    index: 0,
-    size: 4
-})
-
-const R = Algebra.variable({
-    symbol: 'args.result.data',
-    index: 'resultIndex',
-    size: 4
-})
-
-
-console.log(Algebra.assign(temp, R))

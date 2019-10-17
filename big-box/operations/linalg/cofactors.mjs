@@ -1,5 +1,7 @@
 import Algebra from '../../algebra'
 
+export default function () { }
+
 export const cofactors = function (indices, array) {
     if (indices.length === 1)
         return Algebra.variable({
