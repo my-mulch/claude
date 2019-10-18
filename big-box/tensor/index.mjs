@@ -161,6 +161,8 @@ export default class Tensor {
         })
     }
 
+    static min(args) { return Operations.call({ ...args, method: Tensor.min.name }) }
+
     astype(args, old = this) {
         let shape = old.shape.slice()
 
