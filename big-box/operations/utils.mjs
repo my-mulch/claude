@@ -1,4 +1,35 @@
+import Algebra from '../algebra'
 
+export const symbolicInit = function (A, B, R, meta) {
+    const innerLoopAxes = meta.axes
+    const totalLoopAxes = [...new Array(A.shape.length).keys()]
+    const outerLoopAxes = totalLoopAxes.filter(function (axis) { return !meta.axes.includes(axis) })
+
+    const innerSize = innerLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
+    const outerSize = outerLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
+    const totalSize = totalLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
+
+    const innerLoops = innerLoopAxes.map(symbolicLoop, A)
+    const outerLoops = outerLoopAxes.map(symbolicLoop, A)
+    const totalLoops = totalLoopAxes.map(symbolicLoop, A)
+
+    const Aindex = symbolicIndex('A', totalLoopAxes)
+    const Bindex = symbolicIndex('B', totalLoopAxes)
+    const Rindex = symbolicIndex('R', outerLoopAxes)
+
+    const sT = Algebra.variable({ symbol: 'temp', index: '0', size: A.type.size })
+    const sA = Algebra.variable({ symbol: 'A.data', index: 'Aindex', size: A.type.size })
+    const sB = Algebra.variable({ symbol: 'B.data', index: 'Bindex', size: B.type.size })
+    const sR = Algebra.variable({ symbol: 'R.data', index: 'Rindex', size: R.type.size })
+
+    return {
+        sT, sA, sR,
+        Aindex, Bindex, Rindex,
+        innerSize, outerSize, totalSize,
+        innerLoops, outerLoops, totalLoops,
+        innerLoopAxes, totalLoopAxes, outerLoopAxes,
+    }
+}
 export const symbolicLoop = function (axis) {
     return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
 }
@@ -6,7 +37,7 @@ export const symbolicLoop = function (axis) {
 export const symbolicIndex = function (name, axes, aligned) {
     return axes.reduce(function (symbol, axis, i) {
         return `${symbol} + ${name}.strides[${aligned ? axis : i}] * i${axis}`
-    }, `const ${name}Index = ${name}.offset`)
+    }, `const ${name}index = ${name}.offset`)
 }
 
 

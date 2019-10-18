@@ -232,5 +232,5 @@ for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
 }
 
 /** Init null tensor */
-Tensor.NULL = { id: '' }
+Tensor.NULL = Tensor.zeros([1, 1], Tensor.Int32)
 
