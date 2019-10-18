@@ -5,7 +5,7 @@ export default function () { }
 export const cofactors = function (indices, array) {
     if (indices.length === 1)
         return Algebra.variable({
-            symbol: 'args.of.data',
+            symbol: 'A.data',
             size: array.type.size,
             index: array.header.flatIndex(indices[0])
         })
@@ -17,7 +17,7 @@ export const cofactors = function (indices, array) {
         const sign = Math.pow(-1, i % 2)
         const cofactor = cofactors(survivors(indices, 0, i), array)
         const factor = Algebra.variable({
-            symbol: 'args.of.data',
+            symbol: 'A.data',
             size: array.type.size,
             index: array.header.flatIndex(indices[i])
         })

@@ -1,14 +1,14 @@
 import { __Math__, PARSE_NUMBER_REGEX, NUMERIC_SYMBOLS, SPACE_REGEX } from '../resources'
 
-export const isTypedArray = function ({ data }) {
-    return data.constructor === Float32Array
-        || data.constructor === Int8Array
-        || data.constructor === Int16Array
-        || data.constructor === Int32Array
-        || data.constructor === Uint8Array
-        || data.constructor === Uint16Array
-        || data.constructor === Uint32Array
-        || data.constructor === Uint8ClampedArray
+export const isTypedArray = function (array) {
+    return array.constructor === Float32Array
+        || array.constructor === Int8Array
+        || array.constructor === Int16Array
+        || array.constructor === Int32Array
+        || array.constructor === Uint8Array
+        || array.constructor === Uint16Array
+        || array.constructor === Uint32Array
+        || array.constructor === Uint8ClampedArray
 }
 
 export const parseNumber = function (number) {
@@ -42,12 +42,9 @@ export const removeSpaces = function (string) {
 }
 
 
-export const shapeRaw = function ({ data, shape = [] }) {
-    if (data.constructor !== Array)
+export const shapeRaw = function (rawArray, shape = []) {
+    if (rawArray.constructor !== Array)
         return shape
 
-    return shapeRaw({
-        data: data[0],
-        shape: shape.concat(data.length)
-    })
+    return shapeRaw(rawArray[0], shape.concat(rawArray.length))
 }

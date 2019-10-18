@@ -1,13 +1,11 @@
-import radley from '../../radley'
+import Cache from '../cache'
 
 import * as linalg from './linalg'
 import * as element from './element'
 import * as probability from './probability'
 
-export default radley.suite({
+export default new Cache({
     ...linalg,
     ...element,
     ...probability,
-    
-    hash: ['args.of.id', 'args.with.id', 'args.result.id']
 })

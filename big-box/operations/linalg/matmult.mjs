@@ -1,30 +1,30 @@
 import Algebra from '../../algebra'
 
-export default function (args) {
-    const operations = [],
-        rows = args.of.shape[0],
-        cols = args.with.shape[1],
-        shared = args.of.shape[1]
-
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            const ri = args.result.offset + r * args.result.strides[0] + c * args.result.strides[1]
-            const R = Algebra.variable({ symbol: 'args.result.data', size: args.result.type.size, index: ri })
-
-            const innerProduct = new Array(shared).fill(null).map(function (_, s) {
-                const oi = args.of.offset + r * args.of.strides[0] + s * args.of.strides[1]
-                const wi = args.with.offset + c * args.with.strides[1] + s * args.with.strides[0]
-
-                const O = Algebra.variable({ symbol: 'args.of.data', size: args.of.type.size, index: oi })
-                const W = Algebra.variable({ symbol: 'args.with.data', size: args.with.type.size, index: wi })
-
-                return Algebra.multiply(O, W)
-            }).reduce(Algebra.add)
-
-
-            operations.push(Algebra.assign(R, innerProduct))
+export default {
+    test: function (A, B, R, meta) {
+        switch (true) {
+            default: return this.pointwise(A, B, R, meta)
         }
-    }
+    },
 
-    return new Function('args', [operations.flat(Number.POSITIVE_INFINITY).join('\n'), `return args.result`].join('\n'))
+    pointwise: function (A, B, R, meta) {
+        const operations = [], rows = A.shape[0], cols = B.shape[1], shared = A.shape[1]
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const sR = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: R.header.flatIndex([r, c]) })
+
+                const innerProduct = new Array(shared).fill(null).map(function (_, s) {
+                    const sA = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: A.header.flatIndex([r, s]) })
+                    const sB = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: B.header.flatIndex([s, c]) })
+
+                    return Algebra.multiply(sA, sB)
+                }).reduce(Algebra.add)
+
+                operations.push(Algebra.assign(sR, innerProduct))
+            }
+        }
+
+        return new Function('A, B, R', [operations.flat(Number.POSITIVE_INFINITY).join('\n'), `return R`].join('\n'))
+    }
 }

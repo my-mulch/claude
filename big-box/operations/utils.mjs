@@ -1,24 +1,12 @@
 
-export const symLoops = function (axis) {
-    return `for(let a${axis} = 0; 
-                a${axis} < args.meta.fullShape[${axis}]; 
-                a${axis}++){`
+export const symbolicLoop = function (axis) {
+    return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
 }
 
-export const symIndices = function ({ meta, ...arrays }) {
-    return Object.entries(arrays).map(function ([name, array]) {
-        if (!array.shape) return ''
-
-        const assign = `${name}Index = `
-        const offset = `args.${name}.offset + `
-        const dimens = meta.axesShape.map(function (axis) {
-            return array.shape[axis] > 1
-                ? `a${axis} * args.${name}.strides[${axis}]`
-                : 0
-        })
-
-        return assign + offset + dimens.join('+') || 0
-    })
+export const symbolicIndex = function (name, axes, aligned) {
+    return axes.reduce(function (symbol, axis, i) {
+        return `${symbol} + ${name}.strides[${aligned ? axis : i}] * i${axis}`
+    }, `const ${name}Index = ${name}.offset`)
 }
 
 

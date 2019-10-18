@@ -13,6 +13,14 @@ export default class Algebra {
         })
     }
 
+    static min(o1, o2) {
+        if (o1.length === 1) return [`(${o1}<${o2})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.min(a, c), Algebra.min(b, d)].flat(Number.POSITIVE_INFINITY)
+    }
+
     static add(o1, o2) {
         if (o1.length === 1) return [`(${o1}+${o2})`]
 
