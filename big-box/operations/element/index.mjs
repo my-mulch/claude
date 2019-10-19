@@ -8,3 +8,5 @@ export { default as add } from './add'
 export { default as mult } from './mult'
 export { default as mean } from './mean'
 export { default as norm } from './norm'
+export { default as assign } from './assign'
+
