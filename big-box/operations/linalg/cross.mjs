@@ -8,26 +8,29 @@ export default {
     },
 
     pointwise: function (A, B, R, meta) {
-        const symbolicA = [0,], symbolicB = [0,], symbolicR = [0,]
+        const symbolicA = [new Array(A.type.size).fill(0)]
+        const symbolicB = [new Array(A.type.size).fill(0)]
+        const symbolicR = [new Array(A.type.size).fill(0)]
+
 
         for (let i = 0; i < 3; i++) {
             symbolicA.push(Algebra.variable({
                 symbol: 'A.data',
                 index: A.header.flatIndex([i, 0]),
-                size: 1
-            }).pop())
+                size: A.type.size
+            }))
 
             symbolicB.push(Algebra.variable({
                 symbol: 'B.data',
                 index: B.header.flatIndex([i, 0]),
-                size: 1
-            }).pop())
+                size: B.type.size
+            }))
 
             symbolicR.push(Algebra.variable({
                 symbol: 'R.data',
                 index: R.header.flatIndex([i, 0]),
-                size: 1
-            }).pop())
+                size: R.type.size
+            }))
         }
 
         return new Function('A, B, R', [

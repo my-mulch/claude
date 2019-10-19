@@ -1,4 +1,7 @@
 export { default as min } from './min'
+export { default as sub } from './sub'
+export { default as sin } from './sin'
+export { default as div } from './div'
 export { default as max } from './max'
 export { default as sum } from './sum'
 export { default as add } from './add'

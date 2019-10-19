@@ -31,6 +31,7 @@ export const stringNumber = function ({ index, array }) {
             continue
         }
 
+
         string += `${sign}${number}${NUMERIC_SYMBOLS[i]}`
     }
 

@@ -13,6 +13,22 @@ export default class Algebra {
         })
     }
 
+    static sin(o1) {
+        if (o1.length === 1) return [`Math.sin(${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.sin(a), Algebra.sin(b)].flat(Number.POSITIVE_INFINITY)
+    }
+
+    static cos(o1) {
+        if (o1.length === 1) return [`Math.cos(${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.cos(a), Algebra.cos(b)].flat(Number.POSITIVE_INFINITY)
+    }
+
     static and(o1, o2) {
         if (o1.length === 1) return [`(${o1}&&${o2})`]
 

@@ -5,9 +5,9 @@ export const symbolicInit = function (A, B, R, meta) {
     const totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length, R.shape.length)).keys()]
     const outerLoopAxes = totalLoopAxes.filter(function (axis) { return !meta.axes.includes(axis) })
 
-    const ANonZeroAxes = totalLoopAxes.filter(nonZeroAxis, A)
-    const BNonZeroAxes = totalLoopAxes.filter(nonZeroAxis, B)
-    const RNonZeroAxes = outerLoopAxes.filter(nonZeroAxis, R)
+    const ANonZeroAxes = totalLoopAxes.slice().reverse().filter(nonZeroAxis, A).reverse()
+    const BNonZeroAxes = totalLoopAxes.slice().reverse().filter(nonZeroAxis, B).reverse()
+    const RNonZeroAxes = outerLoopAxes.slice().reverse().filter(nonZeroAxis, R).reverse()
 
     const innerSize = innerLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
     const outerSize = outerLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
@@ -17,9 +17,9 @@ export const symbolicInit = function (A, B, R, meta) {
     const outerLoops = outerLoopAxes.map(symbolicLoop, A)
     const totalLoops = totalLoopAxes.map(symbolicLoop, R)
 
-    const AIndex = symbolicIndex('A', ANonZeroAxes, A.shape.length === R.shape.length)
+    const AIndex = symbolicIndex('A', ANonZeroAxes, true)
     const BIndex = symbolicIndex('B', BNonZeroAxes, B.shape.length === R.shape.length)
-    const RIndex = symbolicIndex('R', RNonZeroAxes, false)
+    const RIndex = symbolicIndex('R', RNonZeroAxes, R.shape.length === A.shape.length)
 
     const sT = Algebra.variable({ symbol: 'temp', index: '0', size: R.type.size })
     const sA = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
@@ -45,15 +45,11 @@ export const symbolicIndex = function (name, axes, parity) {
     }, `const ${name}Index = ${name}.offset`)
 }
 
-
 export const nonZeroAxis = function (_, index) {
     const ri = this.shape.length - index - 1
 
-    if (ri < 0)
-        return false
-
-    if (this.shape[ri] > 1)
-        return true
+    if (ri < 0) return false
+    if (this.shape[ri] > 1) return true
 
     return false
 }

@@ -47,6 +47,13 @@ export default class Tensor {
         return new Tensor({ header: new Header({ shape, type }) })
     }
 
+    static onesLike(tensor) {
+        return new Tensor({
+            header: new Header({ shape: tensor.shape, type: tensor.type }),
+            init: function () { return new this.type.array(this.size * this.type.size).fill(1) }
+        })
+    }
+
     static ones(shape, type) {
         return new Tensor({
             header: new Header({ shape, type }),
@@ -147,9 +154,7 @@ export default class Tensor {
     }
 
     ravel() {
-        return Tensor
-            .array({ with: this.toRaw() })
-            .reshape({ shape: [-1] })
+        return Tensor.tensor(this.toRaw(), this.type).reshape([-1])
     }
 
     slice(region, old = this) {
@@ -216,5 +221,5 @@ for (const method in Operations.methods) {
 }
 
 /** Init null tensor */
-Tensor.NULL = Tensor.zeros([1, 1], Tensor.Int32)
+Tensor.NULL = Tensor.zeros([], Tensor.Int32)
 
