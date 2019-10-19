@@ -13,12 +13,28 @@ export default class Algebra {
         })
     }
 
+    static and(o1, o2) {
+        if (o1.length === 1) return [`(${o1}&&${o2})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.and(a, c), Algebra.and(b, d)].flat(Number.POSITIVE_INFINITY)
+    }
+
     static min(o1, o2) {
         if (o1.length === 1) return [`(${o1}<${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
 
         return [Algebra.min(a, c), Algebra.min(b, d)].flat(Number.POSITIVE_INFINITY)
+    }
+
+    static max(o1, o2) {
+        if (o1.length === 1) return [`(${o1}>${o2})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.max(a, c), Algebra.max(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 
     static add(o1, o2) {
@@ -74,10 +90,10 @@ export default class Algebra {
     static norm(o1) {
         if (o1.length === 1) return [`(${o1})`]
 
-        return Algebra.squareRoot(Algebra.squareSum(o1))
+        return Algebra.squareRoot(Algebra.sumSquares(o1))
     }
 
-    static squareSum(o1) {
+    static sumSquares(o1) {
         return Algebra.sum(Algebra.square(o1))
     }
 
@@ -126,6 +142,6 @@ export default class Algebra {
 
         const [a, b, c, d] = Algebra.split(o1, o2)
 
-        return [Algebra.assign(a, c), Algebra.assign(b, d)].flat(Number.POSITIVE_INFINITY)
+        return [Algebra.assign(a, c, type), Algebra.assign(b, d, type)].flat(Number.POSITIVE_INFINITY)
     }
 }

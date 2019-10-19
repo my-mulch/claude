@@ -24,28 +24,15 @@ export default class Tensor {
         this.data = init.call(this)
     }
 
-    static min(A, B, R, meta) { return Operations.invoke(A, B, R, meta, Tensor.min.name) }
-    static mean(A, B, R, meta) { return Operations.invoke(A, B, R, meta, Tensor.mean.name) }
-    static cross(A, B, R, meta) { return Operations.invoke(A, B, R, meta, Tensor.cross.name) }
-    static matMult(A, B, R, meta) { return Operations.invoke(A, B, R, meta, Tensor.matMult.name) }
-    static inverse(A, B, R, meta) { return Operations.invoke(A, B, R, meta, Tensor.inverse.name) }
-
     static tensor(array, type) {
         return new Tensor({
-            header: new Header({
-                type,
-                shape: shapeRaw(array),
-            }),
+            header: new Header({ type, shape: shapeRaw(array) }),
             init: function () {
                 if (isTypedArray(array))
                     return array
 
                 const data = new this.type.array(this.size * this.type.size)
-
-                data.set([array]
-                    .flat(Number.POSITIVE_INFINITY)
-                    .map(parseNumber)
-                    .flat())
+                data.set([array].flat(Number.POSITIVE_INFINITY).map(parseNumber).flat())
 
                 return data
             }
@@ -53,12 +40,7 @@ export default class Tensor {
     }
 
     static zerosLike(tensor) {
-        return new Tensor({
-            header: new Header({
-                shape: tensor.shape,
-                type: tensor.type,
-            })
-        })
+        return new Tensor({ header: new Header({ shape: tensor.shape, type: tensor.type }) })
     }
 
     static zeros(shape, type) {
@@ -68,18 +50,13 @@ export default class Tensor {
     static ones(shape, type) {
         return new Tensor({
             header: new Header({ shape, type }),
-            init: function () {
-                return new this.type.array(this.size * this.type.size).fill(1)
-            }
+            init: function () { return new this.type.array(this.size * this.type.size).fill(1) }
         })
     }
 
     static arange(start, step, stop, type) {
         return new Tensor({
-            header: new Header({
-                type,
-                shape: [__Math__.round((stop - start) / step)],
-            }),
+            header: new Header({ type, shape: [__Math__.round((stop - start) / step)] }),
             init: function () {
                 const data = new this.type.array(this.size * this.type.size)
                 for (let i = start, j = 0; i < stop; i += step, j++) data[j] = i
@@ -229,6 +206,13 @@ for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
     Tensor[prefix + 'Int16'] = { size, array: Int16Array }
     Tensor[prefix + 'Int32'] = { size, array: Int32Array }
     Tensor[prefix + 'Float32'] = { size, array: Float32Array }
+}
+
+/** Init operations */
+for (const method in Operations.methods) {
+    Tensor[method] = function (A, B, R, meta = { axes: [] }) {
+        return Operations.invoke(A, B, R, meta, method)
+    }
 }
 
 /** Init null tensor */

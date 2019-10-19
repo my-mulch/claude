@@ -1,2 +1,7 @@
 export { default as min } from './min'
+export { default as max } from './max'
+export { default as sum } from './sum'
+export { default as add } from './add'
+export { default as mult } from './mult'
 export { default as mean } from './mean'
+export { default as norm } from './norm'

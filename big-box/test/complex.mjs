@@ -14,7 +14,7 @@ export default jest.suite(function () {
         ["2+2i", "7+9i", "3+5i", "5+8i", "3+4i", "5+6i", "0+7i", "5+9i", "6+0i", "1+6i", "7+9i", "5+7i", "1+9i", "6+6i", "0+8i", "6+8i", "1+4i", "1+0i", "2+1i", "6+9i", "0+6i", "3+4i", "8+6i", "1+0i", "0+2i", "3+7i", "0+7i", "9+6i", "3+5i", "2+4i", "1+7i", "7+8i", "6+2i", "6+8i", "4+7i", "9+1i", "8+6i", "5+2i", "1+2i", "5+2i", "8+7i", "7+0i"],
         ["6+4i", "8+0i", "4+0i", "8+7i", "2+0i", "9+8i", "8+7i", "3+7i", "8+6i", "5+0i", "2+1i", "7+5i", "8+6i", "7+4i", "7+7i", "4+8i", "6+6i", "0+3i", "6+1i", "2+6i", "1+6i", "2+8i", "1+9i", "1+3i", "2+2i", "1+6i", "6+0i", "6+6i", "0+2i", "8+7i", "8+9i", "4+6i", "7+4i", "3+2i", "7+1i", "7+4i", "7+6i", "5+3i", "4+5i", "9+1i", "5+2i", "3+0i"]], bb.ComplexInt32)
 
-    const C = bb.tensor(["i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i"], bb.ComplexInt32)
+    const C = bb.tensor(["1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i", "1i"], bb.ComplexInt32)
 
     const D = bb.tensor([
         ['0', '1', '2', '3', '4'],
@@ -63,22 +63,17 @@ export default jest.suite(function () {
         ['7 + 8i', '5 + 4i', '3 + 6i', '7 + 9i'],
         ['7 + 1i', '2 + 3i', '9 + 2i', '2 + 2i']], bb.ComplexInt32)
 
-    const M = bb.zeros([100, 100], bb.ComplexInt32).assign(bb.tensor(['1 + i'], bb.ComplexInt32))
+    // const M = bb.zeros([100, 100], bb.ComplexInt32).assign(bb.tensor(['1 + i'], bb.ComplexInt32))
     const N = bb.tensor([['1. + 0i', '2. + 0i', '4. + 1i', '2. + 3i'], ['4. + 3i', '4. + 3i', '0. + 2i', '4. + 1i'], ['0. + 4i', '1. + 0i', '0. + 1i', '1. + 4i'], ['0. + 1i', '1. + 4i', '0. + 2i', '2. + 0i']], bb.ComplexInt32)
     const O = bb.tensor([['1. + 3i', '0. + 4i'], ['2. + 1i', '3. + 3i']], bb.ComplexInt32)
     const P = bb.tensor([["0.+4i", "0.+4i", "2.+2i", "0.+1i", "3.+4i"], ["1.+2i", "1.+3i", "4.+0i", "2.+4i", "0.+3i"], ["3.+3i", "4.+1i", "3.+0i", "3.+3i", "0.+1i"], ["0.+3i", "3.+3i", "0.+1i", "1.+4i", "2.+1i"], ["2.+2i", "4.+4i", "3.+3i", "3.+4i", "1.+1i"]], bb.ComplexInt32)
 
-    this.expect(A.min()).toEqual('10 + 2i')
-    this.expect(A.max()).toEqual('50 + i')
-    this.expect(A.mean()).toEqual('33.33333206176758 + 2i')
-    this.expect(A.sum()).toEqual('100 + 6i')
-    this.expect(A.norm()).toEqual('64.91532897949219')
-    this.expect(B.min()).toEqual('7i')
-    this.expect(B.max()).toEqual('9 + 6i')
-    this.expect(B.mean()).toEqual('4.464285850524902 + 4.690476417541504i')
-    this.expect(B.sum()).toEqual('375 + 394i')
-    this.expect(B.norm()).toEqual('69.73521423339844')
-    this.expect(B.add({ with: B })).toEqual(B.multiply({ with: 2 }))
+    this.expect(bb.min(A, bb.NULL, bb.zeros([1, 1], bb.ComplexInt32), { axes: [0, 1] })).toEqual([["10+2i"]])
+    this.expect(bb.max(A, bb.NULL, bb.zeros([1, 1], bb.ComplexInt32), { axes: [0, 1] })).toEqual([["40+3i"]])
+    this.expect(bb.mean(A, bb.NULL, bb.zeros([1, 1], bb.ComplexInt32), { axes: [0, 1] })).toEqual([["33+2i"]])
+    this.expect(bb.sum(A, bb.NULL, bb.zeros([1, 1], bb.ComplexInt32), { axes: [0, 1] })).toEqual([['100+6i']])
+    this.expect(bb.norm(A, bb.NULL, bb.zeros([1, 1], bb.Float32), { axes: [0, 1] })).toEqual([["64.91532897949219"]])
+    this.expect(bb.add(B, B, bb.zerosLike(B))).toEqual(bb.mult(B, bb.tensor([2], bb.ComplexInt32), bb.zerosLike(B)))
     this.expect(B.subtract({ with: B })).toEqual(B.multiply({ with: 0 }))
     this.expect(B.divide({ with: B })).toEqual(bb.ones({ shape: B.shape }))
     this.expect(A.add({ with: A })).toEqual(A.multiply({ with: 2 }))

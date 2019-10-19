@@ -10,30 +10,25 @@ export default {
 
     symbolic: function (A, B, R, meta) {
         const {
-            sT, sA, sR,
-            Aindex, Bindex, Rindex,
+            sA, sB, sR, sT,
+            AIndex, BIndex, RIndex,
             innerSize, outerSize, totalSize,
             innerLoops, outerLoops, totalLoops,
+            ANonZeroAxes, BNonZeroAxes, RNonZeroAxes,
             innerLoopAxes, totalLoopAxes, outerLoopAxes,
         } = symbolicInit(A, B, R, meta)
 
         return new Function('A, B, R', [
-            `const temp = new Array(${A.type.size})`,
-            ...outerLoops,
-            Rindex,
-            `temp.fill(0)`,
-            ...innerLoops,
-            Aindex,
-            ...Algebra.assign(sT, sA, '+='),
-            '}'.repeat(innerLoopAxes.length),
-            ...Algebra.assign(sR, Algebra.divide(sT, new Array(A.type.size).fill(innerSize))),
-            '}'.repeat(outerLoopAxes.length),
+            ...totalLoops,
+            AIndex,
+            BIndex,
+            RIndex,
+
+            ...Algebra.assign(sR, Algebra.multiply(sA, sB)),
+
+            '}'.repeat(totalLoopAxes.length),
+
             'return R'
         ].join('\n'))
     }
 }
-
-
-
-
-

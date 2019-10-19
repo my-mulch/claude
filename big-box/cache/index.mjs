@@ -8,7 +8,7 @@ export default class Cache {
         let func
 
         try {
-            func = this.suite[A.id][B.id][R.id][method]
+            (func = this.suite[A.id][B.id][R.id][method]).name
         } catch{
             this.suite[A.id] = {}
             this.suite[A.id][B.id] = {}

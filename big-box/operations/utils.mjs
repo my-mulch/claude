@@ -2,8 +2,12 @@ import Algebra from '../algebra'
 
 export const symbolicInit = function (A, B, R, meta) {
     const innerLoopAxes = meta.axes
-    const totalLoopAxes = [...new Array(A.shape.length).keys()]
+    const totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length, R.shape.length)).keys()]
     const outerLoopAxes = totalLoopAxes.filter(function (axis) { return !meta.axes.includes(axis) })
+
+    const ANonZeroAxes = totalLoopAxes.filter(nonZeroAxis, A)
+    const BNonZeroAxes = totalLoopAxes.filter(nonZeroAxis, B)
+    const RNonZeroAxes = outerLoopAxes.filter(nonZeroAxis, R)
 
     const innerSize = innerLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
     const outerSize = outerLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
@@ -11,22 +15,23 @@ export const symbolicInit = function (A, B, R, meta) {
 
     const innerLoops = innerLoopAxes.map(symbolicLoop, A)
     const outerLoops = outerLoopAxes.map(symbolicLoop, A)
-    const totalLoops = totalLoopAxes.map(symbolicLoop, A)
+    const totalLoops = totalLoopAxes.map(symbolicLoop, R)
 
-    const Aindex = symbolicIndex('A', totalLoopAxes)
-    const Bindex = symbolicIndex('B', totalLoopAxes)
-    const Rindex = symbolicIndex('R', outerLoopAxes)
+    const AIndex = symbolicIndex('A', ANonZeroAxes, A.shape.length === R.shape.length)
+    const BIndex = symbolicIndex('B', BNonZeroAxes, B.shape.length === R.shape.length)
+    const RIndex = symbolicIndex('R', RNonZeroAxes, false)
 
-    const sT = Algebra.variable({ symbol: 'temp', index: '0', size: A.type.size })
-    const sA = Algebra.variable({ symbol: 'A.data', index: 'Aindex', size: A.type.size })
-    const sB = Algebra.variable({ symbol: 'B.data', index: 'Bindex', size: B.type.size })
-    const sR = Algebra.variable({ symbol: 'R.data', index: 'Rindex', size: R.type.size })
+    const sT = Algebra.variable({ symbol: 'temp', index: '0', size: R.type.size })
+    const sA = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
+    const sB = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
+    const sR = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
 
     return {
-        sT, sA, sR,
-        Aindex, Bindex, Rindex,
+        sA, sB, sR, sT,
+        AIndex, BIndex, RIndex,
         innerSize, outerSize, totalSize,
         innerLoops, outerLoops, totalLoops,
+        ANonZeroAxes, BNonZeroAxes, RNonZeroAxes,
         innerLoopAxes, totalLoopAxes, outerLoopAxes,
     }
 }
@@ -34,51 +39,21 @@ export const symbolicLoop = function (axis) {
     return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
 }
 
-export const symbolicIndex = function (name, axes, aligned) {
+export const symbolicIndex = function (name, axes, parity) {
     return axes.reduce(function (symbol, axis, i) {
-        return `${symbol} + ${name}.strides[${aligned ? axis : i}] * i${axis}`
-    }, `const ${name}index = ${name}.offset`)
+        return `${symbol} + ${name}.strides[${parity ? axis : i}] * i${axis}`
+    }, `const ${name}Index = ${name}.offset`)
 }
 
 
-export const shapeAlign = function ({ short, delta }) {
-    return short.reshape({
-        shape: new Array(delta)
-            .fill(1)
-            .concat(short.shape)
-    })
-}
+export const nonZeroAxis = function (_, index) {
+    const ri = this.shape.length - index - 1
 
-export const pairAxesAndShape = function (args) {
-    const axesMatch = []
-    const axesMismatch = []
-    const fullShape = []
+    if (ri < 0)
+        return false
 
-    const ofShape = this.shape
-    const withShape = args.with.shape || this.shape
+    if (this.shape[ri] > 1)
+        return true
 
-    for (let i = 0; i < ofShape.length; i++)
-        if (ofShape[i] === 1) {
-            axesMismatch.push(i)
-            fullShape.push(withShape[i])
-        }
-
-        else if (withShape[i] === 1) {
-            axesMismatch.push(i)
-            fullShape.push(ofShape[i])
-        }
-
-        else if (ofShape[i] === withShape[i]) {
-            axesMatch.push(i)
-            fullShape.push(ofShape[i])
-        }
-
-    const axesShape = axesMismatch.concat(axesMatch)
-
-    return {
-        fullShape,
-        axesShape,
-        axesSize: axesShape.map(axesToShape, this).reduce(__Math__.multiply),
-        fullSize: fullShape.reduce(__Math__.multiply),
-    }
+    return false
 }

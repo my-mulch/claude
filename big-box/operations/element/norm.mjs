@@ -19,15 +19,15 @@ export default {
         } = symbolicInit(A, B, R, meta)
 
         return new Function('A, B, R', [
-            `const temp = new Array(${A.type.size})`,
+            `let temp`,
             ...outerLoops,
             RIndex,
-            `temp.fill(0)`,
+            `temp = 0`,
             ...innerLoops,
             AIndex,
-            ...Algebra.assign(sT, sA, '+='),
+            ...Algebra.assign(['temp'], Algebra.sumSquares(sA), '+='),
             '}'.repeat(innerLoopAxes.length),
-            ...Algebra.assign(sR, sT.map(function (temp) { return `${temp} / ${innerSize}` })),
+            ...Algebra.assign(sR, Algebra.squareRoot(['temp'])),
             '}'.repeat(outerLoopAxes.length),
             'return R'
         ].join('\n'))

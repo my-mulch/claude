@@ -19,22 +19,16 @@ export default {
         } = symbolicInit(A, B, R, meta)
 
         return new Function('A, B, R', [
-            `const temp = new Array(${A.type.size})`,
-            ...outerLoops,
-            RIndex,
-            `temp.fill(0)`,
-            ...innerLoops,
+            ...totalLoops,
             AIndex,
-            ...Algebra.assign(sT, sA, '+='),
-            '}'.repeat(innerLoopAxes.length),
-            ...Algebra.assign(sR, sT.map(function (temp) { return `${temp} / ${innerSize}` })),
-            '}'.repeat(outerLoopAxes.length),
+            BIndex,
+            RIndex,
+
+            ...Algebra.assign(sR, Algebra.add(sA, sB)),
+
+            '}'.repeat(totalLoopAxes.length),
+
             'return R'
         ].join('\n'))
     }
 }
-
-
-
-
-

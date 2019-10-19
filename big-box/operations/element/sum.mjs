@@ -27,7 +27,7 @@ export default {
             AIndex,
             ...Algebra.assign(sT, sA, '+='),
             '}'.repeat(innerLoopAxes.length),
-            ...Algebra.assign(sR, sT.map(function (temp) { return `${temp} / ${innerSize}` })),
+            ...Algebra.assign(sR, sT),
             '}'.repeat(outerLoopAxes.length),
             'return R'
         ].join('\n'))

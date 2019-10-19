@@ -22,12 +22,16 @@ export default {
             `const temp = new Array(${A.type.size})`,
             ...outerLoops,
             RIndex,
-            `temp.fill(0)`,
+            `temp.fill(Number.NEGATIVE_INFINITY)`,
             ...innerLoops,
             AIndex,
-            ...Algebra.assign(sT, sA, '+='),
+
+            `if(${Algebra.max(sA, sT).map(function (comparison) { return new Array(comparison) }).reduce(Algebra.and)}){
+                ${Algebra.assign(sT, sA).join('\n')}
+            }`,
+
             '}'.repeat(innerLoopAxes.length),
-            ...Algebra.assign(sR, sT.map(function (temp) { return `${temp} / ${innerSize}` })),
+            ...Algebra.assign(sR, sT),
             '}'.repeat(outerLoopAxes.length),
             'return R'
         ].join('\n'))
