@@ -2,11 +2,36 @@ import Algebra from '../../algebra'
 
 export default {
     test: function (A, B, R, meta) {
-        switch (true) {
-            default: return this.pointwise(A, B, R, meta)
-        }
+        if (R.size > 1e3)
+            return this.symbolic(A, B, R, meta)
+        else
+            return this.pointwise(A, B, R, meta)
     },
+    symbolic: function (A, B, R, meta) {
+        const sA = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
+        const sB = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
+        const sR = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
 
+        return new Function('A, B, R, meta', [
+            `for (let r = 0; r < A.shape[0]; r++){`,
+            `for (let c = 0; c < B.shape[1]; c++){`,
+
+            `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`,
+            `R.data[RIndex] = 0`,
+
+            `for (let s = 0; s < A.shape[1]; s++) {`,
+
+            `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`,
+            `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`,
+
+            `${Algebra.assign(sR, Algebra.multiply(sA, sB), '+=')}`,
+
+            `}}}`,
+
+            `return R`
+
+        ].join('\n'))
+    },
     pointwise: function (A, B, R, meta) {
         const operations = [], rows = A.shape[0], cols = B.shape[1], shared = A.shape[1]
 
@@ -25,6 +50,8 @@ export default {
             }
         }
 
-        return new Function('A, B, R', [operations.flat(Number.POSITIVE_INFINITY).join('\n'), `return R`].join('\n'))
+        return new Function('A, B, R', [
+            operations.flat(Number.POSITIVE_INFINITY).join('\n'), `return R`
+        ].join('\n'))
     }
 }
