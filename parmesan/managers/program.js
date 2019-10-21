@@ -1,4 +1,4 @@
-import config from '../../resources'
+import config from '../resources'
 
 export default class ProgramManager {
     constructor(options) {

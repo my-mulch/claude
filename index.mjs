@@ -1,5 +1,5 @@
-import bb from './big-box'
 import myio from './myio'
+import bb from './big-box/tensor'
 import parmesan from './parmesan'
 
 window.bb = bb

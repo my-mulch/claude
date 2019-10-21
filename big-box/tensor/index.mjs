@@ -1,17 +1,8 @@
-import util from 'util' // node's utils
-
-import {
-    isTypedArray, // init utils
-    parseNumber, stringNumber, // io utils
-    shapeRaw,  // shape utils
-} from './utils'
-
-import {
-    __Math__, ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX
-} from '../resources'
-
+import util from 'util'
 import Header from '../header'
-import Operations from '../operations'
+
+import { isTypedArray, parseNumber, stringNumber, shapeRaw, } from './utils'
+import { __Math__, ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX } from '../resources'
 
 export default class Tensor {
     constructor({ header, init = function () {
@@ -24,44 +15,44 @@ export default class Tensor {
         this.data = init.call(this)
     }
 
-    static tensor(array, type) {
+    static tensor({ tensor, type }) {
         return new Tensor({
-            header: new Header({ type, shape: shapeRaw(array) }),
+            header: new Header({ type, shape: shapeRaw(tensor) }),
             init: function () {
-                if (isTypedArray(array))
-                    return array
+                if (isTypedArray(tensor))
+                    return tensor
 
                 const data = new this.type.array(this.size * this.type.size)
-                data.set([array].flat(Number.POSITIVE_INFINITY).map(parseNumber).flat())
+                data.set([tensor].flat(Number.POSITIVE_INFINITY).map(parseNumber).flat())
 
                 return data
             }
         })
     }
 
-    static zerosLike(tensor) {
+    static zerosLike({ tensor }) {
         return new Tensor({ header: new Header({ shape: tensor.shape, type: tensor.type }) })
     }
 
-    static zeros(shape, type) {
+    static zeros({ shape, type }) {
         return new Tensor({ header: new Header({ shape, type }) })
     }
 
-    static onesLike(tensor) {
+    static onesLike({ tensor }) {
         return new Tensor({
             header: new Header({ shape: tensor.shape, type: tensor.type }),
             init: function () { return new this.type.array(this.size * this.type.size).fill(1) }
         })
     }
 
-    static ones(shape, type) {
+    static ones({ shape, type }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () { return new this.type.array(this.size * this.type.size).fill(1) }
         })
     }
 
-    static arange(start, step, stop, type) {
+    static arange({ start, step, stop, type }) {
         return new Tensor({
             header: new Header({ type, shape: [__Math__.round((stop - start) / step)] }),
             init: function () {
@@ -72,7 +63,7 @@ export default class Tensor {
         })
     }
 
-    static linspace(start, stop, num, type) {
+    static linspace({ start, stop, num, type }) {
         const step = (stop - start) / num
         return new Tensor({
             header: new Header({ type, shape: [num] }),
@@ -85,7 +76,7 @@ export default class Tensor {
     }
 
 
-    static rand(shape, type) {
+    static rand({ shape, type }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () {
@@ -99,21 +90,21 @@ export default class Tensor {
         })
     }
 
-    static randrange(low, high, shape, type) {
+    static randrange({ low, high, shape, type }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () {
                 const data = new this.type.array(this.size * this.type.size)
 
                 for (let i = 0; i < data.length; i++)
-                    data[i] = Operations.invoke({ low, high, method: Tensor.randrange.name })
+                    data[i] = low + __Math__.floor(__Math__.random() * (high - low))
 
                 return data
             }
         })
     }
 
-    static eye(shape, type) {
+    static eye({ shape, type }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () {
@@ -129,7 +120,7 @@ export default class Tensor {
         })
     }
 
-    astype(type, old = this) {
+    astype({ type }, old = this) {
         let shape = old.shape.slice()
 
         if (type.size > 1 && old.type.size === 1)
@@ -157,7 +148,7 @@ export default class Tensor {
         return Tensor.tensor(this.toRaw(), this.type).reshape([-1])
     }
 
-    slice(region, old = this) {
+    slice({ region }, old = this) {
         return new Tensor({
             header: this.header.slice(region),
             init: function () { return old.data }
@@ -171,7 +162,7 @@ export default class Tensor {
         })
     }
 
-    reshape(shape, old = this) {
+    reshape({ shape }, old = this) {
         if (!this.contig)
             return Tensor.array(this.toRaw(), this.type).reshape({ shape })
 
@@ -200,26 +191,3 @@ export default class Tensor {
 
     [util.inspect.custom]() { return this.toString() }
 }
-
-/** Init data types */
-for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
-    Tensor[prefix + 'Uint8Clamped'] = { size, array: Uint8ClampedArray }
-    Tensor[prefix + 'Uint8'] = { size, array: Uint8Array }
-    Tensor[prefix + 'Uint16'] = { size, array: Uint16Array }
-    Tensor[prefix + 'Uint32'] = { size, array: Uint32Array }
-    Tensor[prefix + 'Int8'] = { size, array: Int8Array }
-    Tensor[prefix + 'Int16'] = { size, array: Int16Array }
-    Tensor[prefix + 'Int32'] = { size, array: Int32Array }
-    Tensor[prefix + 'Float32'] = { size, array: Float32Array }
-}
-
-/** Init operations */
-for (const method in Operations.methods) {
-    Tensor[method] = function (A, B, R, meta = { axes: [] }) {
-        return Operations.invoke(A, B, R, meta, method)
-    }
-}
-
-/** Init null tensor */
-Tensor.NULL = Tensor.zeros([], Tensor.Int32)
-

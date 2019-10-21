@@ -4,7 +4,7 @@ import ProgramManager from './managers/program'
 import UniformManager from './managers/uniform'
 import AttributeManager from './managers/attribute'
 
-import config from '../resources'
+import config from './resources'
 
 export default class GraphicsEngine3D {
     constructor() {

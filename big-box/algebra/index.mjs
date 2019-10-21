@@ -13,6 +13,14 @@ export default class Algebra {
         })
     }
 
+    static exp(o1) {
+        if (o1.length === 1) return [`Math.exp(${o1})`]
+
+        const [a, b] = Algebra.split(o1)
+
+        return [Algebra.exp(a), Algebra.exp(b)].flat(Number.POSITIVE_INFINITY)
+    }
+
     static sin(o1) {
         if (o1.length === 1) return [`Math.sin(${o1})`]
 

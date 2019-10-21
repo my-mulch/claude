@@ -1,5 +1,5 @@
-import bb from '../../../big-box'
-import config from '../../resources'
+import bb from '../../big-box/tensor'
+import config from '../resources'
 
 export default class CameraManager {
     constructor() {
@@ -12,17 +12,17 @@ export default class CameraManager {
         const s = Math.sin(this.config.PAN_DELTA)
         const c = Math.cos(this.config.PAN_DELTA)
 
-        this.upRot = bb.array({ with: [[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]] })
-        this.downRot = bb.array({ with: [[1, 0, 0, 0], [0, c, s, 0], [0, -s, c, 0], [0, 0, 0, 1]] })
-        this.leftRot = bb.array({ with: [[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]] })
-        this.rightRot = bb.array({ with: [[c, 0, -s, 0], [0, 1, 0, 0], [s, 0, c, 0], [0, 0, 0, 1]] })
+        this.upRot = bb.tensor([[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]], bb.Float32)
+        this.downRot = bb.tensor([[1, 0, 0, 0], [0, c, s, 0], [0, -s, c, 0], [0, 0, 0, 1]], bb.Float32)
+        this.leftRot = bb.tensor([[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]], bb.Float32)
+        this.rightRot = bb.tensor([[c, 0, -s, 0], [0, 1, 0, 0], [s, 0, c, 0], [0, 0, 0, 1]], bb.Float32)
     }
 
     lookAt() {
-        const viewMatrix = bb.eye({ shape: [4, 4] })
-        const transMatrix = bb.eye({ shape: [4, 4] })
+        const viewMatrix = bb.eye([4, 4], bb.Float32)
+        const transMatrix = bb.eye([4, 4], bb.Float32)
 
-        const f = this.FROM.subtract({ with: this.TO })
+        const f = bb.sub()this.FROM.sub({ with: this.TO })
         const s = this.UP.cross({ with: f })
 
         const uf = f.divide({ with: f.norm() })
@@ -58,7 +58,7 @@ export default class CameraManager {
         projectionMatrix[11] = -1
         projectionMatrix[14] = -2 * this.config.NEAR * this.config.FAR * reciprocalDepth
 
-        return bb.array({ with: projectionMatrix }).reshape({ shape: [4, 4] })
+        return bb.tensor(projectionMatrix, bb.Float32).reshape([4, 4])
     }
 
     rotate({ orientation, viewMatrix, viewMatrixInv }) {
