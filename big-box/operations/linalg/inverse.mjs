@@ -7,7 +7,9 @@ export default {
             default: return this.pointwise(A, B, R, meta)
         }
     },
-
+    resultant: function (A, B, R, meta) {
+        return { shape: A.shape, type: A.type }
+    },
     pointwise: function (A, B, R, meta) {
         const size = Math.sqrt(A.size),
             indices = template(size),

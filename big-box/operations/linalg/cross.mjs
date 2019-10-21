@@ -7,6 +7,10 @@ export default {
         }
     },
 
+    resultant: function (A, B, R, meta) {
+        return { shape: [3, 1], type: A.type }
+    },
+
     pointwise: function (A, B, R, meta) {
         const sA = [], sB = [], sR = []
 

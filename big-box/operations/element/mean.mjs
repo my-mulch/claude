@@ -2,13 +2,22 @@ import Algebra from '../../algebra'
 import { symbolicInit } from '../utils'
 
 export default {
-    test: function (A, B, R, meta) {
+    test: function (A, B, R, axes) {
         switch (true) {
-            default: return this.symbolic(A, B, R, meta)
+            default: return this.symbolic(A, B, R, axes)
         }
     },
 
-    symbolic: function (A, B, R, meta) {
+    resultant: function (A, B, R, axes = [...A.shape.keys()]) {
+        return {
+            type: A.type,
+            shape: A.shape.filter(function (_, axis) {
+                return !axes.includes(axis)
+            }),
+        }
+    },
+
+    symbolic: function (A, B, R, axes = [...A.shape.keys()]) {
         const {
             sA, sB, sR, sT,
             AIndex, BIndex, RIndex,
@@ -16,7 +25,7 @@ export default {
             innerLoops, outerLoops, totalLoops,
             ANonZeroAxes, BNonZeroAxes, RNonZeroAxes,
             innerLoopAxes, totalLoopAxes, outerLoopAxes,
-        } = symbolicInit(A, B, R, meta)
+        } = symbolicInit(A, B, R, axes)
 
         return new Function('A, B, R', [
             `const temp = new Array(${A.type.size})`,

@@ -52,7 +52,7 @@ export default class Tensor {
         })
     }
 
-    static arange({ start, step, stop, type }) {
+    static arange({ start = 0, step = 1, stop, type }) {
         return new Tensor({
             header: new Header({ type, shape: [__Math__.round((stop - start) / step)] }),
             init: function () {
@@ -63,7 +63,7 @@ export default class Tensor {
         })
     }
 
-    static linspace({ start, stop, num, type }) {
+    static linspace({ start, stop, num = 50, type }) {
         const step = (stop - start) / num
         return new Tensor({
             header: new Header({ type, shape: [num] }),

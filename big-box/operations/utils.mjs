@@ -1,9 +1,9 @@
 import Algebra from '../algebra'
 
-export const symbolicInit = function (A, B, R, meta) {
-    const innerLoopAxes = meta.axes
+export const symbolicInit = function (A, B, R, axes) {
+    const innerLoopAxes = axes
     const totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length, R.shape.length)).keys()]
-    const outerLoopAxes = totalLoopAxes.filter(function (axis) { return !meta.axes.includes(axis) })
+    const outerLoopAxes = totalLoopAxes.filter(function (axis) { return !axes.includes(axis) })
 
     const ANonZeroAxes = totalLoopAxes.slice().reverse().filter(nonZeroAxis, A).reverse()
     const BNonZeroAxes = totalLoopAxes.slice().reverse().filter(nonZeroAxis, B).reverse()

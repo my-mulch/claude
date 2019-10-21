@@ -17,25 +17,32 @@ for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
 Tensor.NULL = Tensor.zeros({ shape: [], type: Tensor.Int32 })
 
 /** Init operations */
-for (const method in Operations.methods) {
-    // Static
-    Tensor[method] = function (args) {
-        const A = args.of
-        const B = args.with || Tensor.NULL
-        const R = args.result
-        const meta = args.meta
+for (const [method, config] of Object.entries(Operations.methods)) {
 
-        return Operations.invoke(A, B, R, meta, method)
+    /** Static operations */
+    Tensor[method] = function (args = {}) {
+        let A = args.of
+        let B = args.with
+        let R = args.result
+        let axes = args.axes
+
+        B = B || Tensor.NULL
+        R = R || Tensor.zeros(config.resultant(A, B, R, axes))
+
+        return Operations.invoke(A, B, R, axes, method)
     }
 
-    // Instance
-    Tensor.prototype[method] = function (args) {
-        const A = this
-        const B = args.with || Tensor.NULL
-        const R = args.result
-        const meta = args.meta
+    /** Instance operations */
+    Tensor.prototype[method] = function (args = {}) {
+        let A = this
+        let B = args.with
+        let R = args.result
+        let axes = args.axes
 
-        return Operations.invoke(A, B, R, meta, method)
+        B = B || Tensor.NULL
+        R = R || Tensor.zeros(config.resultant(A, B, R, axes))
+
+        return Operations.invoke(A, B, R, axes, method)
     }
 }
 

@@ -7,6 +7,9 @@ export default {
         else
             return this.pointwise(A, B, R, meta)
     },
+    resultant: function (A, B, R, meta) {
+        return { shape: [A.shape[0], B.shape[1]], type: A.type }
+    },
     symbolic: function (A, B, R, meta) {
         const sA = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
         const sB = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
@@ -51,7 +54,8 @@ export default {
         }
 
         return new Function('A, B, R', [
-            operations.flat(Number.POSITIVE_INFINITY).join('\n'), `return R`
+            operations.flat(Number.POSITIVE_INFINITY).join('\n'),
+            `return R`
         ].join('\n'))
     }
 }
