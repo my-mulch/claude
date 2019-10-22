@@ -1,7 +1,6 @@
 import Algebra from '../../algebra'
-import Operation from '../operation'
+import PairOperation from './operation'
 
-import { init } from '../../operations/utils'
-import { test, result, symbolic } from '../pair/utils'
-
-export default new Operation({ test, init, result, symbolic, operation: Algebra.subtract })
+export default new PairOperation(function ({ A, B, R }) {
+    return Algebra.assign(R, Algebra.subtract(A, B))
+})

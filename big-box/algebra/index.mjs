@@ -13,6 +13,14 @@ export default class Algebra {
         })
     }
 
+    static noop(o1, o2) {
+        if (o1.length === 1) return [`(${o1})`]
+
+        const [a, b, c, d] = Algebra.split(o1, o2)
+
+        return [Algebra.noop(a, c), Algebra.noop(b, d)].flat(Number.POSITIVE_INFINITY)
+    }
+
     static exp(o1) {
         if (o1.length === 1) return [`Math.exp(${o1})`]
 
@@ -109,12 +117,6 @@ export default class Algebra {
         const [a, b] = Algebra.split(o1)
 
         return [Algebra.squareRoot(a), Algebra.squareRoot(b)].flat(Number.POSITIVE_INFINITY)
-    }
-
-    static norm(o1) {
-        if (o1.length === 1) return [`(${o1})`]
-
-        return Algebra.squareRoot(Algebra.sumSquares(o1))
     }
 
     static sumSquares(o1) {

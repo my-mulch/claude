@@ -1,24 +1,19 @@
 import Algebra from '../../algebra'
-import Opertation from '../operations'
+import ElementOperation from './operation'
 
-import { init } from '../../operations/utils'
-import { test, result, symbolic } from '../element/utils'
+export default new ElementOperation(function () {
+    return {
+        before: Algebra.assign(
+            this.T,
+            Algebra.negativeInfinity(this.T.length)
+        ),
 
-export default new Opertation({
-    test, init, result, symbolic,
-    operations: [
-        function () { return `temp.fill(Number.NEGATIVE_INFINITY)` },
-        function ({ AV, AT }) {
-            return `if(${Algebra.max(AV, AT).map(function (comparison) {
-                return new Array(comparison)
-            }).reduce(Algebra.and)}){
-                ${Algebra.assign(AT, AV).join('\n')}
-            }`
-        },
-        function ({ RV, TV }) {
-            return Algebra.assign(sR, sT).join('\n')
-        }
-    ]
+        inside: Algebra.if(
+            Algebra.greaterThan(this.T, this.A).slice(0, 1),
+            Algebra.assign(this.T, this.A)
+        ),
+
+        after: Algebra.assign(this.R, this.T),
+    }
+
 })
-
-

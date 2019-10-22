@@ -1,6 +1,6 @@
 import { __Math__ } from '../../resources'
 
-export const test = function (A, B, R, axes) {
+export const select = function (A, B, R, axes) {
     return this.symbolic(A, B, R, axes)
 }
 
@@ -10,7 +10,7 @@ export const symbolic = function (operation) {
 
         this.AI, this.BI, this.RI,
 
-        ...Algebra.assign(this.RV, operation(this.AV, this.BV)),
+        operation,
 
         '}'.repeat(this.totalLoopAxes.length),
 
