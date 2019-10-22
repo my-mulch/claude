@@ -1,32 +1,14 @@
 import Algebra from '../../algebra'
-import { symbolicInit } from '../utils'
+import Opertation from '../operations'
 
-export default {
-    test: function (A, B, R, axes) {
-        switch (true) {
-            default: return this.symbolic(A, B, R, axes)
-        }
-    },
+import { init } from '../../operations/utils'
+import { test, result, symbolic } from '../element/utils'
 
-    resultant: function (A, B, R, axes = [...A.shape.keys()]) {
-        return {
-            type: A.type,
-            shape: A.shape.filter(function (_, axis) {
-                return !axes.includes(axis)
-            }),
-        }
-    },
-
-    symbolic: function (A, B, R, axes = [...A.shape.keys()]) {
-        const {
-            sA, sB, sR, sT,
-            AIndex, BIndex, RIndex,
-            innerSize, outerSize, totalSize,
-            innerLoops, outerLoops, totalLoops,
-            ANonZeroAxes, BNonZeroAxes, RNonZeroAxes,
-            innerLoopAxes, totalLoopAxes, outerLoopAxes,
-        } = symbolicInit(A, B, R, axes)
-
+export default new Opertation({
+    test,
+    init,
+    result,
+    symbolic: function () {
         return new Function('A, B, R', [
             `const temp = new Array(${A.type.size})`,
             ...outerLoops,
@@ -41,9 +23,4 @@ export default {
             'return R'
         ].join('\n'))
     }
-}
-
-
-
-
-
+})

@@ -1,44 +1,24 @@
 import Algebra from '../../algebra'
-import { symbolicInit } from '../utils'
+import Opertation from '../operations'
 
-export default {
-    test: function (A, B, R, meta) {
-        switch (true) {
-            default: return this.symbolic(A, B, R, meta)
+import { init } from '../../operations/utils'
+import { test, result, symbolic } from '../element/utils'
+
+export default new Opertation({
+    test, init, result, symbolic,
+    operations: [
+        function () { return `temp.fill(Number.NEGATIVE_INFINITY)` },
+        function ({ AV, AT }) {
+            return `if(${Algebra.max(AV, AT).map(function (comparison) {
+                return new Array(comparison)
+            }).reduce(Algebra.and)}){
+                ${Algebra.assign(AT, AV).join('\n')}
+            }`
+        },
+        function ({ RV, TV }) {
+            return Algebra.assign(sR, sT).join('\n')
         }
-    },
-
-    symbolic: function (A, B, R, meta) {
-        const {
-            sA, sB, sR, sT,
-            AIndex, BIndex, RIndex,
-            innerSize, outerSize, totalSize,
-            innerLoops, outerLoops, totalLoops,
-            ANonZeroAxes, BNonZeroAxes, RNonZeroAxes,
-            innerLoopAxes, totalLoopAxes, outerLoopAxes,
-        } = symbolicInit(A, B, R, meta)
-
-        return new Function('A, B, R', [
-            `const temp = new Array(${A.type.size})`,
-            ...outerLoops,
-            RIndex,
-            `temp.fill(Number.NEGATIVE_INFINITY)`,
-            ...innerLoops,
-            AIndex,
-
-            `if(${Algebra.max(sA, sT).map(function (comparison) { return new Array(comparison) }).reduce(Algebra.and)}){
-                ${Algebra.assign(sT, sA).join('\n')}
-            }`,
-
-            '}'.repeat(innerLoopAxes.length),
-            ...Algebra.assign(sR, sT),
-            '}'.repeat(outerLoopAxes.length),
-            'return R'
-        ].join('\n'))
-    }
-}
-
-
-
+    ]
+})
 
 

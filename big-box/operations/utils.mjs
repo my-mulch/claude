@@ -35,6 +35,7 @@ export const symbolicInit = function (A, B, R, axes) {
         innerLoopAxes, totalLoopAxes, outerLoopAxes,
     }
 }
+
 export const symbolicLoop = function (axis) {
     return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
 }
