@@ -17,32 +17,32 @@ for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
 Tensor.NULL = Tensor.zeros({ shape: [], type: Tensor.Int32 })
 
 /** Init operations */
-for (const [method, config] of Object.entries(Operations.methods)) {
+for (const [name, operation] of Object.entries(Operations.names)) {
 
     /** Static operations */
-    Tensor[method] = function (args = {}) {
+    Tensor[name] = function (args = {}) {
         let A = args.of
         let B = args.with
         let R = args.result
         let axes = args.axes
 
         B = B || Tensor.NULL
-        R = R || Tensor.zeros(config.resultant(A, B, R, axes))
+        R = R || Tensor.zeros(operation.resultant(A, B, R, axes))
 
-        return Operations.invoke(A, B, R, axes, method)
+        return Operations.invoke(A, B, R, axes, name)
     }
 
     /** Instance operations */
-    Tensor.prototype[method] = function (args = {}) {
+    Tensor.prototype[name] = function (args = {}) {
         let A = this
         let B = args.with
         let R = args.result
         let axes = args.axes
 
         B = B || Tensor.NULL
-        R = R || Tensor.zeros(config.resultant(A, B, R, axes))
+        R = R || Tensor.zeros(operation.resultant(A, B, R, axes))
 
-        return Operations.invoke(A, B, R, axes, method)
+        return Operations.invoke(A, B, R, axes, name)
     }
 }
 
