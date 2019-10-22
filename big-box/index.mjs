@@ -17,7 +17,7 @@ for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
 Tensor.NULL = Tensor.zeros({ shape: [], type: Tensor.Int32 })
 
 /** Init operations */
-for (const [name, operation] of Object.entries(Operations.names)) {
+for (const [name, operation] of Object.entries(Operations.methods)) {
 
     /** Static operations */
     Tensor[name] = function (args = {}) {

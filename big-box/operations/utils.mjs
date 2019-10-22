@@ -9,7 +9,7 @@ export const symbolicIndex = function (name, axes, parity) {
     }, `const ${name}Index = ${name}.offset`)
 }
 
-export const nonZeroAxis = function (_, index) {
+export const nonZeroAxes = function (_, index) {
     const ri = this.shape.length - index - 1
 
     if (ri < 0) return false

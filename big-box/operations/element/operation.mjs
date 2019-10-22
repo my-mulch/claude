@@ -1,9 +1,14 @@
+import Operation from '../operation'
 import { symbolicLoop } from '../../operations/utils'
 
-export default class ElementOperation {
-    constructor(operation) { this.operation = operation.bind(this) }
+export default class ElementOperation extends Operation {
+    constructor(operation) {
+        super()
 
-    select(A, B, R, axes) {
+        this.operation = operation.bind(this)
+    }
+
+    create(A, B, R, axes) {
         this.initialize(A, B, R, axes)
 
         return this.symbolic(this.operation())

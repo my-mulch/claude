@@ -1,10 +1,15 @@
+import Operation from '../operation'
 import { __Math__ } from '../../resources'
 import { symbolicLoop, symbolicIndex, nonZeroAxes } from '../../operations/utils'
 
-export default class PairOperation {
-    constructor(operation) { this.operation = operation.bind(this) }
+export default class PairOperation extends Operation {
+    constructor(operation) {
+        super()
+        
+        this.operation = operation.bind(this)
+    }
 
-    select(A, B, R, axes) {
+    create(A, B, R, axes) {
         this.initialize(A, B, R, axes)
 
         return this.symbolic(this.operation())

@@ -1,6 +1,6 @@
 import Algebra from '../../algebra'
 import PairOperation from './operation'
 
-export default new PairOperation(function ({ A, B, R }) {
-    return Algebra.assign(R, Algebra.divide(A, B))
+export default new PairOperation(function () {
+    return Algebra.assign(this.R, Algebra.divide(this.A, this.B))
 })
