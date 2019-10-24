@@ -10,22 +10,26 @@ export default class PairOperation extends Operation {
         this.B = B
         this.R = R
 
-        this.operation = operation
+        /** Symbolic PairOperation */
+        this.symbolic.operation = operation
 
-        this.totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
-        this.totalLoops = totalLoopAxes.map(symbolicLoop, R)
+        this.symbolic.totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
+        this.symbolic.totalLoops = totalLoopAxes.map(symbolicLoop, R)
 
-        this.axes.R = this.totalLoopAxes
-        this.axes.A = totalLoopAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
-        this.axes.B = totalLoopAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
+        this.symbolic.axes.R = this.totalLoopAxes
+        this.symbolic.axes.A = totalLoopAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
+        this.symbolic.axes.B = totalLoopAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
 
-        this.indices.R = symbolicIndex('R', RA, true)
-        this.indices.A = symbolicIndex('A', AA, A.shape.length === R.shape.length)
-        this.indices.B = symbolicIndex('B', BA, B.shape.length === R.shape.length)
+        this.symbolic.indices.R = symbolicIndex('R', RA, true)
+        this.symbolic.indices.A = symbolicIndex('A', AA, A.shape.length === R.shape.length)
+        this.symbolic.indices.B = symbolicIndex('B', BA, B.shape.length === R.shape.length)
 
-        this.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
-        this.variables.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
-        this.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
+        this.symbolic.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
+        this.symbolic.variables.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
+        this.symbolic.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
+
+        this.symbolic.source = this.symbolic()
+        this.symbolic.method = new Function('A,B,R', `${this.symbolic.source}; return R`)
     }
 
     static resultant(A, B) {
@@ -51,15 +55,15 @@ export default class PairOperation extends Operation {
 
     symbolic() {
         return [
-            this.totalLoops.join('\n'),
+            this.symbolic.totalLoops.join('\n'),
 
-            this.indices.AI,
-            this.indices.BI,
-            this.indices.RI,
+            this.symbolic.indices.AI,
+            this.symbolic.indices.BI,
+            this.symbolic.indices.RI,
 
-            this.operation,
+            this.symbolic.operation,
 
-            '}'.repeat(this.totalLoopAxes.length),
+            '}'.repeat(this.symbolic.totalLoopAxes.length),
 
         ].join('\n')
     }

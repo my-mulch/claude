@@ -5,8 +5,8 @@ export default class Exponential extends ElementOperation {
     constructor(A, B, R, axes) {
         super(A, B, R, axes, {
             inside: Algebra.assign(
-                this.variables.R,
-                Algebra.exp(this.variables.A)
+                this.symbolic.variables.R,
+                Algebra.exp(this.symbolic.variables.A)
             )
         })
     }

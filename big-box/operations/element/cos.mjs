@@ -5,8 +5,8 @@ export default class Cosine extends ElementOperation {
     constructor(A, B, R, axes) {
         super(A, B, R, axes, {
             inside: Algebra.assign(
-                this.variables.R,
-                Algebra.cos(this.variables.A)
+                this.symbolic.variables.R,
+                Algebra.cos(this.symbolic.variables.A)
             )
         })
     }

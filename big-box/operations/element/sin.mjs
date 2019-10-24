@@ -5,8 +5,8 @@ export default class Sine extends ElementOperation {
     constructor(A, B, R, axes) {
         super(A, B, R, axes, {
             inside: Algebra.assign(
-                this.variables.R,
-                Algebra.sin(this.variables.A)
+                this.symbolic.variables.R,
+                Algebra.sin(this.symbolic.variables.A)
             )
         })
     }
