@@ -1,20 +1,22 @@
 import Algebra from '../../algebra'
-import { cofactors, template, survivors } from './cofactors.mjs'
+import { cofactors, template, survivors } from './adjugate.mjs'
 
+export default class Inverse extends Operation {
+    create(A, B, R, meta) { return this.pointwise(A, B, R, meta) }
+    resultant(A, B, R, meta) { return { shape: A.shape, type: A.type } }
+    pointwise() {
+        const size = Math.sqrt(A.size)
+        const indices = template(size)
+        const temp = Algebra.variable({ symbol: 'temp', size: A.type.size, index: 0 })
+        const determinant = Algebra.variable({ symbol: 'determinant', size: A.type.size, index: 0 })
+
+
+    }
+}
 export default {
-    test: function (A, B, R, meta) {
-        switch (true) {
-            default: return this.pointwise(A, B, R, meta)
-        }
-    },
-    resultant: function (A, B, R, meta) {
-        return { shape: A.shape, type: A.type }
-    },
+
     pointwise: function (A, B, R, meta) {
-        const size = Math.sqrt(A.size),
-            indices = template(size),
-            temp = Algebra.variable({ symbol: 'temp', size: A.type.size, index: 0 }),
-            determinant = Algebra.variable({ symbol: 'determinant', size: A.type.size, index: 0 })
+
 
         const adjointComputation = new Array(size * size).fill(null).map(function (_, i) {
             const c = i % size

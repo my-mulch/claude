@@ -13,8 +13,9 @@ export default class Cache {
         }
 
         catch (error) {
+            body = this.methods[method].create(A, B, R, axes)
             func = (((this.suite[A.id] = {})[B.id] = {})[R.id] = {})[method]
-                = this.methods[method].create(A, B, R, axes)
+                = new Function('A,B,R', `${body}; return R`)
         }
 
         return func(A, B, R, axes)

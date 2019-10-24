@@ -1,41 +1,47 @@
 import Algebra from '../../algebra'
+import Operation from '../operation'
 
-export default {
-    test: function (A, B, R, meta) {
+export default class MatMult extends Operation {
+    create(A, B, R) {
+        this.initialize(A, B, R)
+
         if (R.size > 1e3)
-            return this.symbolic(A, B, R, meta)
+            return this.symbolic()
         else
             return this.pointwise(A, B, R, meta)
-    },
-    resultant: function (A, B, R, meta) {
-        return { shape: [A.shape[0], B.shape[1]], type: A.type }
-    },
-    symbolic: function (A, B, R, meta) {
-        const sA = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
-        const sB = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
-        const sR = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
+    }
 
+    initialize(A, B, R) {
+        this.RI = `const RI = r * R.strides[0] + c * R.strides[1] + R.offset`
+        this.AI = `const AI = r * A.strides[0] + s * A.strides[1] + A.offset`
+        this.BI = `const BI = r * B.strides[0] + s * B.strides[1] + B.offset`
+
+        this.A = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
+        this.B = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
+        this.R = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
+    }
+
+    static resultant(A, B) {
+        return {
+            shape: [A.shape[0], B.shape[1]],
+            type: A.type
+        }
+    }
+
+    symbolic() {
         return new Function('A, B, R, meta', [
             `for (let r = 0; r < A.shape[0]; r++){`,
             `for (let c = 0; c < B.shape[1]; c++){`,
-
-            `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`,
-            `R.data[RIndex] = 0`,
-
+            this.RI, `R.data[RIndex] = 0`,
             `for (let s = 0; s < A.shape[1]; s++) {`,
-
-            `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`,
-            `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`,
-
-            `${Algebra.assign(sR, Algebra.multiply(sA, sB), '+=')}`,
-
+            this.AI, this.BI,
+            `${Algebra.assign(this.R, Algebra.multiply(this.A, this.B), '+=')}`,
             `}}}`,
-
             `return R`
-
         ].join('\n'))
-    },
-    pointwise: function (A, B, R, meta) {
+    }
+
+    pointwise(A, B, R, meta) {
         const operations = [], rows = A.shape[0], cols = B.shape[1], shared = A.shape[1]
 
         for (let r = 0; r < rows; r++) {
