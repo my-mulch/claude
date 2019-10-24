@@ -1,6 +1,8 @@
 import Algebra from '../../algebra'
 import PairOperation from './operation'
 
-export default new PairOperation(function ({ A, B, R }) {
-    return Algebra.assign(R, Algebra.multiply(A, B))
-})
+export default class Multiplication extends PairOperation {
+    constructor(A, B, R) {
+        super(A, B, R, Algebra.assign(this.symbols.R, Algebra.divide(this.symbols.A, this.symbols.B)))
+    }
+}

@@ -3,36 +3,32 @@ import { __Math__ } from '../../resources'
 import { symbolicLoop, symbolicIndex, nonZeroAxes } from '../../operations/utils'
 
 export default class PairOperation extends Operation {
-    constructor(operation) {
+    constructor(A, B, R, operation) {
         super()
-        
-        this.operation = operation.bind(this)
-    }
 
-    create(A, B, R, axes) {
-        this.initialize(A, B, R, axes)
+        this.A = A
+        this.B = B
+        this.R = R
 
-        return this.symbolic(this.operation())
-    }
+        this.operation = operation
 
-    initialize(A, B, R, axes) {
         this.totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
         this.totalLoops = totalLoopAxes.map(symbolicLoop, R)
 
-        const RA = this.totalLoopAxes
-        const AA = totalLoopAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
-        const BA = totalLoopAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
+        this.axes.R = this.totalLoopAxes
+        this.axes.A = totalLoopAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
+        this.axes.B = totalLoopAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
 
-        this.RI = symbolicIndex('R', RA, true)
-        this.AI = symbolicIndex('A', AA, A.shape.length === R.shape.length)
-        this.BI = symbolicIndex('B', BA, B.shape.length === R.shape.length)
+        this.indices.R = symbolicIndex('R', RA, true)
+        this.indices.A = symbolicIndex('A', AA, A.shape.length === R.shape.length)
+        this.indices.B = symbolicIndex('B', BA, B.shape.length === R.shape.length)
 
-        this.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
-        this.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
-        this.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
+        this.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
+        this.variables.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
+        this.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
     }
 
-    resultant(A, B, R, axes) {
+    static resultant(A, B) {
         const maxLen = __Math__.max(A.shape.length, B.shape.length)
         const shape = []
 
@@ -53,13 +49,18 @@ export default class PairOperation extends Operation {
         return { shape: shape.reverse(), type: A.type }
     }
 
-    symbolic(inside) {
-        return new Function('A, B, R', [
-            ...this.totalLoops,
-            this.AI, this.BI, this.RI,
-            inside,
+    symbolic() {
+        return [
+            this.totalLoops.join('\n'),
+
+            this.indices.AI,
+            this.indices.BI,
+            this.indices.RI,
+
+            this.operation,
+
             '}'.repeat(this.totalLoopAxes.length),
-            'return R'
-        ].join('\n'))
+
+        ].join('\n')
     }
 }
