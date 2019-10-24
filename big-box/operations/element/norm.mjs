@@ -1,10 +1,13 @@
 import Algebra from '../../algebra'
 import ElementOperation from './operation'
 
-export default new ElementOperation(function () {
-    return {
-        before: Algebra.assign(this.T, Algebra.zero(this.T.length)),
-        inside: Algebra.assign(this.T, Algebra.square(this.A), '+='),
-        after: Algebra.assign(this.R, Algebra.squareRoot(this.T)),
+export default class Norm extends ElementOperation {
+    constructor(A, B, R, axes) {
+        super(A, B, R, axes, {
+            before: Algebra.assign(this.variables.T, Algebra.zero(this.variables.T.length)),
+            inside: Algebra.assign(this.variables.T, Algebra.square(this.variables.A), '+='),
+            after: Algebra.assign(this.variables.R, Algebra.squareRoot(this.variables.T)),
+        })
     }
-})
+}
+

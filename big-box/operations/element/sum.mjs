@@ -1,10 +1,12 @@
 import Algebra from '../../algebra'
 import ElementOperation from './operation'
 
-export default new ElementOperation(function () {
-    return {
-        before: Algebra.assign(this.T, Algebra.zero(this.T.length)),
-        inside: Algebra.assign(this.T, this.A, '+='),
-        after: Algebra.assign(this.R, this.T),
+export default class Sum extends ElementOperation {
+    constructor(A, B, R, axes) {
+        super(A, B, R, axes, {
+            before: Algebra.assign(this.variables.T, Algebra.zero(this.variables.T.length)),
+            inside: Algebra.assign(this.variables.T, this.variables.A, '+='),
+            after: Algebra.assign(this.variables.R, this.variables.T),
+        })
     }
-})
+}

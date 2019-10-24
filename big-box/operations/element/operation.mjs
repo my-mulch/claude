@@ -1,37 +1,33 @@
 import Operation from '../operation'
-import { symbolicLoop } from '../../operations/utils'
+import { symbolicLoop, symbolicIndex } from '../../operations/utils'
 
 export default class ElementOperation extends Operation {
-    constructor(operation) {
+    constructor(A, B, R, axes, operation) {
         super()
 
-        this.operation = operation.bind(this)
-    }
+        this.A = A
+        this.B = B
+        this.R = R
 
-    create(A, B, R, axes) {
-        this.initialize(A, B, R, axes)
+        this.operation = operation
 
-        return this.symbolic(this.operation())
-    }
-
-    initialize(A, B, R, axes) {
         this.innerLoopAxes = axes
-        this.totalLoopAxes = [...new Array(A.shape.length).keys()]
+        this.totalLoopAxes = [...new Array(this.A.shape.length).keys()]
         this.outerLoopAxes = totalLoopAxes.filter(function (axis) { return !axes.includes(axis) })
 
-        this.innerSize = innerLoopAxes.reduce(function (size, axis) { return size * A.shape[axis] }, 1)
-        this.innerLoops = innerLoopAxes.map(symbolicLoop, A)
-        this.outerLoops = outerLoopAxes.map(symbolicLoop, A)
+        this.innerSize = innerLoopAxes.reduce(function (size, axis) { return size * this.A.shape[axis] }, 1)
+        this.innerLoops = innerLoopAxes.map(symbolicLoop, this.A)
+        this.outerLoops = outerLoopAxes.map(symbolicLoop, this.A)
 
-        this.AI = symbolicIndex('A', this.innerLoopAxes, true)
-        this.RI = symbolicIndex('R', this.outerLoopAxes, false)
+        this.indices.A = symbolicIndex('A', this.innerLoopAxes, true)
+        this.indices.R = symbolicIndex('R', this.outerLoopAxes, false)
 
-        this.T = Algebra.variable({ symbol: 'temp', index: '0', size: R.type.size })
-        this.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
-        this.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
+        this.variables.T = Algebra.variable({ symbol: 'temp', index: '0', size: this.R.type.size })
+        this.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
+        this.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.R.type.size })
     }
 
-    resultant(A, B, R, axes) {
+    static resultant(A, B, R, axes) {
         return {
             type: A.type,
             shape: A.shape.filter(function (_, axis) {
@@ -40,17 +36,17 @@ export default class ElementOperation extends Operation {
         }
     }
 
-    symbolic(before, inside, after) {
+    symbolic() {
         return new Function('A, B, R', [
             `const temp = new Array(${A.type.size})`,
-            ...this.outerLoops,
+            this.outerLoops.join('\n'),
             this.RI,
-            before,
-            ...this.innerLoops,
+            this.operation.before,
+            this.innerLoops.join('\n'),
             this.AI,
-            inside,
+            this.operation.inside,
             '}'.repeat(this.innerLoopAxes.length),
-            after,
+            this.operation.after,
             '}'.repeat(this.outerLoopAxes.length),
             'return R'
         ].join('\n'))

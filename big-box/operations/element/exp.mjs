@@ -1,6 +1,14 @@
 import Algebra from '../../algebra'
 import ElementOperation from './operation'
 
-export default new ElementOperation(function () {
-    return { inside: Algebra.assign(this.R, Algebra.exp(this.A)) }
-})
+export default class Exponential extends ElementOperation {
+    constructor(A, B, R, axes) {
+        super(A, B, R, axes, {
+            inside: Algebra.assign(
+                this.variables.R,
+                Algebra.exp(this.variables.A)
+            )
+        })
+    }
+}
+
