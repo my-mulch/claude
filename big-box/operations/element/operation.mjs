@@ -37,18 +37,18 @@ export default class ElementOperation extends Operation {
     }
 
     symbolic() {
-        return new Function('A, B, R', [
+        return [
             `const temp = new Array(${A.type.size})`,
             this.outerLoops.join('\n'),
-            this.RI,
+            this.indices.R,
             this.operation.before,
             this.innerLoops.join('\n'),
-            this.AI,
+            this.indices.A,
             this.operation.inside,
             '}'.repeat(this.innerLoopAxes.length),
             this.operation.after,
             '}'.repeat(this.outerLoopAxes.length),
             'return R'
-        ].join('\n'))
+        ].join('\n')
     }
 }
