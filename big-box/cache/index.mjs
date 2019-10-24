@@ -1,23 +1,23 @@
 
-export default class Cache {
-    constructor(methods) {
-        this.suite = {}
-        this.methods = methods
+export default class Cache extends Object {
+    get(A, B, R, method) {
+        let value = this
+
+        if (value = value[A.id])
+            if (value = value[B.id])
+                if (value = value[R.id])
+                    if (value = value[method])
+                        return value
+
+        return null
     }
 
-    invoke(A, B, R, axes, method) {
-        let func
+    set(A, B, R, method, value) {
+        this[A.id] = this[A.id] || {}
+        this[A.id][B.id] = this[A.id][B.id] || {}
+        this[A.id][B.id][R.id] = this[A.id][B.id][R.id] || {}
+        this[A.id][B.id][R.id][method] = value
 
-        try {
-            (func = this.suite[A.id][B.id][R.id][method]).name
-        }
-
-        catch (error) {
-            body = this.methods[method].create(A, B, R, axes)
-            func = (((this.suite[A.id] = {})[B.id] = {})[R.id] = {})[method]
-                = new Function('A,B,R', `${body}; return R`)
-        }
-
-        return func(A, B, R, axes)
+        return func
     }
 }

@@ -1,17 +1,11 @@
+import Operation from '../operation'
 import Algebra from '../../algebra'
 
-export default {
-    test: function (A, B, R, meta) {
-        switch (true) {
-            default: return this.pointwise(A, B, R, meta)
-        }
-    },
+export default class CrossProduct extends Operation {
+    create(A, B, R, meta) { return this.pointwise(A, B, R, meta) }
+    resultant(A, B, R, meta) { return { shape: [3, 1], type: A.type } }
 
-    resultant: function (A, B, R, meta) {
-        return { shape: [3, 1], type: A.type }
-    },
-
-    pointwise: function (A, B, R, meta) {
+    pointwise(A, B, R, meta) {
         const sA = [], sB = [], sR = []
 
         for (let i = 0; i < 3; i++) {
@@ -20,11 +14,10 @@ export default {
             sR.push(Algebra.variable({ symbol: 'R.data', index: R.header.flatIndex([i, 0]), size: R.type.size }))
         }
 
-        return new Function('A, B, R', [
+        return [
             ...Algebra.assign(sR[0], Algebra.add(Algebra.negate(Algebra.multiply(sA[2], sB[1])), Algebra.multiply(sB[2], sA[1]))),
             ...Algebra.assign(sR[1], Algebra.add(Algebra.negate(Algebra.multiply(sA[0], sB[2])), Algebra.multiply(sB[0], sA[2]))),
             ...Algebra.assign(sR[2], Algebra.subtract(Algebra.multiply(sA[0], sB[1]), Algebra.multiply(sB[0], sA[1]))),
-            `return R`
-        ].join('\n'))
+        ]
     }
 }
