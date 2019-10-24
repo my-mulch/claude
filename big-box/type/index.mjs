@@ -1,7 +1,7 @@
 
 export default class Type {
-    constructor({ dimension, array }) {
+    constructor({ size, array }) {
+        this.size = size
         this.array = array
-        this.dimension = dimension
     }
 }

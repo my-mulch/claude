@@ -52,8 +52,4 @@ export default class Determinant {
 
         return result
     }
-
-    static fromAdjugate() {
-
-    }
 }

@@ -18,6 +18,6 @@ export default class Cache extends Object {
         this[A.id][B.id][R.id] = this[A.id][B.id][R.id] || {}
         this[A.id][B.id][R.id][method] = value
 
-        return func
+        return value
     }
 }

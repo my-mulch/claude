@@ -3,15 +3,23 @@ import Operation from '../operation'
 import Determinant from './determinant'
 
 export default class Adjugate extends Operation {
-    create(A, B, R) { return this.pointwise(A, B, R) }
-    resultant(A, B, R, meta) { return { shape: A.shape, type: A.type } }
-    pointwise(A, B, R) {
-        const adjugate = []
+    constructor(A, B, R) {
+        super()
 
-        for (let r = 0; r < A.shape[0]; r++) {
-            for (let c = 0; c < A.shape[0]; c++) {
+        this.A = A
+        this.B = B
+        this.R = R
+
+        this.pointwise.adjugate = []
+        this.pointwise.size = this.A.shape[0]
+    }
+    static resultant(A) { return { shape: A.shape, type: A.type } }
+
+    pointwise() {
+        for (let r = 0; r < this.pointwise.size; r++) {
+            for (let c = 0; c < this.pointwise.size; c++) {
                 const sign = Math.pow(-1, (r + c) % 2)
-                const minor = Determinant.minor(Determinant.template(A.shape[0]), c, r)
+                const minor = Determinant.minor(Determinant.template(this.pointwise.size), c, r)
                 const determinant = Determinant.pointwise(A, B, R, minor)
                 const cofactor = sign < 0 ? Algebra.negate(determinant) : determinant
 

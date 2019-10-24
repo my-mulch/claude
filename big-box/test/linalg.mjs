@@ -59,7 +59,7 @@ export default jest.suite(function () {
 
 
     this.expect(F.matMult({ with: G })).toEqual([["-7756+1076i+9603j+8851k"]])
-    this.expect(G.matMult({ with: F, result: bb.zeros({ shape: [G.shape[0], F.shape[1]], type: bb.QuatFloat32 }) })).toEqual([["-7756+11112i+3761j-5839k"]])
+    this.expect(G.matMult({ with: F })).toEqual([["-7756+11112i+3761j-5839k"]])
     this.expect(A.astype({ type: bb.QuatFloat32 })).toEqual([["10+72i+91j+13k"], ["57+44i+49j+33k"], ["90+66i+23j+21k"]])
     this.expect(B.matMult({ with: A })).toEqual(([["2507", "2962", "2523", "983"], ["2255", "4338", "4719", "1259"], ["2308", "2758", "2487", "985"]]))
     this.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])

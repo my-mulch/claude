@@ -9,37 +9,41 @@ export default class MatrixMultiplication extends Operation {
         this.B = B
         this.R = R
 
+        this.rows = this.A.shape[0]
+        this.cols = this.B.shape[1]
+        this.like = this.A.shape[1]
+
         /** Symbolic Matrix Multiplication */
+        this.symbolic = {}
+
+        this.symbolic.indices = {}
         this.symbolic.indices.A = `const AI = r * A.strides[0] + s * A.strides[1] + A.offset`
         this.symbolic.indices.B = `const BI = r * B.strides[0] + s * B.strides[1] + B.offset`
         this.symbolic.indices.R = `const RI = r * R.strides[0] + c * R.strides[1] + R.offset`
 
+        this.symbolic.variables = {}
         this.symbolic.variables.A = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
         this.symbolic.variables.B = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
         this.symbolic.variables.R = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
 
-        this.symbolic.source = this.symbolic()
+        this.symbolic.source = this.symbolicSource()
         this.symbolic.method = new Function('A,B,R', `${this.symbolic.source}; return R`)
 
         /** Pointwise Matrix Multiplication */
-        this.pointwise.operations = []
-
-        this.pointwise.rows = A.shape[0]
-        this.pointwise.cols = B.shape[1]
-        this.pointwise.like = A.shape[1]
-
-        this.pointwise.variables.A = null
-        this.pointwise.variables.B = null
-        this.pointwise.variables.R = null
-        this.pointwise.variables.innerProduct = null
-
-        this.pointwise.source = this.pointwise()
+        this.pointwise = {}
+        this.pointwise.source = this.pointwiseSource()
         this.pointwise.method = new Function('A,B,R', `${this.pointwise.source}; return R`)
     }
 
     static resultant(A, B) { return { shape: [A.shape[0], B.shape[1]], type: A.type } }
 
-    symbolic() {
+    invoke(A, B, R) {
+        if (this.like < 1e2) return this.pointwise.method(A, B, R)
+
+        return this.symbolic.method(A, B, R)
+    }
+
+    symbolicSource() {
         return [
             `for (let r = 0; r < A.shape[0]; r++){`,
             `for (let c = 0; c < B.shape[1]; c++){`,
@@ -63,40 +67,33 @@ export default class MatrixMultiplication extends Operation {
         ].join('\n')
     }
 
-    pointwise() {
-        for (let r = 0; r < this.pointwise.rows; r++) {
-            for (let c = 0; c < this.pointwise.cols; c++) {
+    pointwiseSource() {
+        const operations = []
 
-                this.pointwise.variables.R = Algebra.variable({
-                    symbol: 'R.data',
-                    size: R.type.size,
-                    index: R.header.flatIndex([r, c])
-                })
-
-                this.pointwise.innerProduct = new Array(this.pointwise.like).fill(null).map(function (_, s) {
-
-                    this.pointwise.variables.A = Algebra.variable({
-                        symbol: 'A.data',
-                        size: A.type.size,
-                        index: A.header.flatIndex([r, s])
-                    })
-
-                    this.pointwise.variables.B = Algebra.variable({
-                        symbol: 'B.data',
-                        size: B.type.size,
-                        index: B.header.flatIndex([s, c])
-                    })
-
-                    return Algebra.multiply(this.pointwise.variables.A, this.pointwise.variables.B)
-
-                }).reduce(Algebra.add)
-
-                this.pointwise.operations.push(Algebra.assign(
-                    this.pointwise.variables.R,
-                    this.pointwise.variables.innerProduct))
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                operations.push(Algebra.assign(
+                    Algebra.variable({
+                        symbol: 'R.data',
+                        size: this.R.type.size,
+                        index: this.R.header.flatIndex([r, c])
+                    }), new Array(this.like).fill(null).map(function (_, s) {
+                        return Algebra.multiply(
+                            Algebra.variable({
+                                symbol: 'A.data',
+                                size: this.A.type.size,
+                                index: this.A.header.flatIndex([r, s])
+                            }),
+                            Algebra.variable({
+                                symbol: 'B.data',
+                                size: this.B.type.size,
+                                index: this.B.header.flatIndex([s, c])
+                            }))
+                    }, this).reduce(Algebra.add)
+                ))
             }
         }
 
-        return this.pointwise.operations.flat(Number.POSITIVE_INFINITY).join('\n')
+        return operations.flat(Number.POSITIVE_INFINITY).join('\n')
     }
 }
