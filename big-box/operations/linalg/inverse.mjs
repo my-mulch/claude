@@ -4,9 +4,9 @@ import Algebra from '../algebra'
 import Adjugate from './adjugate'
 import Determinant from './determinant'
 
-export default class Inverse  {
+export default class Inverse {
     constructor(A, B, R) {
-        
+
 
         this.A = A
         this.B = B
@@ -56,7 +56,7 @@ export default class Inverse  {
                     index: 0
                 })
 
-                operations.push(Algebra.assign(T, Algebra.divide(R, D)))
+                operations.push(Algebra.divide(T, R, D))
                 operations.push(Algebra.assign(R, T))
             }
         }

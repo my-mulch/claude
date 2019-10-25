@@ -105,13 +105,15 @@ export default class Algebra {
         ].flat(Number.POSITIVE_INFINITY)
     }
 
-    static divide(o1, o2) {
-        if (o1.length === 1) return [`(${o1}/${o2})`]
+    static divide(result, o1, o2) {
+        if (o1.length === 1) return [`${result}=(${o1}/${o2})`]
 
-        return Algebra.scale(
-            Algebra.multiply(o1, Algebra.conjugate(o2)),
-            `(1/${Algebra.sum(Algebra.square(o2))})`
-        )
+        return [
+            `var mod = (1/${Algebra.sum(Algebra.square(o2))})`,
+            Algebra.assign(
+                result,
+                Algebra.scale(Algebra.multiply(o1, Algebra.conjugate(o2)), 'mod'))
+        ].join('\n')
     }
 
     static squareRoot(o1) {

@@ -4,9 +4,10 @@ import PairOperation from './operation'
 export default class Division extends PairOperation {
     constructor(A, B, R) {
         super(A, B, R, function () {
-            return Algebra.assign(
+            return Algebra.divide(
                 this.symbolic.variables.R,
-                Algebra.divide(this.symbolic.variables.A, this.symbolic.variables.B))
+                this.symbolic.variables.A,
+                this.symbolic.variables.B)
         })
     }
 }
