@@ -1,10 +1,8 @@
-import Operation from '../operation'
+
 import Algebra from '../algebra'
 
-export default class CrossProduct extends Operation {
+export default class CrossProduct {
     constructor(A, B, R) {
-        super()
-
         this.A = A
         this.B = B
         this.R = R

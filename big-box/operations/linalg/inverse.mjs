@@ -1,12 +1,12 @@
 import Algebra from '../algebra'
-import Operation from '../operation'
+
 
 import Adjugate from './adjugate'
 import Determinant from './determinant'
 
-export default class Inverse extends Operation {
+export default class Inverse  {
     constructor(A, B, R) {
-        super()
+        
 
         this.A = A
         this.B = B

@@ -7,7 +7,7 @@ export default jest.suite(function () {
     console.log('\n\n-------- Linear Algebra Suite --------\n\n')
 
     A = bb.tensor({
-        tensor: [
+        data: [
             ["10", "72", "91", "13"],
             ["57", "44", "49", "33"],
             ["90", "66", "23", "21"]
@@ -17,7 +17,7 @@ export default jest.suite(function () {
 
     B = bb.tensor({
         type: bb.Float32,
-        tensor: [
+        data: [
             ["17", "11", "19"],
             ["41", "15", "11"],
             ["16", "14", "15"]
@@ -26,17 +26,17 @@ export default jest.suite(function () {
 
     D = bb.tensor({
         type: bb.Float32,
-        tensor: [
+        data: [
             ["2", "2", "1"],
             ["4", "2", "6"],
             ["4", "2", "2"]
         ]
     })
 
-    C = bb.tensor({ tensor: [["1"], ["2"], ["3"]], type: bb.Float32 })
+    C = bb.tensor({ data: [["1"], ["2"], ["3"]], type: bb.Float32 })
 
     E = bb.tensor({
-        tensor: [[["10", "5", "2"],
+        data: [[["10", "5", "2"],
         ["72", "6", "3"],
         ["91", "6", "1"],
         ["13", "4", "12"]],
@@ -53,8 +53,8 @@ export default jest.suite(function () {
         type: bb.Float32
     })
 
-    const F = bb.tensor({ tensor: [["72 + 91i + 13j + 57k"]], type: bb.QuatFloat32 })
-    const G = bb.tensor({ tensor: [["10 + 72i + 91j + 13k"]], type: bb.QuatFloat32 })
+    const F = bb.tensor({ data: [["72 + 91i + 13j + 57k"]], type: bb.QuatFloat32 })
+    const G = bb.tensor({ data: [["10 + 72i + 91j + 13k"]], type: bb.QuatFloat32 })
 
 
 
@@ -65,8 +65,8 @@ export default jest.suite(function () {
     this.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])
     this.expect(A.T()).toEqual([["10", "57", "90"], ["72", "44", "66"], ["91", "49", "23"], ["13", "33", "21"]])
     this.expect(D.inverse()).toEqual([["-0.5", "-0.125", "0.625"], ['1', '0', "-0.5"], ['0', "0.25", "-0.25"]])
-    this.expect(bb.tensor({ tensor: [[6, 4], [5, 2]], type: bb.Float32 }).inverse()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
-    this.expect(bb.tensor({ tensor: [[4, 1, 3, 3], [4, 0, 0, 1], [2, 3, 4, 2], [0, 0, 4, 4]], type: bb.Float32 }).inverse()).toEqual([["1.5", '-1', "-0.5", "-0.625"], ['-5', '4', '2', "1.75"], ['6', '-5', '-2', "-2.25"], ['-6', '5', '2', "2.5"]])
+    this.expect(bb.tensor({ data: [[6, 4], [5, 2]], type: bb.Float32 }).inverse()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
+    this.expect(bb.tensor({ data: [[4, 1, 3, 3], [4, 0, 0, 1], [2, 3, 4, 2], [0, 0, 4, 4]], type: bb.Float32 }).inverse()).toEqual([["1.5", '-1', "-0.5", "-0.625"], ['-5', '4', '2', "1.75"], ['6', '-5', '-2', "-2.25"], ['-6', '5', '2', "2.5"]])
     this.expect(E.slice({ region: ['1:2', 0, ':'] }).T().cross({ with: C })).toEqual([['19'], ['-170'], ['107']])
     this.expect(E.slice({ region: [':', 0, ':'] }).matMult({ with: C })).toEqual([['26'], ['74'], ['109']])
 

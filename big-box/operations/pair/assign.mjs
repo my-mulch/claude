@@ -3,8 +3,10 @@ import PairOperation from './operation'
 
 export default class Assignment extends PairOperation {
     constructor(A, B, R) {
-        super(A, B, R, Algebra.assign(
-            this.symbolic.variables.R,
-            this.symbolic.variables.A))
+        super(A, B, R, function () {
+            return Algebra.assign(
+                this.symbolic.variables.A,
+                this.symbolic.variables.B)
+        })
     }
 }

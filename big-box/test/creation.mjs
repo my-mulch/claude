@@ -7,7 +7,7 @@ export default function () {
     console.log('\n\n-------- Creation Suite --------\n\n')
 
     A = bb.tensor({
-        tensor: [
+        data: [
             [10, 72, 91, 13],
             [57, 44, 49, 33],
             [90, 66, 23, 21],
@@ -16,7 +16,7 @@ export default function () {
     })
 
     B = bb.tensor({
-        tensor: [
+        data: [
             [1],
             [2],
             [3],
@@ -26,7 +26,7 @@ export default function () {
     })
 
     let C = bb.tensor({
-        tensor: [
+        data: [
             [10, 4],
             [42, 6],
             [1, 1]

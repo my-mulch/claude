@@ -13,6 +13,17 @@ export default class Algebra {
         })
     }
 
+    static ONE(size) { return new Array(size).fill(1) }
+    static ZERO(size) { return new Array(size).fill(0) }
+    static POSITIVE_INFINITY(size) { return Array(size).fill(Number.POSITIVE_INFINITY) }
+    static NEGATIVE_INFINITY(size) { return Array(size).fill(Number.NEGATIVE_INFINITY) }
+
+    static if(condition, statement) {
+        return `if(${condition}){
+            ${statement}
+        }`
+    }
+
     static noop(o1, o2) {
         if (o1.length === 1) return [`(${o1})`]
 
@@ -45,28 +56,20 @@ export default class Algebra {
         return [Algebra.cos(a), Algebra.cos(b)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static and(o1, o2) {
-        if (o1.length === 1) return [`(${o1}&&${o2})`]
-
-        const [a, b, c, d] = Algebra.split(o1, o2)
-
-        return [Algebra.and(a, c), Algebra.and(b, d)].flat(Number.POSITIVE_INFINITY)
-    }
-
-    static min(o1, o2) {
+    static lessThan(o1, o2) {
         if (o1.length === 1) return [`(${o1}<${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
 
-        return [Algebra.min(a, c), Algebra.min(b, d)].flat(Number.POSITIVE_INFINITY)
+        return [Algebra.lessThan(a, c), Algebra.lessThan(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static max(o1, o2) {
+    static greaterThan(o1, o2) {
         if (o1.length === 1) return [`(${o1}>${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
 
-        return [Algebra.max(a, c), Algebra.max(b, d)].flat(Number.POSITIVE_INFINITY)
+        return [Algebra.greaterThan(a, c), Algebra.greaterThan(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 
     static add(o1, o2) {
@@ -117,10 +120,6 @@ export default class Algebra {
         const [a, b] = Algebra.split(o1)
 
         return [Algebra.squareRoot(a), Algebra.squareRoot(b)].flat(Number.POSITIVE_INFINITY)
-    }
-
-    static sumSquares(o1) {
-        return Algebra.sum(Algebra.square(o1))
     }
 
     static sum(o1) {

@@ -1,12 +1,12 @@
 import Algebra from '../algebra'
-import Operation from '../operation'
+
 import Determinant from './determinant'
 
 import { indexTemplate } from './utils.mjs'
 
-export default class Adjugate extends Operation {
+export default class Adjugate  {
     constructor(A, B, R) {
-        super()
+        
 
         this.A = A
         this.B = B

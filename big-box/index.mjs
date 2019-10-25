@@ -20,7 +20,7 @@ for (const [size, prefix] of [[1, ''], [2, 'Complex'], [4, 'Quat']]) {
 Tensor.cache = new Cache()
 
 /** Init null tensor */
-Tensor.NULL = Tensor.zeros({ shape: [], type: Tensor.Int32 })
+Tensor.NULL = Tensor.zeros({ shape: [], type: Tensor.Float32 })
 
 /** Init operations */
 for (const [name, Operation] of Object.entries(Operations)) {
@@ -30,15 +30,15 @@ for (const [name, Operation] of Object.entries(Operations)) {
         let A = args.of
         let B = args.with
         let R = args.result
-        let meta = args.meta
+        let axes = args.axes
 
         B = B || Tensor.NULL
-        R = R || Tensor.zeros(Operation.resultant(A, B, R, meta))
+        R = R || Tensor.zeros(Operation.resultant(A, B, R, axes))
 
         let func = Tensor.cache.get(A, B, R, name)
 
         if (!func)
-            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, meta))
+            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, axes))
 
         return func.invoke()
     }
@@ -48,15 +48,15 @@ for (const [name, Operation] of Object.entries(Operations)) {
         let A = this
         let B = args.with
         let R = args.result
-        let meta = args.meta
+        let axes = args.axes
 
         B = B || Tensor.NULL
-        R = R || Tensor.zeros(Operation.resultant(A, B, R, meta))
+        R = R || Tensor.zeros(Operation.resultant(A, B, R, axes))
 
         let func = Tensor.cache.get(A, B, R, name)
 
         if (!func)
-            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, meta))
+            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, axes))
 
         return func.invoke(A, B, R)
     }

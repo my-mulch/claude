@@ -15,17 +15,17 @@ export default class Tensor {
         this.data = init.call(this)
     }
 
-    static tensor({ tensor, type }) {
+    static tensor({ data, type }) {
         return new Tensor({
-            header: new Header({ type, shape: shapeRaw(tensor) }),
+            header: new Header({ type, shape: shapeRaw(data) }),
             init: function () {
-                if (isTypedArray(tensor))
-                    return tensor
+                if (isTypedArray(data))
+                    return data
 
-                const data = new this.type.array(this.size * this.type.size)
-                data.set([tensor].flat(Number.POSITIVE_INFINITY).map(parseNumber).flat())
+                const values = new this.type.array(this.size * this.type.size)
+                values.set([data].flat(Number.POSITIVE_INFINITY).map(parseNumber).flat())
 
-                return data
+                return values
             }
         })
     }
@@ -145,7 +145,7 @@ export default class Tensor {
     }
 
     ravel() {
-        return Tensor.tensor(this.toRaw(), this.type).reshape([-1])
+        return Tensor.tensor({ data: this.toRaw(), type: this.type }).reshape({ shape: [-1] })
     }
 
     slice({ region }, old = this) {
@@ -164,7 +164,7 @@ export default class Tensor {
 
     reshape({ shape }, old = this) {
         if (!this.contig)
-            return Tensor.array(this.toRaw(), this.type).reshape({ shape })
+            return Tensor.tensor({ data: this.toRaw(), type: this.type }).reshape({ shape })
 
         return new Tensor({
             header: this.header.reshape(shape),

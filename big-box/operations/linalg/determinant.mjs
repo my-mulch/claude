@@ -1,10 +1,10 @@
 import Algebra from '../algebra'
-import Operation from '../operation'
+
 import { indexTemplate } from './utils'
 
-export default class Determinant extends Operation {
+export default class Determinant  {
     constructor(A, B, R) {
-        super()
+        
 
         this.A = A
         this.B = B
