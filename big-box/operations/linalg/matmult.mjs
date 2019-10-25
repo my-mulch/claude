@@ -1,4 +1,4 @@
-import Algebra from '../../algebra'
+import Algebra from '../algebra'
 import Operation from '../operation'
 
 export default class MatrixMultiplication extends Operation {
@@ -33,23 +33,25 @@ export default class MatrixMultiplication extends Operation {
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource()
         this.pointwise.method = new Function('A,B,R', `${this.pointwise.source}; return R`)
+
+        /** Routing dependent on template size */
+
+        if (this.like < 1e2)
+            this.invoke = this.pointwise.method
+        else
+            this.invoke = this.symbolic.method
     }
 
     static resultant(A, B) { return { shape: [A.shape[0], B.shape[1]], type: A.type } }
 
-    invoke(A, B, R) {
-        if (this.like < 1e2) return this.pointwise.method(A, B, R)
-
-        return this.symbolic.method(A, B, R)
-    }
 
     symbolicSource() {
         return [
             `for (let r = 0; r < A.shape[0]; r++){`,
             `for (let c = 0; c < B.shape[1]; c++){`,
 
-            `R.data[RIndex] = 0`,
             this.symbolic.indices.R,
+            `R.data[RI] = 0`,
 
             `for (let s = 0; s < A.shape[1]; s++) {`,
 

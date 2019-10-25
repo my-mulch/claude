@@ -1,4 +1,4 @@
-import Algebra from '../../algebra'
+import Algebra from '../algebra'
 import ElementOperation from './operation'
 
 export default class Norm extends ElementOperation {

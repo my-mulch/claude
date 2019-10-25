@@ -1,45 +1,70 @@
-import Algebra from '../../algebra'
-import Adjugate from './adjugate'
+import Algebra from '../algebra'
 import Operation from '../operation'
 
+import Adjugate from './adjugate'
+import Determinant from './determinant'
+
 export default class Inverse extends Operation {
-    create(A, B, R, meta) { return this.pointwise(A, B, R, meta) }
-    resultant(A, B, R, meta) { return { shape: A.shape, type: A.type } }
-    pointwise(A, B, R, meta) {
-        const temp = Algebra.variable({ symbol: 'temp', size: A.type.size, index: 0 })
+    constructor(A, B, R) {
+        super()
 
-        const source = [
-            `const temp = new Array(${A.type.size})`,
-            `const determinant = new Array(${A.type.size})`,
-        ]
+        this.A = A
+        this.B = B
+        this.R = R
 
-        const adjugate = Adjugate.pointwise(A, B, R, meta)
+        this.rows = this.A.shape[0]
+        this.cols = this.B.shape[1]
+        this.size = this.rows
 
-        const determinantVariable = Algebra.variable({ symbol: 'determinant', size: A.type.size, index: 0 })
-        const determinantSymbolic = new Array(A.shape[0]).fill(null).map(function (_, i) {
-            const factors = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: A.header.flatIndex([0, i]) })
-            const cofactors = Algebra.variable({ symbol: 'R.data', size: A.type.size, index: R.header.flatIndex([i, 0]) })
+        /** Pointwise Inverse */
+        this.pointwise = {}
+        this.pointwise.source = this.pointwiseSource()
+        this.pointwise.method = new Function('A,B,R', `
+            const temp = new Array(${this.A.type.size})
+            const determinant = new Array(${this.A.type.size})
+            ${this.pointwise.source.join('\n')};
+            return R
+        `)
 
-            return Algebra.multiply(factors, cofactors)
-        }).reduce(Algebra.add)
+        this.invoke = this.pointwise.method
+    }
 
-        const determinant = Algebra.assign(determinantVariable, determinantSymbolic)
+    static resultant(A) { return { shape: A.shape, type: A.type } }
 
-        const inverse = new Array(size * size).fill(null).map(function (_, i) {
-            const c = i % size
-            const r = Math.floor(i / size)
-            const sR = Algebra.variable({ index: R.header.flatIndex([r, c]), symbol: 'R.data', size: R.type.size, })
-            return [
-                Algebra.assign(temp, Algebra.divide(sR, determinant)),
-                Algebra.assign(sR, temp)
-            ]
-        }).flat(Number.POSITIVE_INFINITY)
+    pointwiseSource() {
+        this.adjugate = new Adjugate(this.A, this.B, this.R)
+        this.determinant = Determinant.fromAdjugate(this.adjugate)
+
+        const operations = []
+        for (let r = 0; r < this.size; r++) {
+            for (let c = 0; c < this.size; c++) {
+                const D = Algebra.variable({
+                    symbol: 'determinant',
+                    size: this.A.type.size,
+                    index: 0
+                })
+
+                const R = Algebra.variable({
+                    index: this.R.header.flatIndex([r, c]),
+                    symbol: 'R.data',
+                    size: this.R.type.size,
+                })
+
+                const T = Algebra.variable({
+                    symbol: 'temp',
+                    size: this.A.type.size,
+                    index: 0
+                })
+
+                operations.push(Algebra.assign(T, Algebra.divide(R, D)))
+                operations.push(Algebra.assign(R, T))
+            }
+        }
 
         return [
-            adjugate.join('\n'),
-            determinant.join('\n'),
-            inverse.join('\n'),
-        ].join('\n')
-
+            this.adjugate.pointwise.source,
+            this.determinant,
+            operations
+        ].flat(Number.POSITIVE_INFINITY)
     }
 }

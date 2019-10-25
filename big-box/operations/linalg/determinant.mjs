@@ -1,14 +1,58 @@
+import Algebra from '../algebra'
+import Operation from '../operation'
+import { indexTemplate } from './utils'
 
-export default class Determinant {
-    create(A, B, R) { return this.pointwise(A, B, R) }
-    resultant(A) { return { shape: [1], type: A.type.size } }
+export default class Determinant extends Operation {
+    constructor(A, B, R) {
+        super()
 
-    pointwise(A, B, R, matrix = Determinant.template(A.shape[0])) {
+        this.A = A
+        this.B = B
+        this.R = R
+
+        this.rows = this.A.shape[0]
+        this.cols = this.A.shape[1]
+        this.size = this.rows
+
+        this.matrixTemplate = indexTemplate(this.size)
+
+        this.pointwise = {}
+        this.pointwise.source = this.pointwiseSource(this.matrixTemplate)
+        this.pointwise.method = new Function('A,B,R', `${this.pointwise.source}; return R`)
+        
+        this.invoke = this.pointwise.method
+    }
+
+    static fromAdjugate(adjugate) {
+        return Algebra.assign(
+            Algebra.variable({
+                symbol: 'determinant',
+                size: adjugate.A.type.size,
+                index: 0
+            }),
+            new Array(adjugate.size).fill(null).map(function (_, i) {
+                return Algebra.multiply(
+                    Algebra.variable({
+                        symbol: 'A.data',
+                        size: adjugate.A.type.size,
+                        index: adjugate.A.header.flatIndex([0, i])
+                    }),
+                    Algebra.variable({
+                        symbol: 'R.data',
+                        size: adjugate.A.type.size,
+                        index: adjugate.R.header.flatIndex([i, 0])
+                    }))
+            }).reduce(Algebra.add))
+    }
+
+    static resultant(A) { return { shape: [1, 1], type: A.type.size } }
+
+    pointwiseSource(matrix) {
         if (matrix.length === 1)
             return Algebra.variable({
                 symbol: 'A.data',
-                size: A.type.size,
-                index: A.header.flatIndex(matrix[0])
+                size: this.A.type.size,
+                index: this.A.header.flatIndex(matrix[0])
             })
 
         const subDeterminants = []
@@ -16,12 +60,12 @@ export default class Determinant {
 
         for (let i = 0; i < size; i++) {
             const minor = Determinant.minor(matrix, 0, i)
-            const subDeterminant = this.pointwise(A, B, R, minor)
+            const subDeterminant = this.pointwiseSource(minor)
 
             const factor = Algebra.variable({
                 symbol: 'A.data',
-                size: A.type.size,
-                index: A.header.flatIndex(matrix[i])
+                size: this.A.type.size,
+                index: this.A.header.flatIndex(matrix[i])
             })
 
             const cofactor = Algebra.multiply(factor, subDeterminant)
@@ -41,15 +85,5 @@ export default class Determinant {
 
             return true
         })
-    }
-
-    static template(size) {
-        const result = []
-
-        for (let r = 0; r < size; r++)
-            for (let c = 0; c < size; c++)
-                result.push([r, c])
-
-        return result
     }
 }

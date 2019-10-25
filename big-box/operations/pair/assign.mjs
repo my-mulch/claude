@@ -1,4 +1,4 @@
-import Algebra from '../../algebra'
+import Algebra from '../algebra'
 import PairOperation from './operation'
 
 export default class Assignment extends PairOperation {
