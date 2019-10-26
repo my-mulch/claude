@@ -1,9 +1,10 @@
 import util from 'util'
+import Type from '../type'
 import Header from '../header'
 
 import {
-    __Math__, PARSE_NUMBER, NUMBER_FROM_SYMBOL,
-    SYMBOL_FROM_NUMBER, ARRAY_SPACER, ARRAY_REPLACER, SPACE
+    __Math__, PARSE_NUMBER, ID_FROM_SYMBOL,
+    SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER, SPACE
 } from '../resources'
 
 export default class Tensor {
@@ -17,46 +18,53 @@ export default class Tensor {
         this.data = init.call(this)
     }
 
-    static isTypedArray(tensor) {
-        if (tensor.constructor === Tensor)
+    static isTypedArray(array) {
+        if (array.constructor === Tensor)
             return true
 
-        return tensor.constructor === Float32Array
-            || tensor.constructor === Int8Array
-            || tensor.constructor === Int16Array
-            || tensor.constructor === Int32Array
-            || tensor.constructor === Uint8Array
-            || tensor.constructor === Uint16Array
-            || tensor.constructor === Uint32Array
-            || tensor.constructor === Uint8ClampedArray
+        return array.constructor === Float32Array
+            || array.constructor === Int8Array
+            || array.constructor === Int16Array
+            || array.constructor === Int32Array
+            || array.constructor === Uint8Array
+            || array.constructor === Uint16Array
+            || array.constructor === Uint32Array
+            || array.constructor === Uint8ClampedArray
     }
 
-    static shape(tensor, shape = []) {
-        if (tensor.constructor === Tensor)
-            return tensor.shape
+    static shape(array, shape = []) {
+        if (array.constructor === Tensor)
+            return array.shape
 
-        if (tensor.constructor !== Array)
+        if (array.constructor !== Array)
             return shape
 
-        return Tensor.shape(tensor[0], shape.concat(tensor.length))
+        return Tensor.shape(array[0], shape.concat(array.length))
     }
 
-    static tensor({ data, type }) {
+    static fillEmpties(array) {
+        return Array.from(array, function (value) { return value || 0 })
+    }
+
+    static tensor({ data, type = Tensor.Float32 }) {
         return new Tensor({
             header: new Header({ type, shape: Tensor.shape(data) }),
             init: function () {
                 if (Tensor.isTypedArray(data))
                     return data
 
-                const values = new this.type.array(this.size * this.type.size)
-                values.set([data]
+                return new this.type.array([data]
                     .flat(Number.POSITIVE_INFINITY)
-                    .map(function (number) {
-                        return Tensor.parseNumber(number, this.type.size)
-                    }, this)
-                    .flat())
+                    .flatMap(function (number) {
+                        const result = Tensor.parseNumber(number)
 
-                return values
+                        if (result.length > this.type.size)
+                            this.type = Type.resolve(result.length)
+
+                        result.length = this.type.size
+
+                        return Tensor.fillEmpties(result)
+                    }, this))
             }
         })
     }
@@ -65,7 +73,7 @@ export default class Tensor {
         return new Tensor({ header: new Header({ shape: tensor.shape, type: tensor.type }) })
     }
 
-    static zeros({ shape, type }) {
+    static zeros({ shape, type = Tensor.Float32 }) {
         return new Tensor({ header: new Header({ shape, type }) })
     }
 
@@ -76,14 +84,14 @@ export default class Tensor {
         })
     }
 
-    static ones({ shape, type }) {
+    static ones({ shape, type = Tensor.Float32 }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () { return new this.type.array(this.size * this.type.size).fill(1) }
         })
     }
 
-    static arange({ start = 0, step = 1, stop, type }) {
+    static arange({ start = 0, step = 1, stop, type = Tensor.Float32 }) {
         return new Tensor({
             header: new Header({ type, shape: [__Math__.round((stop - start) / step)] }),
             init: function () {
@@ -94,7 +102,7 @@ export default class Tensor {
         })
     }
 
-    static linspace({ start, stop, num = 50, type }) {
+    static linspace({ start, stop, num = 50, type = Tensor.Float32 }) {
         const step = (stop - start) / num
         return new Tensor({
             header: new Header({ type, shape: [num] }),
@@ -107,7 +115,7 @@ export default class Tensor {
     }
 
 
-    static rand({ shape, type }) {
+    static rand({ shape, type = Tensor.Float32 }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () {
@@ -121,7 +129,7 @@ export default class Tensor {
         })
     }
 
-    static randint({ low, high, shape, type }) {
+    static randrange({ low, high, shape, type = Tensor.Float32 }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () {
@@ -135,7 +143,7 @@ export default class Tensor {
         })
     }
 
-    static eye({ shape, type }) {
+    static eye({ shape, type = Tensor.Float32 }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () {
@@ -214,20 +222,22 @@ export default class Tensor {
 
     valueOf() { return this.data[this.offset] }
 
-    static parseNumber(number, size) {
-        const result = new Array(size).fill(0)
+    static parseNumber(number) {
+        const result = []
         const tokens = String(number)
             .match(PARSE_NUMBER)
-            .filter(function (token) { return !SPACE.test(token) })
+            .filter(function (token) {
+                return !SPACE.test(token)
+            })
 
         let sign = 1, token
         for (let i = 0; i < tokens.length; i++) {
             token = tokens[i]
 
-            if (token in NUMBER_FROM_SYMBOL) {
+            if (token in ID_FROM_SYMBOL) {
                 if (isNaN(tokens[i - 1])) {
-                    result[NUMBER_FROM_SYMBOL[token]] = result[NUMBER_FROM_SYMBOL[token]] || 0
-                    result[NUMBER_FROM_SYMBOL[token]] += sign
+                    result[ID_FROM_SYMBOL[token]] = result[ID_FROM_SYMBOL[token]] || 0
+                    result[ID_FROM_SYMBOL[token]] += sign
                 }
             }
 
@@ -237,9 +247,9 @@ export default class Tensor {
             else if (!isNaN(token)) {
                 let symbol = tokens[i + 1]
 
-                if (symbol in NUMBER_FROM_SYMBOL) {
-                    result[NUMBER_FROM_SYMBOL[symbol]] = result[NUMBER_FROM_SYMBOL[symbol]] || 0
-                    result[NUMBER_FROM_SYMBOL[symbol]] += sign * Number(token)
+                if (symbol in ID_FROM_SYMBOL) {
+                    result[ID_FROM_SYMBOL[symbol]] = result[ID_FROM_SYMBOL[symbol]] || 0
+                    result[ID_FROM_SYMBOL[symbol]] += sign * Number(token)
                 }
                 else {
                     result[0] = result[0] || 0
@@ -248,32 +258,20 @@ export default class Tensor {
             }
         }
 
-        return result
+        return Tensor.fillEmpties(result)
     }
 
-    toStringAtIndex(index) {
-        let string = ''
-
+    toStringAtIndex(index, string = '') {
         for (let i = 0; i < this.type.size; i++) {
-            let number = this.data[index + i]
-            const sign = Math.sign(number) < 0 ? '-' : '+'
-            number = Math.abs(number)
+            const sign = Math.sign(this.data[index + i]) < 0 ? '-' : '+'
+            const number = Math.abs(this.data[index + i])
 
-            if (number === 0) continue
-
-            if (i === 0) {
-                string += `${sign === '-' ? sign : ''}${number}`
-                continue
-            }
-
-            string += `${sign}${number}${SYMBOL_FROM_NUMBER[i]}`
+            if (number)
+                string += `${sign}${number}${SYMBOL_FROM_ID[i]}`
         }
 
-        if (string.startsWith('+'))
-            return string.slice(1)
-
-        if (!string)
-            return "0"
+        if (!string) return "0"
+        if (string.startsWith('+')) return string.slice(1)
 
         return string
     }
