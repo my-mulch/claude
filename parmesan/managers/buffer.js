@@ -23,20 +23,20 @@ export default class BufferManager {
             count: array.shape[0],
             type: numberType,
             normalize: false,
-            offset: array.offset * array.type.BYTES_PER_ELEMENT,
-            stride: array.strides[0] * array.type.BYTES_PER_ELEMENT
+            offset: array.offset * array.data.BYTES_PER_ELEMENT,
+            stride: array.strides[0] * array.data.BYTES_PER_ELEMENT
         }
     }
 
     mapType({ array }) {
-        if (array.type === Int8Array) { return this.context.BYTE }
-        if (array.type === Uint8Array) { return this.context.UNSIGNED_BYTE }
-        if (array.type === Uint8ClampedArray) { return this.context.UNSIGNED_BYTE }
-        if (array.type === Int16Array) { return this.context.SHORT }
-        if (array.type === Uint16Array) { return this.context.UNSIGNED_SHORT }
-        if (array.type === Int32Array) { return this.context.INT }
-        if (array.type === Uint32Array) { return this.context.UNSIGNED_INT }
-        if (array.type === Float32Array) { return this.context.FLOAT }
+        if (array.type.array === Int8Array) { return this.context.BYTE }
+        if (array.type.array === Uint8Array) { return this.context.UNSIGNED_BYTE }
+        if (array.type.array === Uint8ClampedArray) { return this.context.UNSIGNED_BYTE }
+        if (array.type.array === Int16Array) { return this.context.SHORT }
+        if (array.type.array === Uint16Array) { return this.context.UNSIGNED_SHORT }
+        if (array.type.array === Int32Array) { return this.context.INT }
+        if (array.type.array === Uint32Array) { return this.context.UNSIGNED_INT }
+        if (array.type.array === Float32Array) { return this.context.FLOAT }
 
         return null
     }

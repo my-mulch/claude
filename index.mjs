@@ -1,5 +1,5 @@
 import myio from './myio'
-import bb from './big-box/tensor'
+import bb from './big-box'
 import parmesan from './parmesan'
 
 window.bb = bb
@@ -50,13 +50,16 @@ export default (async function () {
 
 
     /** RGB CUBE */
-    window.vertices = bb.randint({ low: 0, high: 256, shape: [1e6, 3], type: Float32Array })
-    window.colors = vertices.divide({ with: 255 })
+    window.vertices = bb.randint({ low: 0, high: 256, shape: [1e4, 3], type: bb.Float32 })
+    window.colors = vertices.divide({ with: bb.tensor({ data: 255, type: bb.Float32 }) })
     window.sizes = bb
-        .ones({ shape: [1e6, 1] })
-        .multiply({ with: 10 })
+        .ones({ shape: [1e4, 1], type: bb.Float32 })
+        .multiply({ with: bb.tensor({ data: 10, type: bb.Float32 }) })
 
-
-    app.graphics.plot({ vertices: vertices.multiply({ with: 0.1 }), colors, sizes })
-
+    app.graphics.plot({
+        vertices: vertices.multiply({ with: bb.tensor({ data: 0.1, type: bb.Float32 }) }),
+        colors,
+        sizes,
+        mode: 'POINTS'
+    })
 })()

@@ -1,4 +1,4 @@
-import bb from '../../big-box/tensor'
+import bb from '../../big-box/'
 import config from '../resources'
 
 export default class CameraManager {
@@ -12,34 +12,30 @@ export default class CameraManager {
         const s = Math.sin(this.config.PAN_DELTA)
         const c = Math.cos(this.config.PAN_DELTA)
 
-        this.upRot = bb.tensor([[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]], bb.Float32)
-        this.downRot = bb.tensor([[1, 0, 0, 0], [0, c, s, 0], [0, -s, c, 0], [0, 0, 0, 1]], bb.Float32)
-        this.leftRot = bb.tensor([[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]], bb.Float32)
-        this.rightRot = bb.tensor([[c, 0, -s, 0], [0, 1, 0, 0], [s, 0, c, 0], [0, 0, 0, 1]], bb.Float32)
+        this.upRot = bb.tensor({ data: [[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]], type: bb.Float32 })
+        this.downRot = bb.tensor({ data: [[1, 0, 0, 0], [0, c, s, 0], [0, -s, c, 0], [0, 0, 0, 1]], type: bb.Float32 })
+        this.leftRot = bb.tensor({ data: [[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]], type: bb.Float32 })
+        this.rightRot = bb.tensor({ data: [[c, 0, -s, 0], [0, 1, 0, 0], [s, 0, c, 0], [0, 0, 0, 1]], type: bb.Float32 })
     }
 
     lookAt() {
-        const viewMatrix = bb.eye([4, 4], bb.Float32)
-        const transMatrix = bb.eye([4, 4], bb.Float32)
+        this.viewMatrix = bb.eye({ shape: [4, 4], type: bb.Float32 })
+        this.transMatrix = bb.eye({ shape: [4, 4], type: bb.Float32 })
 
-        const f = bb.sub()this.FROM.sub({ with: this.TO })
-        const s = this.UP.cross({ with: f })
+        this.f = this.FROM.subtract({ with: this.TO })
+        this.s = this.UP.cross({ with: this.f })
 
-        const uf = f.divide({ with: f.norm() })
-        const us = s.divide({ with: s.norm() })
-        const uu = uf.cross({ with: us })
+        this.uf = this.f.divide({ with: this.f.norm() })
+        this.us = this.s.divide({ with: this.s.norm() })
+        this.uu = this.uf.cross({ with: this.us })
 
-        viewMatrix
-            .assign({ region: [':3', 0], with: us })
-            .assign({ region: [':3', 1], with: uu })
-            .assign({ region: [':3', 2], with: uf })
+        this.viewMatrix.slice({ region: [':3', '0:1'] }).assign({ with: this.us })
+        this.viewMatrix.slice({ region: [':3', '1:2'] }).assign({ with: this.uu })
+        this.viewMatrix.slice({ region: [':3', '2:3'] }).assign({ with: this.uf })
 
-        transMatrix.assign({
-            region: [3, ':3'],
-            with: this.FROM.multiply({ with: -1 })
-        })
+        this.transMatrix.slice({ region: ['3:4', ':3'] }).assign({ with: this.FROM.negate().T() })
 
-        return transMatrix.matMult({ with: viewMatrix })
+        return this.transMatrix.matMult({ with: this.viewMatrix })
     }
 
     project() {
@@ -58,7 +54,9 @@ export default class CameraManager {
         projectionMatrix[11] = -1
         projectionMatrix[14] = -2 * this.config.NEAR * this.config.FAR * reciprocalDepth
 
-        return bb.tensor(projectionMatrix, bb.Float32).reshape([4, 4])
+        return bb
+            .tensor({ data: projectionMatrix, type: bb.Float32 })
+            .reshape({ shape: [4, 4] })
     }
 
     rotate({ orientation, viewMatrix, viewMatrixInv }) {

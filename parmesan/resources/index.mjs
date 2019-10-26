@@ -1,6 +1,7 @@
-import bb from '../../big-box/tensor'
+import bb from '../../big-box'
 
 export default {
+    CONTEXT_2D: '2d',
     CONTEXT_WEB_GL: 'webgl',
 
     HUD_FONT: '18px serif',
@@ -42,24 +43,22 @@ export default {
         '}\n',
 
 
-    TO_VECTOR: bb.tensor([[0], [0], [0], [1]], bb.Float32),
-    UP_VECTOR: bb.tensor([[0], [1], [0], [1]], bb.Float32),
-    FROM_VECTOR: bb.tensor([[0], [0], [20], [1]], bb.Float32),
+    TO_VECTOR: bb.tensor({ data: [[0], [0], [0], [1]], type: bb.Float32 }),
+    UP_VECTOR: bb.tensor({ data: [[0], [1], [0], [1]], type: bb.Float32 }),
+    FROM_VECTOR: bb.tensor({ data: [[20], [20], [20], [1]], type: bb.Float32 }),
 
     VIEWING_ANGLE: 30,
     ASPECT_RATIO: 1,
     NEAR: 0.1,
-    FAR: 100,
+    FAR: 2e6,
 
-    ZOOM_DELTA: 0.05,
-    PAN_DELTA: Math.PI / 64,
+    ZOOM_DELTA: bb.tensor({ data: 0.25, type: bb.Float32 }),
+    PAN_DELTA: bb.tensor({ data: Math.PI / 64, type: bb.Float32 }),
     ACTIVE_VERTICES: 0,
 
     UP_DIRECTION: 0,
     DOWN_DIRECTION: 1,
     LEFT_DIRECTION: 2,
     RIGHT_DIRECTION: 3,
-
-
 
 }

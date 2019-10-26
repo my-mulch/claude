@@ -121,7 +121,7 @@ export default class Tensor {
         })
     }
 
-    static randrange({ low, high, shape, type }) {
+    static randint({ low, high, shape, type }) {
         return new Tensor({
             header: new Header({ shape, type }),
             init: function () {
