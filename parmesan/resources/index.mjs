@@ -49,8 +49,8 @@ export default {
 
     VIEWING_ANGLE: 30,
     ASPECT_RATIO: 1,
-    NEAR: 0.1,
-    FAR: 2e6,
+    NEAR: 1e-6,
+    FAR: 1e6,
 
     ZOOM_DELTA: bb.tensor({ data: 0.25, type: bb.Float32 }),
     PAN_DELTA: bb.tensor({ data: Math.PI / 64, type: bb.Float32 }),
