@@ -1,7 +1,7 @@
 import {
     __Math__, // misc resources
     SHAPE, OFFSET, CONTIG, STRIDES, // init resources
-    PARTIAL_SLICE_REGEX, NUMBER_REGEX, SLICE_CHARACTER_REGEX, // slice resources
+    PARTIAL_SLICE, NUMBER, SLICE_CHARACTER, // slice resources
 } from '../resources'
 
 import { resolveStrides, resolveContiguity, resolveReshape } from './utils'
@@ -57,15 +57,15 @@ export default class Header {
              *  If the index is a ':', the user wants that entire dimension 
              */
 
-            if (index[i] === SLICE_CHARACTER_REGEX || index[i] === undefined)
+            if (index[i] === SLICE_CHARACTER || index[i] === undefined)
                 shape.push(this.shape[i]), strides.push(this.strides[i])
 
             /** 
              * If the index is a slice of the form 'a:b', the user wants a slice from a to b 
             */
 
-            else if (PARTIAL_SLICE_REGEX.test(index[i])) {
-                let [low, high] = index[i].split(SLICE_CHARACTER_REGEX).map(Number)
+            else if (PARTIAL_SLICE.test(index[i])) {
+                let [low, high] = index[i].split(SLICE_CHARACTER).map(Number)
 
                 if (high === 0)
                     high = this.shape[i]
@@ -80,7 +80,7 @@ export default class Header {
              * If the index is a number, the user wants that index
              */
 
-            else if (NUMBER_REGEX.test(index[i]))
+            else if (NUMBER.test(index[i]))
                 offset += this.strides[i] * index[i]
 
         }

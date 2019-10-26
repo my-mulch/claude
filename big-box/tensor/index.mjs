@@ -1,8 +1,10 @@
 import util from 'util'
 import Header from '../header'
 
-import { isTypedArray, parseNumber, stringNumber, shapeRaw, } from './utils'
-import { __Math__, ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX } from '../resources'
+import {
+    __Math__, PARSE_NUMBER, NUMBER_FROM_SYMBOL,
+    SYMBOL_FROM_NUMBER, ARRAY_SPACER, ARRAY_REPLACER, SPACE
+} from '../resources'
 
 export default class Tensor {
     constructor({ header, init = function () {
@@ -15,15 +17,44 @@ export default class Tensor {
         this.data = init.call(this)
     }
 
+    static isTypedArray(tensor) {
+        if (tensor.constructor === Tensor)
+            return true
+
+        return tensor.constructor === Float32Array
+            || tensor.constructor === Int8Array
+            || tensor.constructor === Int16Array
+            || tensor.constructor === Int32Array
+            || tensor.constructor === Uint8Array
+            || tensor.constructor === Uint16Array
+            || tensor.constructor === Uint32Array
+            || tensor.constructor === Uint8ClampedArray
+    }
+
+    static shape(tensor, shape = []) {
+        if (tensor.constructor === Tensor)
+            return tensor.shape
+
+        if (tensor.constructor !== Array)
+            return shape
+
+        return Tensor.shape(tensor[0], shape.concat(tensor.length))
+    }
+
     static tensor({ data, type }) {
         return new Tensor({
-            header: new Header({ type, shape: shapeRaw(data) }),
+            header: new Header({ type, shape: Tensor.shape(data) }),
             init: function () {
-                if (isTypedArray(data))
+                if (Tensor.isTypedArray(data))
                     return data
 
                 const values = new this.type.array(this.size * this.type.size)
-                values.set([data].flat(Number.POSITIVE_INFINITY).map(parseNumber).flat())
+                values.set([data]
+                    .flat(Number.POSITIVE_INFINITY)
+                    .map(function (number) {
+                        return Tensor.parseNumber(number, this.type.size)
+                    }, this)
+                    .flat())
 
                 return values
             }
@@ -174,7 +205,7 @@ export default class Tensor {
 
     toRaw(index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return stringNumber({ index, array: this })
+            return this.toStringAtIndex(index)
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
@@ -183,10 +214,74 @@ export default class Tensor {
 
     valueOf() { return this.data[this.offset] }
 
+    static parseNumber(number, size) {
+        const result = new Array(size).fill(0)
+        const tokens = String(number)
+            .match(PARSE_NUMBER)
+            .filter(function (token) { return !SPACE.test(token) })
+
+        let sign = 1, token
+        for (let i = 0; i < tokens.length; i++) {
+            token = tokens[i]
+
+            if (token in NUMBER_FROM_SYMBOL) {
+                if (isNaN(tokens[i - 1])) {
+                    result[NUMBER_FROM_SYMBOL[token]] = result[NUMBER_FROM_SYMBOL[token]] || 0
+                    result[NUMBER_FROM_SYMBOL[token]] += sign
+                }
+            }
+
+            else if (token === '+') sign = 1
+            else if (token === '-') sign = -1
+
+            else if (!isNaN(token)) {
+                let symbol = tokens[i + 1]
+
+                if (symbol in NUMBER_FROM_SYMBOL) {
+                    result[NUMBER_FROM_SYMBOL[symbol]] = result[NUMBER_FROM_SYMBOL[symbol]] || 0
+                    result[NUMBER_FROM_SYMBOL[symbol]] += sign * Number(token)
+                }
+                else {
+                    result[0] = result[0] || 0
+                    result[0] += sign * Number(token)
+                }
+            }
+        }
+
+        return result
+    }
+
+    toStringAtIndex(index) {
+        let string = ''
+
+        for (let i = 0; i < this.type.size; i++) {
+            let number = this.data[index + i]
+            const sign = Math.sign(number) < 0 ? '-' : '+'
+            number = Math.abs(number)
+
+            if (number === 0) continue
+
+            if (i === 0) {
+                string += `${sign === '-' ? sign : ''}${number}`
+                continue
+            }
+
+            string += `${sign}${number}${SYMBOL_FROM_NUMBER[i]}`
+        }
+
+        if (string.startsWith('+'))
+            return string.slice(1)
+
+        if (!string)
+            return "0"
+
+        return string
+    }
+
     toString() {
         return JSON
             .stringify(this.toRaw())
-            .replace(ARRAY_SPACER_REGEX, ARRAY_REPLACER_REGEX)
+            .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
 
     [util.inspect.custom]() { return this.toString() }

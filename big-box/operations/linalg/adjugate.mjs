@@ -6,8 +6,6 @@ import { indexTemplate } from './utils.mjs'
 
 export default class Adjugate  {
     constructor(A, B, R) {
-        
-
         this.A = A
         this.B = B
         this.R = R
