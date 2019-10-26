@@ -1,20 +1,32 @@
 import {
-    PARTIAL_SLICE_REGEX, NUMBER_REGEX,
-    SLICE_CHARACTER, AXIS_INNER_CHARACTER, AXIS_RESULT_CHARACTER,
-    SHAPE, OFFSET, CONTIG, STRIDES, __Math__
+    __Math__, // misc resources
+    SHAPE, OFFSET, CONTIG, STRIDES, // init resources
+    PARTIAL_SLICE, NUMBER, SLICE_CHARACTER, // slice resources
 } from '../resources'
 
-import { getStrides, isContiguousSlice, resolveReshape } from './utils'
+import { resolveStrides, resolveContiguity, resolveReshape } from './utils'
 
 export default class Header {
-
     constructor(opts) {
-        this.shape = SHAPE in opts ? opts.shape : []
-        this.offset = OFFSET in opts ? opts.offset : 0
-        this.contig = CONTIG in opts ? opts.contig : true
-        this.strides = STRIDES in opts ? opts.strides : getStrides(this.shape)
+        this.type = opts.type
 
-        this.id = `${this.shape}|${this.strides}|${this.offset}`
+        this.shape = SHAPE in opts
+            ? opts.shape
+            : []
+
+        this.offset = OFFSET in opts
+            ? opts.offset
+            : 0
+
+        this.contig = CONTIG in opts
+            ? opts.contig
+            : true
+
+        this.strides = STRIDES in opts
+            ? opts.strides
+            : resolveStrides({ shape: this.shape, type: this.type })
+
+        this.id = `${this.type.size}|${this.shape}|${this.strides}|${this.offset}`
         this.size = this.shape.reduce(__Math__.multiply, 1)
         this.lastStride = this.strides[this.strides.length - 1]
     }
@@ -23,10 +35,19 @@ export default class Header {
         return new Header(JSON.parse(JSON.stringify(this)))
     }
 
+    flatIndex(index) {
+        let flatIndex = this.offset
+
+        for (let i = 0; i < index.length; i++)
+            flatIndex += index[i] * this.strides[i]
+
+        return flatIndex
+    }
+
     slice(index) {
         const shape = new Array()
         const strides = new Array()
-        const contig = isContiguousSlice(index)
+        const contig = resolveContiguity({ index })
 
         let offset = this.offset
 
@@ -43,7 +64,7 @@ export default class Header {
              * If the index is a slice of the form 'a:b', the user wants a slice from a to b 
             */
 
-            else if (PARTIAL_SLICE_REGEX.test(index[i])) {
+            else if (PARTIAL_SLICE.test(index[i])) {
                 let [low, high] = index[i].split(SLICE_CHARACTER).map(Number)
 
                 if (high === 0)
@@ -59,16 +80,17 @@ export default class Header {
              * If the index is a number, the user wants that index
              */
 
-            else if (NUMBER_REGEX.test(index[i]))
+            else if (NUMBER.test(index[i]))
                 offset += this.strides[i] * index[i]
 
         }
 
-        return new Header({ shape, strides, offset, contig })
+        return new Header({ shape, strides, offset, contig, type: this.type })
     }
 
     transpose() {
         return new Header({
+            type: this.type,
             shape: this.shape.slice().reverse(),
             strides: this.strides.slice().reverse(),
             offset: this.offset,
@@ -76,12 +98,19 @@ export default class Header {
         })
     }
 
-    reshape(newShape) {
-        const resolvedShape = resolveReshape(newShape, this.size)
+    reshape(shape) {
+        const resolvedShape = resolveReshape({ shape, size: this.size })
+
+        const resolvedStrides = resolveStrides({
+            shape: resolvedShape,
+            type: this.type,
+            lastStride: this.lastStride
+        })
 
         return new Header({
+            type: this.type,
             shape: resolvedShape,
-            strides: getStrides(resolvedShape, this.lastStride)
+            strides: resolvedStrides,
         })
     }
 }

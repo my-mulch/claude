@@ -1,39 +1,42 @@
 import bb from '..'
 import jest from '../../test'
 
-export default function () {
+export default jest.suite(function () {
     let A, B, C, D, E
 
     console.log('\n\n-------- Linear Algebra Suite --------\n\n')
 
-    A = bb.array({
-        with: [
+    A = bb.tensor({
+        data: [
             ["10", "72", "91", "13"],
             ["57", "44", "49", "33"],
             ["90", "66", "23", "21"]
-        ]
+        ],
+        type: bb.Float32
     })
 
-    B = bb.array({
-        with: [
+    B = bb.tensor({
+        type: bb.Float32,
+        data: [
             ["17", "11", "19"],
             ["41", "15", "11"],
             ["16", "14", "15"]
         ]
     })
 
-    D = bb.array({
-        with: [
+    D = bb.tensor({
+        type: bb.Float32,
+        data: [
             ["2", "2", "1"],
             ["4", "2", "6"],
             ["4", "2", "2"]
         ]
     })
 
-    C = bb.array({ with: [["1"], ["2"], ["3"]] })
+    C = bb.tensor({ data: [["1"], ["2"], ["3"]], type: bb.Float32 })
 
-    E = bb.array({
-        with: [[["10", "5", "2"],
+    E = bb.tensor({
+        data: [[["10", "5", "2"],
         ["72", "6", "3"],
         ["91", "6", "1"],
         ["13", "4", "12"]],
@@ -46,20 +49,26 @@ export default function () {
         [["90", "2", "5"],
         ["66", "4", "3"],
         ["23", "1", "2"],
-        ["21", "2", "2"]]]
+        ["21", "2", "2"]]],
+        type: bb.Float32
     })
 
-    jest.expect(B.matMult({ with: A })).toEqual(([["2507", "2962", "2523", "983"], ["2255", "4338", "4719", "1259"], ["2308", "2758", "2487", "985"]]))
-    jest.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])
+    const F = bb.tensor({ data: [["72 + 91i + 13j + 57k"]], type: bb.QuatFloat32 })
+    const G = bb.tensor({ data: [["10 + 72i + 91j + 13k"]], type: bb.QuatFloat32 })
 
-    jest.expect(A.T()).toEqual([["10", "57", "90"], ["72", "44", "66"], ["91", "49", "23"], ["13", "33", "21"]])
 
-    jest.expect(D.inverse()).toEqual([["-0.5", "-0.125", "0.625"], ['1', '0', "-0.5"], ['0', "0.25", "-0.25"]])
-    jest.expect(bb.array({ with: [[6, 4], [5, 2]] }).inverse()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
-    jest.expect(bb.array({ with: [[4, 1, 3, 3], [4, 0, 0, 1], [2, 3, 4, 2], [0, 0, 4, 4]] }).inverse()).toEqual([["1.5", '-1', "-0.5", "-0.625"], ['-5', '4', '2', "1.75"], ['6', '-5', '-2', "-2.25"], ['-6', '5', '2', "2.5"]])
 
-    jest.expect(E.slice({ with: ['1:2', 0, ':'] }).cross({ with: C })).toEqual([['19'], ['-170'], ['107']])
-    jest.expect(E.slice({ with: [':', 0, ':'] }).matMult({ with: C })).toEqual([['26'], ['74'], ['109']])
+    this.expect(F.matMult({ with: G })).toEqual([["-7756+1076i+9603j+8851k"]])
+    this.expect(G.matMult({ with: F })).toEqual([["-7756+11112i+3761j-5839k"]])
+    this.expect(A.astype({ type: bb.QuatFloat32 })).toEqual([["10+72i+91j+13k"], ["57+44i+49j+33k"], ["90+66i+23j+21k"]])
+    this.expect(B.matMult({ with: A })).toEqual(([["2507", "2962", "2523", "983"], ["2255", "4338", "4719", "1259"], ["2308", "2758", "2487", "985"]]))
+    this.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])
+    this.expect(A.T()).toEqual([["10", "57", "90"], ["72", "44", "66"], ["91", "49", "23"], ["13", "33", "21"]])
+    this.expect(D.inverse()).toEqual([["-0.5", "-0.125", "0.625"], ['1', '0', "-0.5"], ['0', "0.25", "-0.25"]])
+    this.expect(bb.tensor({ data: [[6, 4], [5, 2]], type: bb.Float32 }).inverse()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
+    this.expect(bb.tensor({ data: [[4, 1, 3, 3], [4, 0, 0, 1], [2, 3, 4, 2], [0, 0, 4, 4]], type: bb.Float32 }).inverse()).toEqual([["1.5", '-1', "-0.5", "-0.625"], ['-5', '4', '2', "1.75"], ['6', '-5', '-2', "-2.25"], ['-6', '5', '2', "2.5"]])
+    this.expect(E.slice({ region: ['1:2', 0, ':'] }).T().cross({ with: C })).toEqual([['19'], ['-170'], ['107']])
+    this.expect(E.slice({ region: [':', 0, ':'] }).matMult({ with: C })).toEqual([['26'], ['74'], ['109']])
 
     console.log('\n\n-------- End Linear Algebra Suite --------\n\n')
-}
+})

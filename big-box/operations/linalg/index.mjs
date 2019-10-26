@@ -1,12 +1,5 @@
-import cross from './cross'
-import inverse from './inverse'
-import matMult from './matmult'
-
-export default {
-    utils: {},
-    operations: {
-        ...cross,
-        ...inverse,
-        ...matMult
-    }
-}
+export { default as cross } from './cross'
+export { default as inverse } from './inverse'
+export { default as matMult } from './matMult'
+export { default as adjugate } from './adjugate'
+export { default as determinant } from './determinant'
