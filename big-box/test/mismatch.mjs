@@ -25,6 +25,16 @@ export default jest.suite(function () {
     })
 
 
+    var axis = bb.linspace({
+        start: 0,
+        stop: 2 * Math.PI,
+        num: 10000
+    }).multiply({ with: 'i' })
+
+    var vertices = bb.zeros({ shape: [10000, 3] })
+    var vslice = vertices.slice({ region: [':', 0] })
+    vslice.assign({ with: axis.exp() })
+
 
 
 

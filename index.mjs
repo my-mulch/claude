@@ -7,7 +7,7 @@ window.myio = myio
 window.app = parmesan
 
 export default (async function () {
-    /** Random points */
+    /** Cricle */
 
     window.sin = bb
         .arange({ stop: 10000 })
@@ -27,19 +27,15 @@ export default (async function () {
         num: 10000
     }).multiply({ with: 'i' })
 
-    // window.vertices = bb
-    //     .zeros({ shape: [10000, 3] })
-    //     .assign({ region: [':', 0], with: axis.exp() })
+    window.vertices = bb.zeros({ shape: [10000, 3], type: bb.ComplexFloat32 })
+    vertices.slice({ region: [':', 0] }).assign({ with: axis.exp().multiply({ with: 250 }) })
 
-    // window.colors = bb
-    //     .zeros({ shape: [10000, 3] })
-    //     .assign({ region: [':', ':2'], with: 255 })
+    window.colors = bb.zeros({ shape: [10000, 3] })
+    colors.slice({ region: [':', ':2'] }).assign({ with: 255 })
 
-    // window.sizes = bb
-    //     .ones({ shape: [10000, 1] })
-    //     .multiply({ with: 1 })
+    window.sizes = bb.ones({ shape: [10000, 1] }).multiply({ with: 1 })
 
-    // app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
+    app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
 
     /** Image CUBE */
     // const { shape, pixels, binary } = await myio.imread('http://localhost:3000/Users/trumanpurnell/Desktop/tahie.jpg')
@@ -54,9 +50,9 @@ export default (async function () {
 
 
     /** RGB CUBE */
-    window.vertices = bb.randrange({ low: 0, high: 256, shape: [1e6, 3] })
-    window.colors = vertices.divide({ with: 255 })
-    window.sizes = bb.ones({ shape: [1e6, 1] }).multiply({ with: 3 })
+    // window.vertices = bb.randrange({ low: 0, high: 256, shape: [1e6, 3] })
+    // window.colors = vertices.divide({ with: 255 })
+    // window.sizes = bb.ones({ shape: [1e6, 1] }).multiply({ with: 3 })
 
-    app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
+    // app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
 })()
