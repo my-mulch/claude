@@ -9,9 +9,8 @@ export default jest.suite(function () {
         data: [
             ['10 + 2i'],
             ['40 + 3i'],
-            ['50 + 1i']
-        ],
-        type: bb.ComplexFloat32
+            ['50 + i']
+        ]
     })
 
     const B = bb.tensor({
@@ -19,12 +18,11 @@ export default jest.suite(function () {
             ["2+2i", "7+9i", "3+5i", "5+8i", "3+4i", "5+6i", "7i", "5+9i", "6+0i", "1+6i", "7+9i", "5+7i", "1+9i", "6+6i", "8i", "6+8i", "1+4i", "1", "2+1i", "6+9i", "6i", "3+4i", "8+6i", "1", "2i", "3+7i", "7i", "9+6i", "3+5i", "2+4i", "1+7i", "7+8i", "6+2i", "6+8i", "4+7i", "9+1i", "8+6i", "5+2i", "1+2i", "5+2i", "8+7i", "7+0i"],
             ["6+4i", "8+0i", "4+0i", "8+7i", "2+0i", "9+8i", "8+7i", "3+7i", "8+6i", "5+0i", "2+1i", "7+5i", "8+6i", "7+4i", "7+7i", "4+8i", "6+6i", "3i", "6+1i", "2+6i", "1+6i", "2+8i", "1+9i", "1+3i", "2+2i", "1+6i", "6+0i", "6+6i", "2i", "8+7i", "8+9i", "4+6i", "7+4i", "3+2i", "7+1i", "7+4i", "7+6i", "5+3i", "4+5i", "9+1i", "5+2i", "3+0i"],
         ],
-        type: bb.ComplexFloat32
     })
 
     const C = bb.tensor({
         data: ["i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i"],
-        type: bb.ComplexFloat32
+
     })
 
     const D = bb.tensor({
@@ -35,12 +33,12 @@ export default jest.suite(function () {
             ['0', '1', '2', '3', '4'],
             ['0', '1', '2', '3', '4'],
         ],
-        type: bb.Float32
+
     })
 
 
-    const E = bb.tensor({ data: ['1 + 8i'], type: bb.ComplexFloat32 })
-    const F = bb.tensor({ data: [['0'], ['1'], ['2'], ['3'], ['4']], type: bb.Float32 })
+    const E = bb.tensor({ data: ['1 + 8i'], })
+    const F = bb.tensor({ data: [['0'], ['1'], ['2'], ['3'], ['4']], })
 
     const G = bb.tensor({
         data: [
@@ -65,17 +63,16 @@ export default jest.suite(function () {
             ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"],
             ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"]
         ],
-        type: bb.Float32
     })
 
     const H = bb.tensor({
         data: [["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"]],
-        type: bb.Float32
+
 
     })
 
-    const I = bb.tensor({ data: [['1 + 1i', '4 + 6i', '2 - 5i']], type: bb.ComplexFloat32 })
-    const J = bb.tensor({ data: [['7 - 1i', '2 + 1i', '5 - 9i']], type: bb.ComplexFloat32 })
+    const I = bb.tensor({ data: [['1 + 1i', '4 + 6i', '2 - 5i']], })
+    const J = bb.tensor({ data: [['7 - 1i', '2 + 1i', '5 - 9i']], })
 
     const K = bb.tensor({
         data: [
@@ -84,12 +81,12 @@ export default jest.suite(function () {
             ['3. + 1i', '4. + 3i', '5. + 1i', '7. + 7i'],
             ['4. + 5i', '7. + 3i', '3. + 5i', '7. + 3i']
         ],
-        type: bb.ComplexFloat32
+
     })
 
     const L = bb.tensor({
         data: [['6 + 1i', '4 + 0i', '4 + 4i', '3 + 1i'], ['1 + 5i', '0 + 1i', '2 + 4i', '3 + 9i'], ['7 + 8i', '5 + 4i', '3 + 6i', '7 + 9i'], ['7 + 1i', '2 + 3i', '9 + 2i', '2 + 2i']],
-        type: bb.ComplexFloat32
+
     })
 
     const M = bb.zeros({ shape: [100, 100], type: bb.ComplexFloat32 }).assign({
@@ -98,16 +95,18 @@ export default jest.suite(function () {
 
     const N = bb.tensor({
         data: [['1. + 0i', '2. + 0i', '4. + 1i', '2. + 3i'], ['4. + 3i', '4. + 3i', '0. + 2i', '4. + 1i'], ['0. + 4i', '1. + 0i', '0. + 1i', '1. + 4i'], ['0. + 1i', '1. + 4i', '0. + 2i', '2. + 0i']],
-        type: bb.ComplexFloat32
+
     })
 
-    const O = bb.tensor({ data: [['1. + 3i', '0. + 4i'], ['2. + 1i', '3. + 3i']], type: bb.ComplexFloat32 })
+    const O = bb.tensor({ data: [['1. + 3i', '0. + 4i'], ['2. + 1i', '3. + 3i']], })
     const P = bb.tensor({
         data: [["0.+4i", "0.+4i", "2.+2i", "0.+1i", "3.+4i"], ["1.+2i", "1.+3i", "4.+0i", "2.+4i", "0.+3i"], ["3.+3i", "4.+1i", "3.+0i", "3.+3i", "0.+1i"], ["0.+3i", "3.+3i", "0.+1i", "1.+4i", "2.+1i"], ["2.+2i", "4.+4i", "3.+3i", "3.+4i", "1.+1i"]],
-        type: bb.ComplexFloat32
+
     })
 
     /** Elementwise operations */
+
+
     this.expect(A.min()).toEqual('10+2i')
     this.expect(A.max()).toEqual('50+1i')
     this.expect(A.mean()).toEqual('33.33333206176758+2i')
@@ -121,7 +120,7 @@ export default jest.suite(function () {
     this.expect(B.add({ with: B })).toEqual(B.multiply({ with: bb.tensor({ data: [2], type: bb.ComplexFloat32 }) }))
     this.expect(B.subtract({ with: B })).toEqual(B.multiply({ with: bb.tensor({ data: [0], type: bb.ComplexFloat32 }) }))
     this.expect(B.divide({ with: B })).toEqual([["1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"], ["1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"]])
-    this.expect(B.subtract({ with: C })).toEqual(B.subtract({ with: bb.tensor({ data: [' 0 + 1i'], type: bb.ComplexFloat32 }) }))
+    this.expect(B.subtract({ with: C })).toEqual(B.subtract({ with: bb.tensor({ data: [' 0 + 1i'], }) }))
     this.expect(A.multiply({ with: E })).toEqual([["-6+82i"], ["16+323i"], ["42+401i"]])
     this.expect(A.add({ with: E })).toEqual([["11+10i"], ["41+11i"], ["51+9i"]])
     this.expect(D.add({ with: F.T() })).toEqual([['0', '2', '4', '6', '8'], ['0', '2', '4', '6', '8'], ['0', '2', '4', '6', '8'], ['0', '2', '4', '6', '8'], ['0', '2', '4', '6', '8']])

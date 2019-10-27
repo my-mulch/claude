@@ -1,68 +1,39 @@
 import util from 'util'
+import Type from '../type'
 import Header from '../header'
 
-import {
-    __Math__, PARSE_NUMBER, NUMBER_FROM_SYMBOL,
-    SYMBOL_FROM_NUMBER, ARRAY_SPACER, ARRAY_REPLACER, SPACE
-} from '../resources'
+import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER } from '../resources'
 
 export default class Tensor {
-    constructor({ header, init = function () {
-        return new this.type.array(this.size * this.type.size)
-    } }) {
-        for (const field in header)
-            this[field] = header[field]
-
-        this.header = header
-        this.data = init.call(this)
+    constructor({ header, data }) {
+        Object.assign(this, this.header = header)
+        this.data = this.type.array(data || this.size)
     }
 
-    static isTypedArray(tensor) {
-        if (tensor.constructor === Tensor)
-            return true
+    static shape(array, shape = []) {
+        if (array.constructor === Tensor)
+            return array.shape
 
-        return tensor.constructor === Float32Array
-            || tensor.constructor === Int8Array
-            || tensor.constructor === Int16Array
-            || tensor.constructor === Int32Array
-            || tensor.constructor === Uint8Array
-            || tensor.constructor === Uint16Array
-            || tensor.constructor === Uint32Array
-            || tensor.constructor === Uint8ClampedArray
-    }
+        if (Type.isTypedArray(array))
+            return [array.length]
 
-    static shape(tensor, shape = []) {
-        if (tensor.constructor === Tensor)
-            return tensor.shape
-
-        if (tensor.constructor !== Array)
+        if (array.constructor !== Array)
             return shape
 
-        return Tensor.shape(tensor[0], shape.concat(tensor.length))
+        return Tensor.shape(array[0], shape.concat(array.length))
     }
 
     static tensor({ data, type }) {
-        return new Tensor({
-            header: new Header({ type, shape: Tensor.shape(data) }),
-            init: function () {
-                if (Tensor.isTypedArray(data))
-                    return data
+        const shape = Tensor.shape(data)
+        
+        data = [data].flat(Number.POSITIVE_INFINITY)
+        type = type || Type.resolve(data[0])
 
-                const values = new this.type.array(this.size * this.type.size)
-                values.set([data]
-                    .flat(Number.POSITIVE_INFINITY)
-                    .map(function (number) {
-                        return Tensor.parseNumber(number, this.type.size)
-                    }, this)
-                    .flat())
-
-                return values
-            }
-        })
+        return new Tensor({ data, header: new Header({ type, shape }) })
     }
 
     static zerosLike({ tensor }) {
-        return new Tensor({ header: new Header({ shape: tensor.shape, type: tensor.type }) })
+        return new Tensor({ header: new Header({ ...tensor }) })
     }
 
     static zeros({ shape, type }) {
@@ -70,137 +41,89 @@ export default class Tensor {
     }
 
     static onesLike({ tensor }) {
-        return new Tensor({
-            header: new Header({ shape: tensor.shape, type: tensor.type }),
-            init: function () { return new this.type.array(this.size * this.type.size).fill(1) }
-        })
+        tensor = new Tensor({ header: new Header({ ...tensor }) })
+        tensor.data.fill(1)
+
+        return tensor
     }
 
     static ones({ shape, type }) {
-        return new Tensor({
-            header: new Header({ shape, type }),
-            init: function () { return new this.type.array(this.size * this.type.size).fill(1) }
-        })
+        const tensor = new Tensor({ header: new Header({ shape, type }) })
+        tensor.data.fill(1)
+
+        return tensor
     }
 
     static arange({ start = 0, step = 1, stop, type }) {
-        return new Tensor({
-            header: new Header({ type, shape: [__Math__.round((stop - start) / step)] }),
-            init: function () {
-                const data = new this.type.array(this.size * this.type.size)
-                for (let i = start, j = 0; i < stop; i += step, j++) data[j] = i
-                return data
-            }
+        const tensor = new Tensor({
+            header: new Header({ type, shape: [__Math__.round((stop - start) / step)] })
         })
+
+        for (let i = start, j = 0; i < stop; i += step, j++)
+            tensor.data[j] = i
+
+        return tensor
     }
 
     static linspace({ start, stop, num = 50, type }) {
         const step = (stop - start) / num
-        return new Tensor({
-            header: new Header({ type, shape: [num] }),
-            init: function () {
-                const data = new this.type.array(this.size * this.type.size)
-                for (let i = start, j = 0; i < stop; i += step, j++) data[j] = i
-                return data
-            }
-        })
+        const tensor = new Tensor({ header: new Header({ type, shape: [num] }) })
+
+        for (let i = start, j = 0; i < stop; i += step, j++)
+            tensor.data[j] = i
+
+        return tensor
     }
 
 
     static rand({ shape, type }) {
-        return new Tensor({
-            header: new Header({ shape, type }),
-            init: function () {
-                const data = new this.type.array(this.size * this.type.size)
+        const tensor = new Tensor({ header: new Header({ shape, type }) })
 
-                for (let i = 0; i < data.length; i++)
-                    data[i] = __Math__.random() - 1
+        for (let i = 0; i < data.length; i++)
+            tensor.data[i] = __Math__.random() - 1
 
-                return data
-            }
-        })
+        return tensor
     }
 
-    static randint({ low, high, shape, type }) {
-        return new Tensor({
-            header: new Header({ shape, type }),
-            init: function () {
-                const data = new this.type.array(this.size * this.type.size)
+    static randrange({ low, high, shape, type }) {
+        const tensor = new Tensor({ header: new Header({ shape, type }) })
 
-                for (let i = 0; i < data.length; i++)
-                    data[i] = low + __Math__.floor(__Math__.random() * (high - low))
+        for (let i = 0; i < data.length; i++)
+            tensor.data[i] = low + __Math__.floor(__Math__.random() * (high - low))
 
-                return data
-            }
-        })
+        return tensor
     }
 
     static eye({ shape, type }) {
-        return new Tensor({
-            header: new Header({ shape, type }),
-            init: function () {
-                const data = new this.type.array(this.size)
-                const diagonal = this.strides.reduce(__Math__.add)
-                const numDiags = __Math__.min(...this.shape)
+        const tensor = new Tensor({ header: new Header({ shape, type }) })
+        const diagonal = tensor.strides.reduce(__Math__.add)
+        const numDiags = __Math__.min(...tensor.shape)
 
-                for (let i = 0; i < numDiags * diagonal; i += diagonal)
-                    data[i] = 1
+        for (let i = 0; i < numDiags * diagonal; i += diagonal)
+            tensor.data[i] = 1
 
-                return data
-            }
-        })
+        return tensor
     }
 
-    astype({ type }, old = this) {
-        let shape = old.shape.slice()
+    astype({ type }) {
+        let shape = this.shape.slice()
 
-        if (type.size > 1 && old.type.size === 1)
+        if (type.size > 1 && this.type.size === 1)
             shape[shape.length - 1] /= type.size
 
-        return new Tensor({
-            header: new Header({
-                type,
-                shape,
-                offset: this.offset,
-                contig: this.contig,
-            }),
-            init: function () { return new this.type.array(old.data) }
-        })
+        return new Tensor({ header: new Header({ type, shape, ...this }), data: this.data.slice() })
     }
 
-    copy(old = this) {
-        return new Tensor({
-            header: this.header,
-            init: function () { return old.data.slice() }
-        })
-    }
+    copy() { return new Tensor({ header: this.header, data: this.data.slice() }) }
+    ravel() { return Tensor.tensor({ data: this.toRaw(), type: this.type }).reshape({ shape: [-1] }) }
+    slice({ region }) { return new Tensor({ header: this.header.slice(region), data: this.data }) }
+    T() { return new Tensor({ header: this.header.transpose(), data: this.data }) }
 
-    ravel() {
-        return Tensor.tensor({ data: this.toRaw(), type: this.type }).reshape({ shape: [-1] })
-    }
-
-    slice({ region }, old = this) {
-        return new Tensor({
-            header: this.header.slice(region),
-            init: function () { return old.data }
-        })
-    }
-
-    T(old = this) {
-        return new Tensor({
-            header: this.header.transpose(),
-            init: function () { return old.data }
-        })
-    }
-
-    reshape({ shape }, old = this) {
+    reshape({ shape }) {
         if (!this.contig)
             return Tensor.tensor({ data: this.toRaw(), type: this.type }).reshape({ shape })
 
-        return new Tensor({
-            header: this.header.reshape(shape),
-            init: function () { return old.data }
-        })
+        return new Tensor({ header: this.header.reshape(shape), data: this.data })
     }
 
     toRaw(index = this.offset, depth = 0) {
@@ -214,66 +137,17 @@ export default class Tensor {
 
     valueOf() { return this.data[this.offset] }
 
-    static parseNumber(number, size) {
-        const result = new Array(size).fill(0)
-        const tokens = String(number)
-            .match(PARSE_NUMBER)
-            .filter(function (token) { return !SPACE.test(token) })
-
-        let sign = 1, token
-        for (let i = 0; i < tokens.length; i++) {
-            token = tokens[i]
-
-            if (token in NUMBER_FROM_SYMBOL) {
-                if (isNaN(tokens[i - 1])) {
-                    result[NUMBER_FROM_SYMBOL[token]] = result[NUMBER_FROM_SYMBOL[token]] || 0
-                    result[NUMBER_FROM_SYMBOL[token]] += sign
-                }
-            }
-
-            else if (token === '+') sign = 1
-            else if (token === '-') sign = -1
-
-            else if (!isNaN(token)) {
-                let symbol = tokens[i + 1]
-
-                if (symbol in NUMBER_FROM_SYMBOL) {
-                    result[NUMBER_FROM_SYMBOL[symbol]] = result[NUMBER_FROM_SYMBOL[symbol]] || 0
-                    result[NUMBER_FROM_SYMBOL[symbol]] += sign * Number(token)
-                }
-                else {
-                    result[0] = result[0] || 0
-                    result[0] += sign * Number(token)
-                }
-            }
-        }
-
-        return result
-    }
-
-    toStringAtIndex(index) {
-        let string = ''
-
+    toStringAtIndex(index, string = '') {
         for (let i = 0; i < this.type.size; i++) {
-            let number = this.data[index + i]
-            const sign = Math.sign(number) < 0 ? '-' : '+'
-            number = Math.abs(number)
+            const sign = Math.sign(this.data[index + i]) < 0 ? '-' : '+'
+            const number = Math.abs(this.data[index + i])
 
-            if (number === 0) continue
-
-            if (i === 0) {
-                string += `${sign === '-' ? sign : ''}${number}`
-                continue
-            }
-
-            string += `${sign}${number}${SYMBOL_FROM_NUMBER[i]}`
+            if (number)
+                string += `${sign}${number}${SYMBOL_FROM_ID[i]}`
         }
 
-        if (string.startsWith('+'))
-            return string.slice(1)
-
-        if (!string)
-            return "0"
+        if (!string) return "0"
+        if (string.startsWith('+')) return string.slice(1)
 
         return string
     }

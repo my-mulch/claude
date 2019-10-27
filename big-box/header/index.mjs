@@ -1,34 +1,60 @@
 import {
     __Math__, // misc resources
-    SHAPE, OFFSET, CONTIG, STRIDES, // init resources
+    TYPE, SHAPE, OFFSET, CONTIG, STRIDES, // init resources
     PARTIAL_SLICE, NUMBER, SLICE_CHARACTER, // slice resources
 } from '../resources'
 
-import { resolveStrides, resolveContiguity, resolveReshape } from './utils'
+import Type from '../type'
 
 export default class Header {
     constructor(opts) {
-        this.type = opts.type
-
-        this.shape = SHAPE in opts
-            ? opts.shape
-            : []
-
-        this.offset = OFFSET in opts
-            ? opts.offset
-            : 0
-
-        this.contig = CONTIG in opts
-            ? opts.contig
-            : true
-
-        this.strides = STRIDES in opts
-            ? opts.strides
-            : resolveStrides({ shape: this.shape, type: this.type })
+        this.type = opts.type !== undefined ? opts.type : Type.Float32
+        this.shape = opts.shape !== undefined ? opts.shape : []
+        this.offset = opts.offset !== undefined ? opts.offset : 0
+        this.contig = opts.contig !== undefined ? opts.contig : true
+        this.strides = opts.strides !== undefined ? opts.strides : Header.strides(this.shape, this.type)
 
         this.id = `${this.type.size}|${this.shape}|${this.strides}|${this.offset}`
         this.size = this.shape.reduce(__Math__.multiply, 1)
         this.lastStride = this.strides[this.strides.length - 1]
+    }
+
+    static isContigous(index) {
+        let last = -1
+
+        for (let i = 0; i < index.length; i++) {
+            if (last >= 0
+                && index[i].constructor === String
+                && i - last > 1)
+                return false
+
+            if (index[i].constructor === String)
+                last = i
+        }
+
+        return true
+    }
+
+    static strides(shape, type, lastStride) {
+        const strides = new Array(shape.length)
+
+        let stride = lastStride || type.size
+        strides[strides.length - 1] = stride
+
+        for (let i = shape.length - 1; i > 0; i--)
+            strides[i - 1] = (stride *= shape[i])
+
+        return strides
+    }
+
+    static reshape(shape, size) {
+        const reshape = new Array(shape.length)
+        const product = shape.reduce(__Math__.multiply, 1)
+
+        for (let i = 0; i < shape.length; i++)
+            reshape[i] = shape[i] < 0 ? -size / product : shape[i]
+
+        return reshape
     }
 
     copy() {
@@ -47,7 +73,7 @@ export default class Header {
     slice(index) {
         const shape = new Array()
         const strides = new Array()
-        const contig = resolveContiguity({ index })
+        const contig = Header.isContigous(index)
 
         let offset = this.offset
 
@@ -99,18 +125,13 @@ export default class Header {
     }
 
     reshape(shape) {
-        const resolvedShape = resolveReshape({ shape, size: this.size })
-
-        const resolvedStrides = resolveStrides({
-            shape: resolvedShape,
-            type: this.type,
-            lastStride: this.lastStride
-        })
+        const newShape = Header.reshape(shape, this.size)
+        const newStrides = Header.strides(newShape, this.type, this.lastStride)
 
         return new Header({
             type: this.type,
-            shape: resolvedShape,
-            strides: resolvedStrides,
+            shape: newShape,
+            strides: newStrides,
         })
     }
 }
