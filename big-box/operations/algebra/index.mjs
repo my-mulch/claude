@@ -7,6 +7,18 @@ export default class Algebra {
         ]
     }
 
+    static match(o1, o2) {
+        const maxLen = Math.max(o1.length, o2.length)
+
+        o1.length = maxLen
+        o2.length = maxLen
+
+        return [
+            Array.from(o1, function (value) { return value || 0 }),
+            Array.from(o2, function (value) { return value || 0 })
+        ]
+    }
+
     static variable({ symbol, size, index }) {
         return new Array(size).fill(null).map(function (_, i) {
             return `${symbol}[${index}+${i}]`
@@ -25,6 +37,8 @@ export default class Algebra {
     }
 
     static noop(o1, o2) {
+        [o1, o2] = Algebra.match(o1, o2)
+
         if (o1.length === 1) return [`(${o1})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
@@ -57,6 +71,8 @@ export default class Algebra {
     }
 
     static lessThan(o1, o2) {
+        [o1, o2] = Algebra.match(o1, o2)
+
         if (o1.length === 1) return [`(${o1}<${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
@@ -65,6 +81,8 @@ export default class Algebra {
     }
 
     static greaterThan(o1, o2) {
+        [o1, o2] = Algebra.match(o1, o2)
+
         if (o1.length === 1) return [`(${o1}>${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
@@ -73,6 +91,8 @@ export default class Algebra {
     }
 
     static add(o1, o2) {
+        [o1, o2] = Algebra.match(o1, o2)
+
         if (o1.length === 1) return [`(${o1}+${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
@@ -81,6 +101,8 @@ export default class Algebra {
     }
 
     static subtract(o1, o2) {
+        [o1, o2] = Algebra.match(o1, o2)
+
         if (o1.length === 1) return [`(${o1}-${o2})`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
@@ -88,7 +110,9 @@ export default class Algebra {
         return [Algebra.subtract(a, c), Algebra.subtract(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static multiply(o1, o2) {
+    static multiply(o1, o2) {        
+        [o1, o2] = Algebra.match(o1, o2)
+
         if (o1.length === 1) return [`${o1}*${o2}`]
 
         const [a, b, c, d] = Algebra.split(o1, o2)
@@ -106,6 +130,8 @@ export default class Algebra {
     }
 
     static divide(result, o1, o2) {
+        [o1, o2] = Algebra.match(o1, o2)
+        
         if (o1.length === 1) return [`${result}=(${o1}/${o2})`]
 
         return [
