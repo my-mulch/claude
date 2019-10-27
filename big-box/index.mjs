@@ -17,8 +17,8 @@ for (const [name, Operation] of Object.entries(Operations)) {
 
     /** Static operations */
     Tensor[name] = function (args = {}) {
-        let A = args.of
-        let B = args.with
+        let A = Tensor.tensor({ data: args.of })
+        let B = Tensor.tensor({ data: args.with })
         let R = args.result
         let axes = args.axes
 
@@ -36,7 +36,7 @@ for (const [name, Operation] of Object.entries(Operations)) {
     /** Instance operations */
     Tensor.prototype[name] = function (args = {}) {
         let A = this
-        let B = args.with
+        let B = Tensor.tensor({ data: args.with })
         let R = args.result
         let axes = args.axes
 
