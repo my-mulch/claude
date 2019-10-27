@@ -24,8 +24,11 @@ export default class Tensor {
     }
 
     static tensor({ data, type }) {
+        if (data.constructor === Tensor)
+            return data
+            
         const shape = Tensor.shape(data)
-        
+
         data = [data].flat(Number.POSITIVE_INFINITY)
         type = type || Type.resolve(data[0])
 
