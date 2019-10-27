@@ -10,7 +10,7 @@
     "serve": "http-server / -p 3000 --cors",
     "build": "webpack --devtool source-map",
     "watch": "nodemon --ignore docs --exec 'npm run build'",
-    "dev": "npm run build && npm run launch",
+    "local": "npm run build && npm run launch",
     "kill": "lsof -t -i tcp:3000 | xargs kill"
   },
   "repository": {

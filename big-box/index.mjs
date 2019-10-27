@@ -1,10 +1,10 @@
-import Types from './type'
+import Type from './type'
 import Cache from './cache'
 import Tensor from './tensor'
 import Operations from './operations'
 
 /** Init data types */
-Object.assign(Tensor, Types)
+Object.assign(Tensor, Type)
 
 /** Init cache */
 Tensor.cache = new Cache()
@@ -17,13 +17,13 @@ for (const [name, Operation] of Object.entries(Operations)) {
 
     /** Static operations */
     Tensor[name] = function (args = {}) {
-        let A = Tensor.tensor({ data: args.of })
-        let B = Tensor.tensor({ data: args.with })
-        let R = args.result
-        let axes = args.axes
+        const [A, B] = Type.promote(
+            Tensor.tensor({ data: args.of }),
+            Tensor.tensor({ data: args.with }) || Tensor.NULL
+        )
 
-        B = B || Tensor.NULL
-        R = R || Tensor.zeros(Operation.resultant(A, B, R, axes))
+        const axes = args.axes
+        const R = args.result || Tensor.zeros(Operation.resultant(A, B, null, axes))
 
         let func = Tensor.cache.get(A, B, R, name)
 
@@ -35,13 +35,13 @@ for (const [name, Operation] of Object.entries(Operations)) {
 
     /** Instance operations */
     Tensor.prototype[name] = function (args = {}) {
-        let A = this
-        let B = Tensor.tensor({ data: args.with })
-        let R = args.result
-        let axes = args.axes
+        const [A, B] = Type.promote(
+            this,
+            Tensor.tensor({ data: args.with }) || Tensor.NULL,
+        )
 
-        B = B || Tensor.NULL
-        R = R || Tensor.zeros(Operation.resultant(A, B, R, axes))
+        const axes = args.axes
+        const R = args.result || Tensor.zeros(Operation.resultant(A, B, null, axes))
 
         let func = Tensor.cache.get(A, B, R, name)
 

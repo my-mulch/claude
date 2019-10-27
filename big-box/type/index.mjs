@@ -6,6 +6,10 @@ export default class Type {
         this.typed = typed
     }
 
+    static promote(A, B, R) {
+        return [A, B, R]
+    }
+
     static isTypedArray(array) {
         if (array === undefined) return false
 

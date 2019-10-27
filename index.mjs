@@ -21,7 +21,12 @@ export default (async function () {
     //     .cos()
     //     .multiply({ with: 3 })
 
-    // window.axis = bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' })
+    // window.axis = bb.linspace({
+    //     start: 0,
+    //     stop: 2 * Math.PI,
+    //     num: 10000,
+    //     type: bb.ComplexFloat32
+    // }).multiply({ with: 'i' })
 
     // window.vertices = bb
     //     .zeros({ shape: [10000, 3] })
@@ -50,16 +55,9 @@ export default (async function () {
 
 
     /** RGB CUBE */
-    window.vertices = bb.randrange({ low: 0, high: 256, shape: [1e4, 3], type: bb.Float32 })
-    window.colors = vertices.divide({ with: bb.tensor({ data: 255, type: bb.Float32 }) })
-    window.sizes = bb
-        .ones({ shape: [1e4, 1], type: bb.Float32 })
-        .multiply({ with: bb.tensor({ data: 10, type: bb.Float32 }) })
+    window.vertices = bb.randrange({ low: 0, high: 256, shape: [1e6, 3] })
+    window.colors = vertices.divide({ with: 255 })
+    window.sizes = bb.ones({ shape: [1e6, 1] }).multiply({ with: 3 })
 
-    app.graphics.plot({
-        vertices: vertices.multiply({ with: bb.tensor({ data: 0.1, type: bb.Float32 }) }),
-        colors,
-        sizes,
-        mode: 'POINTS'
-    })
+    app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
 })()
