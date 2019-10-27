@@ -7,7 +7,7 @@ export default jest.suite(function () {
     console.log('\n\n-------- Elementwise Suite --------\n\n')
 
     A = bb.tensor({
-        type: bb.Float32,
+
         data:
             [
                 [
@@ -42,7 +42,7 @@ export default jest.suite(function () {
     })
 
     B = bb.tensor({
-        type: bb.Float32,
+
         data: [
             [-46, 19],
             [-38, 9],
@@ -52,7 +52,7 @@ export default jest.suite(function () {
     })
 
     C = bb.tensor({
-        type: bb.Float32,
+
         data: [[[10, 5, 2],
         [72, 6, 3],
         [91, 6, 1],
@@ -70,7 +70,7 @@ export default jest.suite(function () {
     })
 
     E = bb.tensor({
-        type: bb.ComplexFloat32,
+
         data: [
             ['1 + 1i', '10 + 10i', '100 + 100i'],
             ['1 + 1i', '10 + 10i', '100 + 100i'],
@@ -80,7 +80,7 @@ export default jest.suite(function () {
     })
 
     const F = bb.tensor({
-        type: bb.Float32,
+
         data: [[[[0],
         [0],
         [0]]],
@@ -107,7 +107,7 @@ export default jest.suite(function () {
     })
 
     const G = bb.tensor({
-        type: bb.Float32,
+
         data: [[[[3, 2],
         [3, 3],
         [4, 2]],
@@ -126,7 +126,7 @@ export default jest.suite(function () {
     })
 
     const H = bb.tensor({
-        type: bb.Float32,
+
         data: [[[[3, 2],
         [3, 3],
         [4, 2]],
@@ -212,14 +212,14 @@ export default jest.suite(function () {
         [7, 6]]]]
     })
     const I = bb.tensor({
-        type: bb.Float32,
+
         data: [[[[[2, 1]],
         [[1, 3]]]],
         [[[[2, 2]],
         [[3, 1]]]]]
     })
     const J = bb.tensor({
-        type: bb.Float32,
+
         data: [[[[[2],
         [0]]],
 
@@ -228,7 +228,7 @@ export default jest.suite(function () {
         [4]]]]]
     })
     const K = bb.tensor({
-        type: bb.Float32,
+
         data: [[[[3, 2],
         [3, 3],
         [4, 2]],
@@ -314,14 +314,14 @@ export default jest.suite(function () {
         [7, 6]]]]
     })
 
-    const L = bb.arange({ stop: 100, type: bb.Float32 })
+    const L = bb.arange({ stop: 100, })
 
 
 
     this.expect(B.mean()).toEqual("-15")
     this.expect(C.mean()).toEqual("16.66666603088379")
     this.expect(K.mean()).toEqual("4.525000095367432")
-    this.expect(B.multiply({ with: bb.tensor({ data: [6], type: bb.Float32 }) })).toEqual([["-276", "114"], ["-228", "54"], ["54", "-90"], ["-150", "-198"]])
+    this.expect(B.multiply({ with: bb.tensor({ data: [6], }) })).toEqual([["-276", "114"], ["-228", "54"], ["54", "-90"], ["-150", "-198"]])
     this.expect(A.min()).toEqual("-15")
     this.expect(A.min({ axes: [0, 3] })).toEqual([["17", "21", "-15"], ["-2", "-13", "-5"]])
     this.expect(A.max()).toEqual("44")

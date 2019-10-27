@@ -1,45 +1,133 @@
+import { PARSE_NUMBER, ID_FROM_SYMBOL, SPACE } from '../resources'
 
 export default class Type {
-    constructor({ size, array }) {
+    constructor({ size, typed }) {
         this.size = size
-        this.array = array
+        this.typed = typed
     }
 
-    static resolve(dimension) {
-        if (dimension === 1) return Type.Float32
-        if (dimension === 2) return Type.ComplexFloat32
-        if (dimension > 2) return Type.QuatFloat32
+    static isTypedArray(array) {
+        return array.constructor === Int8Array
+            || array.constructor === Int16Array
+            || array.constructor === Int32Array
+            || array.constructor === Uint8Array
+            || array.constructor === Uint16Array
+            || array.constructor === Uint32Array
+            || array.constructor === Float32Array
+            || array.constructor === Float64Array
+            || array.constructor === Uint8ClampedArray
     }
 
-    static compare(t1, t2) {
-        return t1.size >= t2.size
+    static resolveTypedArray(array) {
+        if (array.constructor === Int8Array) return Type.Int8
+        if (array.constructor === Int16Array) return Type.Int16
+        if (array.constructor === Int32Array) return Type.Int32
+        if (array.constructor === Uint8Array) return Type.Uint8
+        if (array.constructor === Uint16Array) return Type.Uint16
+        if (array.constructor === Uint32Array) return Type.Uint32
+        if (array.constructor === Float32Array) return Type.Float32
+        if (array.constructor === Float64Array) return Type.Float64
+        if (array.constructor === Uint8ClampedArray) return Type.Uint8Clamped
+
+        return null
+    }
+
+    static resolve(data) {
+        if (Type.isTypedArray(data))
+            return Type.resolveTypedArray(data)
+
+        const number = Type.parse(data)
+
+        if (number.length === 1) return Type.Float32
+        if (number.length === 2) return Type.ComplexFloat32
+        if (number.length > 2) return Type.QuatFloat32
+    }
+
+
+    static parse(number) {
+        let token
+        let sign = 1
+        const result = []
+        const tokens = String(number)
+            .match(PARSE_NUMBER)
+            .filter(function (token) { return !SPACE.test(token) })
+
+        for (let i = 0; i < tokens.length; i++) {
+            token = tokens[i]
+
+            if (token in ID_FROM_SYMBOL) {
+                if (isNaN(tokens[i - 1])) {
+                    result[ID_FROM_SYMBOL[token]] = result[ID_FROM_SYMBOL[token]] || 0
+                    result[ID_FROM_SYMBOL[token]] += sign
+                }
+            }
+
+            else if (token === '+') sign = 1
+            else if (token === '-') sign = -1
+
+            else if (!isNaN(token)) {
+                let symbol = tokens[i + 1]
+
+                if (symbol in ID_FROM_SYMBOL) {
+                    result[ID_FROM_SYMBOL[symbol]] = result[ID_FROM_SYMBOL[symbol]] || 0
+                    result[ID_FROM_SYMBOL[symbol]] += sign * Number(token)
+                }
+                else {
+                    result[0] = result[0] || 0
+                    result[0] += sign * Number(token)
+                }
+            }
+        }
+
+        return result
+    }
+
+    array(data) {
+        if (Type.isTypedArray(data))
+            return data
+
+        if (data.constructor === Array)
+            return new this.typed([data]
+                .flat(Number.POSITIVE_INFINITY)
+                .flatMap(function (number) { return this.align(Type.parse(number)) }, this))
+
+        if (data.constructor === Number)
+            return new this.typed(data * this.size)
+    }
+
+    align(number) {
+        number.length = this.size
+
+        return Array.from(number, function (value) { return value || 0 })
     }
 }
 
-Type.Int8 = new Type({ size: 1, array: Int8Array })
-Type.Int16 = new Type({ size: 1, array: Int16Array })
-Type.Int32 = new Type({ size: 1, array: Int32Array })
-Type.Uint8 = new Type({ size: 1, array: Uint8Array })
-Type.Uint16 = new Type({ size: 1, array: Uint16Array })
-Type.Uint32 = new Type({ size: 1, array: Uint32Array })
-Type.Float32 = new Type({ size: 1, array: Float32Array })
-Type.Float64 = new Type({ size: 1, array: Float64Array })
-Type.Uint8Clamped = new Type({ size: 1, array: Uint8ClampedArray })
-Type.ComplexInt8 = new Type({ size: 2, array: Int8Array })
-Type.ComplexInt16 = new Type({ size: 2, array: Int16Array })
-Type.ComplexInt32 = new Type({ size: 2, array: Int32Array })
-Type.ComplexUint8 = new Type({ size: 2, array: Uint8Array })
-Type.ComplexUint16 = new Type({ size: 2, array: Uint16Array })
-Type.ComplexUint32 = new Type({ size: 2, array: Uint32Array })
-Type.ComplexFloat32 = new Type({ size: 2, array: Float32Array })
-Type.ComplexFloat64 = new Type({ size: 2, array: Float64Array })
-Type.ComplexUint8Clamped = new Type({ size: 2, array: Uint8ClampedArray })
-Type.QuatInt8 = new Type({ size: 4, array: Int8Array })
-Type.QuatInt16 = new Type({ size: 4, array: Int16Array })
-Type.QuatInt32 = new Type({ size: 4, array: Int32Array })
-Type.QuatUint8 = new Type({ size: 4, array: Uint8Array })
-Type.QuatUint16 = new Type({ size: 4, array: Uint16Array })
-Type.QuatUint32 = new Type({ size: 4, array: Uint32Array })
-Type.QuatFloat32 = new Type({ size: 4, array: Float32Array })
-Type.QuatFloat64 = new Type({ size: 4, array: Float64Array })
-Type.QuatUint8Clamped = new Type({ size: 4, array: Uint8ClampedArray })
+Type.Int8 = new Type({ size: 1, typed: Int8Array })
+Type.Int16 = new Type({ size: 1, typed: Int16Array })
+Type.Int32 = new Type({ size: 1, typed: Int32Array })
+Type.Uint8 = new Type({ size: 1, typed: Uint8Array })
+Type.Uint16 = new Type({ size: 1, typed: Uint16Array })
+Type.Uint32 = new Type({ size: 1, typed: Uint32Array })
+Type.Float32 = new Type({ size: 1, typed: Float32Array })
+Type.Float64 = new Type({ size: 1, typed: Float64Array })
+Type.Uint8Clamped = new Type({ size: 1, typed: Uint8ClampedArray })
+
+Type.ComplexInt8 = new Type({ size: 2, typed: Int8Array })
+Type.ComplexInt16 = new Type({ size: 2, typed: Int16Array })
+Type.ComplexInt32 = new Type({ size: 2, typed: Int32Array })
+Type.ComplexUint8 = new Type({ size: 2, typed: Uint8Array })
+Type.ComplexUint16 = new Type({ size: 2, typed: Uint16Array })
+Type.ComplexUint32 = new Type({ size: 2, typed: Uint32Array })
+Type.ComplexFloat32 = new Type({ size: 2, typed: Float32Array })
+Type.ComplexFloat64 = new Type({ size: 2, typed: Float64Array })
+Type.ComplexUint8Clamped = new Type({ size: 2, typed: Uint8ClampedArray })
+
+Type.QuatInt8 = new Type({ size: 4, typed: Int8Array })
+Type.QuatInt16 = new Type({ size: 4, typed: Int16Array })
+Type.QuatInt32 = new Type({ size: 4, typed: Int32Array })
+Type.QuatUint8 = new Type({ size: 4, typed: Uint8Array })
+Type.QuatUint16 = new Type({ size: 4, typed: Uint16Array })
+Type.QuatUint32 = new Type({ size: 4, typed: Uint32Array })
+Type.QuatFloat32 = new Type({ size: 4, typed: Float32Array })
+Type.QuatFloat64 = new Type({ size: 4, typed: Float64Array })
+Type.QuatUint8Clamped = new Type({ size: 4, typed: Uint8ClampedArray })
