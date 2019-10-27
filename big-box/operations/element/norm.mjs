@@ -1,3 +1,4 @@
+import Type from '../../type'
 import Algebra from '../algebra'
 import ElementOperation from './operation'
 
@@ -20,12 +21,7 @@ export default class Norm extends ElementOperation {
         })
     }
 
-    static resultant(A, B) {
-        return {
-            type: B.type,
-            shape: []
-        }
-    }
+    static resultant(A, B) { return { type: Type.Float32, shape: [] } }
 
 }
 

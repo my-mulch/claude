@@ -2,7 +2,7 @@ import util from 'util'
 import Type from '../type'
 import Header from '../header'
 
-import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER } from '../resources'
+import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER, PRECISION } from '../resources'
 
 export default class Tensor {
     constructor({ header, data }) {
@@ -25,7 +25,7 @@ export default class Tensor {
 
     static tensor({ data, type }) {
         if (data === undefined)
-            return null
+            return data
 
         if (data.constructor === Tensor)
             return data
@@ -77,7 +77,7 @@ export default class Tensor {
         const step = (stop - start) / num
         const tensor = new Tensor({ header: new Header({ type, shape: [num] }) })
 
-        for (let i = start, j = 0; i < stop; i += step, j++)
+        for (let i = start, j = 0; i < stop; i += step, j += tensor.type.size)
             tensor.data[j] = i
 
         return tensor
@@ -114,12 +114,20 @@ export default class Tensor {
     }
 
     astype({ type }) {
-        let shape = this.shape.slice()
+        if (type === this.type)
+            return this
 
-        if (type.size > 1 && this.type.size === 1)
-            shape[shape.length - 1] /= type.size
+        if (this.size === 1)
+            return this
 
-        return new Tensor({ header: new Header({ type, shape, ...this }), data: this.data.slice() })
+        const raw = this.toRaw().flat(Number.POSITIVE_INFINITY)
+        const data = type.array(this.size)
+
+        for (let i = 0, j = 0; i < raw.length; i += this.type.size, j += type.size)
+            for (let offset = 0; offset < Math.min(type.size, this.type.size); offset++)
+                data[j + offset] = raw[i + offset]
+
+        return new Tensor({ header: new Header({ type, ...this }), data: this.data.slice() })
     }
 
     copy() { return new Tensor({ header: this.header, data: this.data.slice() }) }

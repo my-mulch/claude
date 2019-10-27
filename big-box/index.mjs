@@ -9,9 +9,6 @@ Object.assign(Tensor, Type)
 /** Init cache */
 Tensor.cache = new Cache()
 
-/** Init null tensor */
-Tensor.NULL = Tensor.zeros({ shape: [], type: Tensor.Float32 })
-
 /** Init operations */
 for (const [name, Operation] of Object.entries(Operations)) {
 
@@ -19,7 +16,7 @@ for (const [name, Operation] of Object.entries(Operations)) {
     Tensor[name] = function (args = {}) {
         const [A, B] = Type.promote(
             Tensor.tensor({ data: args.of }),
-            Tensor.tensor({ data: args.with }) || Tensor.NULL
+            Tensor.tensor({ data: args.with })
         )
 
         const axes = args.axes
@@ -37,7 +34,7 @@ for (const [name, Operation] of Object.entries(Operations)) {
     Tensor.prototype[name] = function (args = {}) {
         const [A, B] = Type.promote(
             this,
-            Tensor.tensor({ data: args.with }) || Tensor.NULL,
+            Tensor.tensor({ data: args.with })
         )
 
         const axes = args.axes

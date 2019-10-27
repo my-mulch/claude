@@ -9,24 +9,24 @@ window.app = parmesan
 export default (async function () {
     /** Random points */
 
-    // window.sin = bb
-    //     .arange({ stop: 10000 })
-    //     .divide({ with: 10 })
-    //     .sin()
-    //     .multiply({ with: 3 })
+    window.sin = bb
+        .arange({ stop: 10000 })
+        .divide({ with: 10 })
+        .sin()
+        .multiply({ with: 3 })
 
-    // window.cos = bb
-    //     .arange({ stop: 10000 })
-    //     .divide({ with: 10 })
-    //     .cos()
-    //     .multiply({ with: 3 })
+    window.cos = bb
+        .arange({ stop: 10000 })
+        .divide({ with: 10 })
+        .cos()
+        .multiply({ with: 3 })
 
-    // window.axis = bb.linspace({
-    //     start: 0,
-    //     stop: 2 * Math.PI,
-    //     num: 10000,
-    //     type: bb.ComplexFloat32
-    // }).multiply({ with: 'i' })
+    window.axis = bb.linspace({
+        start: 0,
+        stop: 2 * Math.PI,
+        num: 10000,
+        type: bb.ComplexFloat32
+    }).multiply({ with: 'i' })
 
     // window.vertices = bb
     //     .zeros({ shape: [10000, 3] })

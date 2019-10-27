@@ -13,7 +13,7 @@ export default class Inverse {
         this.R = R
 
         this.rows = this.A.shape[0]
-        this.cols = this.B.shape[1]
+        this.cols = this.A.shape[1]
         this.size = this.rows
 
         /** Pointwise Inverse */

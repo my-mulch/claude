@@ -6,6 +6,7 @@ export const CONTIG = 'contig'
 export const STRIDES = 'strides'
 export const SPACE = / +/g
 export const NUMBER = /\d+/
+export const PRECISION = 2
 export const SLICE_CHARACTER = ':'
 export const PARTIAL_SLICE = /\d*:\d*/
 export const ARRAY_REPLACER = '],\n$1['
