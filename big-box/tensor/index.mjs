@@ -127,7 +127,7 @@ export default class Tensor {
             for (let offset = 0; offset < Math.min(type.size, this.type.size); offset++)
                 data[j + offset] = raw[i + offset]
 
-        return new Tensor({ header: new Header({ type, ...this }), data: this.data.slice() })
+        return new Tensor({ header: new Header({ type, shape: this.shape }), data })
     }
 
     copy() { return new Tensor({ header: this.header, data: this.data.slice() }) }

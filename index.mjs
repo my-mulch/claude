@@ -24,8 +24,7 @@ export default (async function () {
     window.axis = bb.linspace({
         start: 0,
         stop: 2 * Math.PI,
-        num: 10000,
-        type: bb.ComplexFloat32
+        num: 10000
     }).multiply({ with: 'i' })
 
     // window.vertices = bb
