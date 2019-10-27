@@ -47,9 +47,13 @@ export default class Algebra {
     }
 
     static exp(o1) {
-        if (o1.length === 1) return [`Math.exp(${o1})`]
+        if (o1.length === 1)
+            return [`Math.exp(${o1})`]
 
         const [a, b] = Algebra.split(o1)
+
+        if (o1.length === 2)
+            return Algebra.scale([Algebra.cos(b), Algebra.sin(b)], Algebra.exp(a))
 
         return [Algebra.exp(a), Algebra.exp(b)].flat(Number.POSITIVE_INFINITY)
     }
@@ -110,7 +114,7 @@ export default class Algebra {
         return [Algebra.subtract(a, c), Algebra.subtract(b, d)].flat(Number.POSITIVE_INFINITY)
     }
 
-    static multiply(o1, o2) {        
+    static multiply(o1, o2) {
         [o1, o2] = Algebra.match(o1, o2)
 
         if (o1.length === 1) return [`${o1}*${o2}`]
@@ -131,7 +135,7 @@ export default class Algebra {
 
     static divide(result, o1, o2) {
         [o1, o2] = Algebra.match(o1, o2)
-        
+
         if (o1.length === 1) return [`${result}=(${o1}/${o2})`]
 
         return [

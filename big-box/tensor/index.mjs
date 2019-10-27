@@ -159,7 +159,7 @@ export default class Tensor {
             const number = Math.abs(this.data[index + i])
 
             if (number)
-                string += `${sign}${number}${SYMBOL_FROM_ID[i]}`
+                string += `${sign}${number.toPrecision()}${SYMBOL_FROM_ID[i]}`
         }
 
         if (!string) return "0"
