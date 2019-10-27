@@ -6,8 +6,15 @@ export default class Type {
         this.typed = typed
     }
 
-    static promote(A, B, R) {
-        return [A, B, R]
+    static promote(A, B) {
+        if (!B) return [A, B]
+        
+        const maxType = A.type.size > B.type.size ? A.type : B.type
+
+        return [
+            A.astype({ type: maxType }),
+            B.astype({ type: maxType })
+        ]
     }
 
     static isTypedArray(array) {
