@@ -7,6 +7,8 @@ export default class Type {
     }
 
     static isTypedArray(array) {
+        if (array === undefined) return false
+
         return array.constructor === Int8Array
             || array.constructor === Int16Array
             || array.constructor === Int32Array
@@ -18,24 +20,7 @@ export default class Type {
             || array.constructor === Uint8ClampedArray
     }
 
-    static resolveTypedArray(array) {
-        if (array.constructor === Int8Array) return Type.Int8
-        if (array.constructor === Int16Array) return Type.Int16
-        if (array.constructor === Int32Array) return Type.Int32
-        if (array.constructor === Uint8Array) return Type.Uint8
-        if (array.constructor === Uint16Array) return Type.Uint16
-        if (array.constructor === Uint32Array) return Type.Uint32
-        if (array.constructor === Float32Array) return Type.Float32
-        if (array.constructor === Float64Array) return Type.Float64
-        if (array.constructor === Uint8ClampedArray) return Type.Uint8Clamped
-
-        return null
-    }
-
     static resolve(data) {
-        if (Type.isTypedArray(data))
-            return Type.resolveTypedArray(data)
-
         const number = Type.parse(data)
 
         if (number.length === 1) return Type.Float32
@@ -87,9 +72,10 @@ export default class Type {
             return data
 
         if (data.constructor === Array)
-            return new this.typed([data]
-                .flat(Number.POSITIVE_INFINITY)
-                .flatMap(function (number) { return this.align(Type.parse(number)) }, this))
+            return new this.typed(data
+                .flatMap(function (number) {
+                    return this.align(Type.parse(number))
+                }, this))
 
         if (data.constructor === Number)
             return new this.typed(data * this.size)

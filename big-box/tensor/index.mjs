@@ -26,13 +26,15 @@ export default class Tensor {
     static tensor({ data, type }) {
         if (data === undefined)
             return null
-            
+
         if (data.constructor === Tensor)
             return data
 
         const shape = Tensor.shape(data)
 
-        data = [data].flat(Number.POSITIVE_INFINITY)
+        if (data.constructor === String || data.constructor === Number || data.constructor === Array)
+            data = [data].flat(Number.POSITIVE_INFINITY)
+
         type = type || Type.resolve(data[0])
 
         return new Tensor({ data, header: new Header({ type, shape }) })
@@ -85,7 +87,7 @@ export default class Tensor {
     static rand({ shape, type }) {
         const tensor = new Tensor({ header: new Header({ shape, type }) })
 
-        for (let i = 0; i < data.length; i++)
+        for (let i = 0; i < tensor.data.length; i++)
             tensor.data[i] = __Math__.random() - 1
 
         return tensor
@@ -94,7 +96,7 @@ export default class Tensor {
     static randrange({ low, high, shape, type }) {
         const tensor = new Tensor({ header: new Header({ shape, type }) })
 
-        for (let i = 0; i < data.length; i++)
+        for (let i = 0; i < tensor.data.length; i++)
             tensor.data[i] = low + __Math__.floor(__Math__.random() * (high - low))
 
         return tensor

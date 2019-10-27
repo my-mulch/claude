@@ -29,14 +29,14 @@ export default class BufferManager {
     }
 
     mapType({ array }) {
-        if (array.type.array === Int8Array) { return this.context.BYTE }
-        if (array.type.array === Uint8Array) { return this.context.UNSIGNED_BYTE }
-        if (array.type.array === Uint8ClampedArray) { return this.context.UNSIGNED_BYTE }
-        if (array.type.array === Int16Array) { return this.context.SHORT }
-        if (array.type.array === Uint16Array) { return this.context.UNSIGNED_SHORT }
-        if (array.type.array === Int32Array) { return this.context.INT }
-        if (array.type.array === Uint32Array) { return this.context.UNSIGNED_INT }
-        if (array.type.array === Float32Array) { return this.context.FLOAT }
+        if (array.type.typed === Int8Array) { return this.context.BYTE }
+        if (array.type.typed === Uint8Array) { return this.context.UNSIGNED_BYTE }
+        if (array.type.typed === Uint8ClampedArray) { return this.context.UNSIGNED_BYTE }
+        if (array.type.typed === Int16Array) { return this.context.SHORT }
+        if (array.type.typed === Uint16Array) { return this.context.UNSIGNED_SHORT }
+        if (array.type.typed === Int32Array) { return this.context.INT }
+        if (array.type.typed === Uint32Array) { return this.context.UNSIGNED_INT }
+        if (array.type.typed === Float32Array) { return this.context.FLOAT }
 
         return null
     }

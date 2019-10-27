@@ -107,6 +107,7 @@ export default jest.suite(function () {
     /** Elementwise operations */
 
 
+    
     this.expect(A.min()).toEqual('10+2i')
     this.expect(A.max()).toEqual('50+1i')
     this.expect(A.mean()).toEqual('33.33333206176758+2i')

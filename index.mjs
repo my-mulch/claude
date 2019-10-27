@@ -50,7 +50,7 @@ export default (async function () {
 
 
     /** RGB CUBE */
-    window.vertices = bb.randint({ low: 0, high: 256, shape: [1e4, 3], type: bb.Float32 })
+    window.vertices = bb.randrange({ low: 0, high: 256, shape: [1e4, 3], type: bb.Float32 })
     window.colors = vertices.divide({ with: bb.tensor({ data: 255, type: bb.Float32 }) })
     window.sizes = bb
         .ones({ shape: [1e4, 1], type: bb.Float32 })
