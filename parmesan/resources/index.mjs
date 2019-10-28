@@ -45,15 +45,15 @@ export default {
 
     TO_VECTOR: bb.tensor({ data: [[0], [0], [0], [1]], type: bb.Float32 }),
     UP_VECTOR: bb.tensor({ data: [[0], [1], [0], [1]], type: bb.Float32 }),
-    FROM_VECTOR: bb.tensor({ data: [[200], [200], [200], [1]], type: bb.Float32 }),
+    FROM_VECTOR: bb.tensor({ data: [[5], [5], [5], [1]], type: bb.Float32 }),
 
     VIEWING_ANGLE: 30,
     ASPECT_RATIO: 1,
     NEAR: 1e-6,
     FAR: 1e6,
 
-    ZOOM_DELTA: 1.2,
-    PAN_DELTA: Math.PI / 32,
+    ZOOM_DELTA: 0.02,
+    PAN_DELTA: Math.PI / 128,
     ACTIVE_VERTICES: 0,
 
     UP_DIRECTION: 0,
