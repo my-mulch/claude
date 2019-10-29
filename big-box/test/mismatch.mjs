@@ -28,6 +28,9 @@ export default jest.suite(function () {
 
 
 
+    this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', ':2'], with: 255 })).toEqual([["255", "255", "0"]])
+    this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', 1], with: 255 }).toString()).toEqual([["0", "255", "0"]])
+    this.expect(bb.ones({ shape: [2, 2] }).negate()).toEqual([["-1", "-1"], ["-1", "-1"]])
     this.expect(bb.zeros({ shape: [3, 3] }).assign({ region: [":", 1], with: 1 })).toEqual([["0", "1", "0"], ["0", "1", "0"], ["0", "1", "0"]])
     this.expect(bb.tensor({ data: `${Math.PI}i` }).exp()).toEqual("-1-8.742277657347586e-8i")
     this.expect(A.multiply({ with: 10 })).toEqual([['100+20i'], ['400+30i'], ['500+10i']])

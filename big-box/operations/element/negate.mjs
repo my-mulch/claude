@@ -13,6 +13,6 @@ export default class Negate extends ElementOperation {
         })
     }
 
-    static resultant(A, B, R, { axes = [] }) { return super.resultant(A, B, R, axes) }
+    static resultant(A, B, R) { return super.resultant(A, B, R, { axes: [] }) }
 }
 

@@ -12,12 +12,14 @@ export default class Cache extends Object {
         return {}
     }
 
-    set(A, B, R, method, value) {
-        this[A.id] = this[A.id] || {}
-        this[A.id][B.id] = this[A.id][B.id] || {}
-        this[A.id][B.id][R.id] = this[A.id][B.id][R.id] || {}
-        this[A.id][B.id][R.id][method] = value
+    set(operation) {
+        let value = this
+        
+        value[operation.A.id] = value[operation.A.id] || {}
+        value[operation.B.id] = value[operation.B.id] || {}
+        value[operation.R.id] = value[operation.R.id] || {}
+        value[operation.name] = operation
 
-        return value
+        return operation
     }
 }

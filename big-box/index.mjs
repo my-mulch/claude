@@ -41,7 +41,7 @@ for (const [name, Operation] of Object.entries(Operations)) {
         let func = Tensor.cache.get(A, B, R, name)
 
         if (!func.invoke)
-            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, args))
+            func = Tensor.cache.set(new Operation(A, B, R, args))
 
         return func.invoke(A, B, R, args)
     }
