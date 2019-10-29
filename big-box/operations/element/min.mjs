@@ -2,7 +2,7 @@ import Algebra from '../algebra'
 import ElementOperation from './operation'
 
 export default class Minimum extends ElementOperation {
-    constructor(A, B, R, axes) {
+    constructor(A, B, R, { axes }) {
         super(A, B, R, axes, function () {
             return {
                 before: Algebra.assign(

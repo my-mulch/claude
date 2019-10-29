@@ -40,7 +40,7 @@ export default class ElementOperation {
         this.invoke = this.symbolic.method
     }
 
-    static resultant(A, B, R, axes = [...new Array(A.shape.length).keys()]) {
+    static resultant(A, B, R, { axes = [...new Array(A.shape.length).keys()] }) {
         return {
             type: A.type,
             shape: A.shape.filter(function (_, axis) {
