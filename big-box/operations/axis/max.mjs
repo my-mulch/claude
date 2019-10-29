@@ -3,7 +3,7 @@ import ElementOperation from './operation'
 
 export default class Maximum extends ElementOperation {
     constructor(A, B, R, { axes }) {
-        super(A, B, R, axes, function () {
+        super(A, B, R, { axes }, function () {
             return {
                 before: Algebra.assign(
                     this.variables.T,

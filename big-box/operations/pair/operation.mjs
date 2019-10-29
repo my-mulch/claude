@@ -7,8 +7,7 @@ export default class PairOperation {
         this.A = A
         this.B = B
         this.R = R
-
-        /** Symbolic PairOperation */
+        
         this.totalAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
         this.totalLoops = this.totalAxes.map(symbolicLoop, R)
 

@@ -3,24 +3,19 @@ import Algebra from '../algebra'
 import { symbolicLoop, symbolicIndex } from '../../operations/utils'
 
 export default class ElementOperation {
-    constructor(A, B, R, axes, operation) {
+    constructor(A, B, R, meta, operation = function () { return {} }) {
         this.A = A
         this.B = B
         this.R = R
 
-        /** Symbolic Element Operation */
         this.totalAxes = [...new Array(this.A.shape.length).keys()]
-        this.innerAxes = axes || [...new Array(this.A.shape.length).keys()]
-        this.outerAxes = this.totalAxes.filter(function (axis) {
-            return !this.innerAxes.includes(axis)
-        }, this)
+        this.innerAxes = meta.axes || [...new Array(this.A.shape.length).keys()]
+        this.outerAxes = this.totalAxes.filter(function (axis) { return !this.innerAxes.includes(axis) }, this)
 
         this.outerLoops = this.outerAxes.map(symbolicLoop, this.A)
         this.innerLoops = this.innerAxes.map(symbolicLoop, this.A)
 
-        this.innerSize = this.innerAxes.reduce(function (size, axis) {
-            return size * this.A.shape[axis]
-        }.bind(this), 1)
+        this.innerSize = this.innerAxes.reduce(function (size, axis) { return size * this.A.shape[axis] }.bind(this), 1)
 
         this.indices = {}
         this.indices.A = symbolicIndex('A', [...this.totalAxes.keys()], this.totalAxes.map(function (axis) { return `i${axis}` }))
