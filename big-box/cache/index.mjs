@@ -1,8 +1,6 @@
 
 export default class Cache extends Object {
     get(A, B, R, method) {
-        if (!B) B = { id: '' }
-        
         let value = this
 
         if (value = value[A.id])
@@ -11,17 +9,17 @@ export default class Cache extends Object {
                     if (value = value[method])
                         return value
 
-        return null
+        return {}
     }
 
-    set(A, B, R, method, value) {
-        if (!B) B = { id: '' }
+    set(operation) {
+        let value = this
+        
+        value[operation.A.id] = value[operation.A.id] || {}
+        value[operation.B.id] = value[operation.B.id] || {}
+        value[operation.R.id] = value[operation.R.id] || {}
+        value[operation.name] = operation
 
-        this[A.id] = this[A.id] || {}
-        this[A.id][B.id] = this[A.id][B.id] || {}
-        this[A.id][B.id][R.id] = this[A.id][B.id][R.id] || {}
-        this[A.id][B.id][R.id][method] = value
-
-        return value
+        return operation
     }
 }

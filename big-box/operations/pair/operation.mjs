@@ -32,7 +32,7 @@ export default class PairOperation {
         this.symbolic.operation = operation.call(this)
 
         this.symbolic.source = this.symbolicSource()
-        this.symbolic.method = new Function('A,B,R', `${this.symbolic.source}; return R`)
+        this.symbolic.method = new Function('A,B,R,args', `${this.symbolic.source}; return R`)
 
         this.invoke = this.symbolic.method
     }
@@ -60,15 +60,19 @@ export default class PairOperation {
 
     symbolicSource() {
         return [
+            this.symbolic.operation.before,
+            
             this.symbolic.totalLoops.join('\n'),
 
             this.symbolic.indices.A,
             this.symbolic.indices.B,
             this.symbolic.indices.R,
 
-            this.symbolic.operation,
+            this.symbolic.operation.inside,
 
             '}'.repeat(this.symbolic.totalLoopAxes.length),
+            
+            this.symbolic.operation.after,
 
         ].join('\n')
     }

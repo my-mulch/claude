@@ -19,15 +19,14 @@ for (const [name, Operation] of Object.entries(Operations)) {
             Tensor.tensor({ data: args.with })
         )
 
-        const axes = args.axes
-        const R = args.result || Tensor.zeros(Operation.resultant(A, B, null, axes))
+        const R = args.result || Tensor.zeros(Operation.resultant(A, B, null, args))
 
         let func = Tensor.cache.get(A, B, R, name)
 
         if (!func)
-            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, axes))
+            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, args))
 
-        return func.invoke()
+        return func.invoke(A, B, R, args)
     }
 
     /** Instance operations */
@@ -37,15 +36,14 @@ for (const [name, Operation] of Object.entries(Operations)) {
             Tensor.tensor({ data: args.with })
         )
 
-        const axes = args.axes
-        const R = args.result || Tensor.zeros(Operation.resultant(A, B, null, axes))
+        const R = args.result || Tensor.zeros(Operation.resultant(A, B, null, args))
 
         let func = Tensor.cache.get(A, B, R, name)
 
-        if (!func)
-            func = Tensor.cache.set(A, B, R, name, new Operation(A, B, R, axes))
+        if (!func.invoke)
+            func = Tensor.cache.set(new Operation(A, B, R, args))
 
-        return func.invoke(A, B, R)
+        return func.invoke(A, B, R, args)
     }
 }
 

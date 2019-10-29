@@ -7,7 +7,7 @@ export default class Type {
     }
 
     static promote(A, B) {
-        if (!B) return [A, B]
+        if (!B.type) return [A, B]
 
         const maxType = A.type.size > B.type.size ? A.type : B.type
 

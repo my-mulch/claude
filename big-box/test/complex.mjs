@@ -104,7 +104,8 @@ export default jest.suite(function () {
 
     })
 
-    /** Elementwise operations */
+
+    
 
 
     bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' })

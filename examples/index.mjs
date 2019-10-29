@@ -28,32 +28,34 @@ export const points = {
     mode: 'POINTS'
 }
 
+export const circle = {
+    vertices: bb
+        .zeros({ shape: [10000, 3], type: bb.ComplexFloat32 })
+        .assign({
+            region: [':', 0],
+            with: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' }).exp()
+        }),
+
+    colors: bb
+        .zeros({ shape: [10000, 3] })
+        .assign({ region: [':', ':2'], with: 255 }),
+
+    sizes: bb.ones({ shape: [10000, 1] }).multiply({ with: 1 }),
+    
+    mode: 'POINTS'
+}
+
 /** Image CUBE */
-    // const { shape, pixels, binary } = await myio.imread('http://localhost:3000/Users/trumanpurnell/Desktop/tahie.jpg')
+// const { shape, pixels, binary } = await myio.imread('http://localhost:3000/Users/trumanpurnell/Desktop/tahie.jpg')
 
-    // window.vertices = bb
-    //     .array({ with: pixels, type: Float32Array })
-    //     .reshape({ shape: [-1, 3] })
-
-
-    // window.colors = vertices.divide({ with: 255 })
-    // window.sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 1 })
+// window.vertices = bb
+//     .array({ with: pixels, type: Float32Array })
+//     .reshape({ shape: [-1, 3] })
 
 
-/** Cricle */
-    // window.circle = bb
-    //     .linspace({ start: 0, stop: 2 * Math.PI, num: 10000 })
-    //     .multiply({ with: 'i' })
+// window.colors = vertices.divide({ with: 255 })
+// window.sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 1 })
 
-    // window.vertices = bb.zeros({ shape: [10000, 3], type: bb.ComplexFloat32 })
-    // vertices.slice({ region: [':', 0] }).assign({ with: circle.exp() })
-
-    // window.colors = bb.zeros({ shape: [10000, 3] })
-    // colors.slice({ region: [':', ':2'] }).assign({ with: 255 })
-
-    // window.sizes = bb.ones({ shape: [10000, 1] }).multiply({ with: 1 })
-
-    // app.graphics.plot({ vertices, colors, sizes, mode: 'POINTS' })
 
 
 /** RGB CUBE */
