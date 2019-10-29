@@ -25,7 +25,7 @@ export default class Tensor {
 
     static tensor({ data, type }) {
         if (data === undefined)
-            return data
+            return {}
 
         if (data.constructor === Tensor)
             return data
@@ -44,7 +44,9 @@ export default class Tensor {
         return new Tensor({ header: new Header({ ...tensor }) })
     }
 
-    static zeros({ shape, type }) {
+    static zeros({ shape, type } = {}) {
+        if (!shape) return {}
+
         return new Tensor({ header: new Header({ shape, type }) })
     }
 

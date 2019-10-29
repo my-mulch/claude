@@ -25,19 +25,10 @@ export default jest.suite(function () {
     })
 
 
-    var axis = bb.linspace({
-        start: 0,
-        stop: 2 * Math.PI,
-        num: 10000
-    }).multiply({ with: 'i' })
-
-    var vertices = bb.zeros({ shape: [10000, 3] })
-    var vslice = vertices.slice({ region: [':', 0] })
-    vslice.assign({ with: axis.exp() })
 
 
 
-
+    this.expect(bb.zeros({ shape: [3, 3] }).assign({ region: [":", 1], with: 1 })).toEqual([["0", "1", "0"], ["0", "1", "0"], ["0", "1", "0"]])
     this.expect(bb.tensor({ data: `${Math.PI}i` }).exp()).toEqual("-1-8.742277657347586e-8i")
     this.expect(A.multiply({ with: 10 })).toEqual([['100+20i'], ['400+30i'], ['500+10i']])
     this.expect(K.multiply({ with: D })).toEqual([["0", "4+2i", "8+16i", "27+21i"], ["0", "9+2i", "8+8i", "12+24i"], ["0", "4+3i", "10+2i", "21+21i"], ["0", "7+3i", "6+10i", "21+9i"]])

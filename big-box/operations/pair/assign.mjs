@@ -4,9 +4,14 @@ import PairOperation from './operation'
 export default class Assignment extends PairOperation {
     constructor(A, B, R, { region = [] }) {
         super(A.slice({ region }), B, R = A, function () {
-            return Algebra.assign(
-                this.symbolic.variables.A,
-                this.symbolic.variables.B)
+            return {
+                before: 'R = A; A = A.slice({ region: args.region || [] })',
+                inside: Algebra.assign(
+                    this.symbolic.variables.A,
+                    this.symbolic.variables.B),
+            }
         })
     }
+
+    static resultant() { return {} }
 }
