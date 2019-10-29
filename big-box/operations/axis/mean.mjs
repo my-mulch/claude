@@ -6,16 +6,16 @@ export default class Mean extends ElementOperation {
         super(A, B, R, axes, function () {
             return {
                 before: Algebra.assign(
-                    this.symbolic.variables.T,
-                    Algebra.ZERO(this.symbolic.variables.T.length)),
+                    this.variables.T,
+                    Algebra.ZERO(this.variables.T.length)),
 
                 inside: Algebra.assign(
-                    this.symbolic.variables.T,
-                    this.symbolic.variables.A, '+='),
+                    this.variables.T,
+                    this.variables.A, '+='),
 
                 after: Algebra.assign(
-                    this.symbolic.variables.R,
-                    Algebra.scale(this.symbolic.variables.T, 1 / this.symbolic.innerSize)),
+                    this.variables.R,
+                    Algebra.scale(this.variables.T, 1 / this.innerSize)),
             }
         })
     }

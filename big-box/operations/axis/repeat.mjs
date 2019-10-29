@@ -4,12 +4,7 @@ import ElementOperation from './operation'
 export default class Repeat extends ElementOperation {
     constructor(A, B, R, { axes = [] }) {
         super(A, B, R, axes, function () {
-            return {
-                inside: Algebra.assign(
-                    this.symbolic.variables.R,
-                    Algebra.negate(this.symbolic.variables.A)
-                )
-            }
+            return {}
         })
     }
 
@@ -24,5 +19,5 @@ export default class Repeat extends ElementOperation {
             })
         }
     }
-    
+
 }

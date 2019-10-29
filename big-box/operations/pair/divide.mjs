@@ -6,9 +6,9 @@ export default class Division extends PairOperation {
         super(A, B, R, function () {
             return {
                 inside: Algebra.divide(
-                    this.symbolic.variables.R,
-                    this.symbolic.variables.A,
-                    this.symbolic.variables.B)
+                    this.variables.R,
+                    this.variables.A,
+                    this.variables.B)
             }
         })
     }

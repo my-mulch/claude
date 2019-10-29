@@ -3,9 +3,9 @@ export const symbolicLoop = function (axis) {
     return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
 }
 
-export const symbolicIndex = function (name, axes, parity) {
-    return axes.reduce(function (symbol, axis, i) {
-        return `${symbol} + ${name}.strides[${parity ? axis : i}] * i${axis}`
+export const symbolicIndex = function (name, strides, axes) {
+    return axes.reduce(function (symbol, _, i) {
+        return `${symbol} + ${name}.strides[${strides[i]}] * ${axes[i]}`
     }, `const ${name}Index = ${name}.offset`)
 }
 

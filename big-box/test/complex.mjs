@@ -21,7 +21,7 @@ export default jest.suite(function () {
     })
 
     const C = bb.tensor({
-        data: ["i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i"],
+        data: [["i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i", "i"]],
 
     })
 
@@ -108,7 +108,6 @@ export default jest.suite(function () {
     
 
 
-    bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' })
     this.expect(A.min()).toEqual('10+2i')
     this.expect(A.max()).toEqual('50+1i')
     this.expect(A.mean()).toEqual('33.33333206176758+2i')

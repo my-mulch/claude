@@ -7,8 +7,8 @@ export default class Assignment extends PairOperation {
             return {
                 before: 'R = A; A = A.slice({ region: args.region || [] })',
                 inside: Algebra.assign(
-                    this.symbolic.variables.A,
-                    this.symbolic.variables.B),
+                    this.variables.A,
+                    this.variables.B),
             }
         })
     }

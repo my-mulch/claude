@@ -6,8 +6,8 @@ export default class Subtraction extends PairOperation {
         super(A, B, R, function () {
             return {
                 inside: Algebra.assign(
-                    this.symbolic.variables.R,
-                    Algebra.subtract(this.symbolic.variables.A, this.symbolic.variables.B))
+                    this.variables.R,
+                    Algebra.subtract(this.variables.A, this.variables.B))
             }
         })
     }

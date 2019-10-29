@@ -6,16 +6,16 @@ export default class Sum extends ElementOperation {
         super(A, B, R, axes, function () {
             return {
                 before: Algebra.assign(
-                    this.symbolic.variables.T,
-                    Algebra.ZERO(this.symbolic.variables.T.length)),
+                    this.variables.T,
+                    Algebra.ZERO(this.variables.T.length)),
 
                 inside: Algebra.assign(
-                    this.symbolic.variables.T,
-                    this.symbolic.variables.A, '+='),
+                    this.variables.T,
+                    this.variables.A, '+='),
 
                 after: Algebra.assign(
-                    this.symbolic.variables.R,
-                    this.symbolic.variables.T),
+                    this.variables.R,
+                    this.variables.T),
             }
         })
     }

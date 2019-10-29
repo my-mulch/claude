@@ -1,13 +1,13 @@
 import Algebra from '../algebra'
 import ElementOperation from './operation'
 
-export default class Exponential extends ElementOperation {
+export default class Cosine extends ElementOperation {
     constructor(A, B, R, { axes = [] }) {
         super(A, B, R, axes, function () {
             return {
                 inside: Algebra.assign(
-                    this.symbolic.variables.R,
-                    Algebra.exp(this.symbolic.variables.A)
+                    this.variables.R,
+                    Algebra.cos(this.variables.A)
                 )
             }
         })

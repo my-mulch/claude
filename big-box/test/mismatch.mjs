@@ -27,6 +27,7 @@ export default jest.suite(function () {
     const J = bb.tensor({ data: [[1, 2], [3, 4]] })
 
 
+    
     this.expect(J.repeat({ num: 2 })).toEqual([1, 1, 2, 2, 3, 3, 4, 4])
     this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', ':2'], with: 255 })).toEqual([["255", "255", "0"]])
     this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', 1], with: 255 }).toString()).toEqual([["0", "255", "0"]])

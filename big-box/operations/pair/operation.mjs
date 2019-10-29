@@ -1,4 +1,3 @@
-
 import Algebra from '../algebra'
 import { __Math__ } from '../../resources'
 import { symbolicLoop, symbolicIndex, nonZeroAxes } from '../../operations/utils'
@@ -10,31 +9,30 @@ export default class PairOperation {
         this.R = R
 
         /** Symbolic PairOperation */
-        this.symbolic = {}
-        this.symbolic.totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
-        this.symbolic.totalLoops = this.symbolic.totalLoopAxes.map(symbolicLoop, R)
+        this.totalAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
+        this.totalLoops = this.totalAxes.map(symbolicLoop, R)
 
-        this.symbolic.axes = {}
-        this.symbolic.axes.R = this.symbolic.totalLoopAxes
-        this.symbolic.axes.A = this.symbolic.totalLoopAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
-        this.symbolic.axes.B = this.symbolic.totalLoopAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
+        this.axes = {}
+        this.axes.R = this.totalAxes
+        this.axes.A = this.totalAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
+        this.axes.B = this.totalAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
 
-        this.symbolic.indices = {}
-        this.symbolic.indices.R = symbolicIndex('R', this.symbolic.axes.R, true)
-        this.symbolic.indices.A = symbolicIndex('A', this.symbolic.axes.A, A.shape.length === R.shape.length)
-        this.symbolic.indices.B = symbolicIndex('B', this.symbolic.axes.B, B.shape.length === R.shape.length)
+        this.indices = {}
+        this.indices.R = symbolicIndex('R', this.axes.R, this.axes.R.map(function (axis) { return `i${axis}` }))
+        this.indices.A = symbolicIndex('A', this.axes.A, this.axes.A.map(function (axis) { return `i${axis}` }))
+        this.indices.B = symbolicIndex('B', this.axes.B, this.axes.B.map(function (axis) { return `i${axis}` }))
 
-        this.symbolic.variables = {}
-        this.symbolic.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
-        this.symbolic.variables.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
-        this.symbolic.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
+        this.variables = {}
+        this.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
+        this.variables.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
+        this.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
 
-        this.symbolic.operation = operation.call(this)
+        this.operation = operation.call(this)
 
-        this.symbolic.source = this.symbolicSource()
-        this.symbolic.method = new Function('A,B,R,args', `${this.symbolic.source}; return R`)
+        this.source = this.symbolicSource()
+        this.method = new Function('A,B,R,args', `${this.source}; return R`)
 
-        this.invoke = this.symbolic.method
+        this.invoke = this.method
     }
 
     static resultant(A, B) {
@@ -60,19 +58,19 @@ export default class PairOperation {
 
     symbolicSource() {
         return [
-            this.symbolic.operation.before,
-            
-            this.symbolic.totalLoops.join('\n'),
+            this.operation.before,
 
-            this.symbolic.indices.A,
-            this.symbolic.indices.B,
-            this.symbolic.indices.R,
+            this.totalLoops.join('\n'),
 
-            this.symbolic.operation.inside,
+            this.indices.A,
+            this.indices.B,
+            this.indices.R,
 
-            '}'.repeat(this.symbolic.totalLoopAxes.length),
-            
-            this.symbolic.operation.after,
+            this.operation.inside,
+
+            '}'.repeat(this.totalAxes.length),
+
+            this.operation.after,
 
         ].join('\n')
     }

@@ -17,20 +17,20 @@ export default class MatrixMultiplication {
         if (this.like > 50) {
             this.symbolic = {}
 
-            this.symbolic.indices = {}
-            this.symbolic.indices.A = `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`
-            this.symbolic.indices.B = `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`
-            this.symbolic.indices.R = `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`
+            this.indices = {}
+            this.indices.A = `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`
+            this.indices.B = `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`
+            this.indices.R = `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`
 
-            this.symbolic.variables = {}
-            this.symbolic.variables.A = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
-            this.symbolic.variables.B = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
-            this.symbolic.variables.R = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
+            this.variables = {}
+            this.variables.A = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
+            this.variables.B = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
+            this.variables.R = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
 
-            this.symbolic.source = this.symbolicSource()
-            this.symbolic.method = new Function('A,B,R', `${this.symbolic.source}; return R`)
+            this.source = this.symbolicSource()
+            this.method = new Function('A,B,R', `${this.source}; return R`)
             
-            this.invoke = this.symbolic.method
+            this.invoke = this.method
 
             return
         }
@@ -51,18 +51,18 @@ export default class MatrixMultiplication {
             `for (let r = 0; r < A.shape[0]; r++){`,
             `for (let c = 0; c < B.shape[1]; c++){`,
 
-            this.symbolic.indices.R,
+            this.indices.R,
             `R.data[RIndex] = 0`,
 
             `for (let s = 0; s < A.shape[1]; s++) {`,
 
-            this.symbolic.indices.A,
-            this.symbolic.indices.B,
+            this.indices.A,
+            this.indices.B,
 
             `${[
                 Algebra.assign(
-                    this.symbolic.variables.R,
-                    Algebra.multiply(this.symbolic.variables.A, this.symbolic.variables.B), '+='
+                    this.variables.R,
+                    Algebra.multiply(this.variables.A, this.variables.B), '+='
                 )
             ]}`,
 
