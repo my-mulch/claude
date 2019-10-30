@@ -1,6 +1,6 @@
 import Algebra from '../algebra'
 
-import { symbolicLoop, symbolicIndex } from '../../operations/utils'
+import { loop, index } from '../../operations/utils'
 
 export default class ElementOperation {
     constructor(A, B, R, meta, operation = function () { return {} }) {
@@ -8,18 +8,35 @@ export default class ElementOperation {
         this.B = B
         this.R = R
 
+        this.axes = {}
+        this.axes.A = [...new Array(this.A.shape.length).keys()]
+        this.axes.I = meta.axes || [...new Array(this.A.shape.length).keys()]
+        this.axes.R = this.axes.A.filter(function (axis) { return !this.axes.I.includes(axis) }, this)
+
         this.totalAxes = [...new Array(this.A.shape.length).keys()]
         this.innerAxes = meta.axes || [...new Array(this.A.shape.length).keys()]
         this.outerAxes = this.totalAxes.filter(function (axis) { return !this.innerAxes.includes(axis) }, this)
 
+        this.totalSize = this.totalAxes.reduce(function (size, axis, i) { return size.concat(size[i] * this.A.shape[axis]) }.bind(this), [1])
+        this.innerSize = this.innerAxes.reduce(function (size, axis) { return size * this.A.shape[axis] }.bind(this), 1)
+        this.outerSize = this.outerAxes.reduce(function (size, axis) { return size * this.A.shape[axis] }.bind(this), 1)
+
         this.outerLoops = this.outerAxes.map(symbolicLoop, this.A)
         this.innerLoops = this.innerAxes.map(symbolicLoop, this.A)
 
-        this.innerSize = this.innerAxes.reduce(function (size, axis) { return size * this.A.shape[axis] }.bind(this), 1)
-
         this.indices = {}
-        this.indices.A = symbolicIndex('A', [...this.totalAxes.keys()], this.totalAxes.map(function (axis) { return `i${axis}` }))
-        this.indices.R = symbolicIndex('R', [...this.outerAxes.keys()], this.outerAxes.map(function (axis) { return `i${axis}` }))
+
+        this.indices.A = symbolicIndex(
+            'let AIndex = A.offset',
+            [...this.totalAxes.keys()].map(function (axis) { return `A.strides[${axis}]` }),
+            this.totalAxes.map(function (axis) { return `i${axis}` })
+        )
+
+        this.indices.R = symbolicIndex(
+            'let RIndex = R.offset',
+            [...this.outerAxes.keys()].map(function (axis) { return `R.strides[${axis}]` }),
+            this.outerAxes.map(function (axis) { return `i${axis}` })
+        )
 
         this.variables = {}
         this.variables.T = Algebra.variable({ symbol: 'temp', index: '0', size: this.R.type.size })

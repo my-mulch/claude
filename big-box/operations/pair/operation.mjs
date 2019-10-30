@@ -1,13 +1,13 @@
 import Algebra from '../algebra'
 import { __Math__ } from '../../resources'
-import { symbolicLoop, symbolicIndex, nonZeroAxes } from '../../operations/utils'
+import { loop, index, nonZeroAxes } from '../../operations/utils'
 
 export default class PairOperation {
     constructor(A, B, R, operation) {
         this.A = A
         this.B = B
         this.R = R
-        
+
         this.totalAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
         this.totalLoops = this.totalAxes.map(symbolicLoop, R)
 
@@ -17,9 +17,24 @@ export default class PairOperation {
         this.axes.B = this.totalAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
 
         this.indices = {}
-        this.indices.R = symbolicIndex('R', this.axes.R, this.axes.R.map(function (axis) { return `i${axis}` }))
-        this.indices.A = symbolicIndex('A', this.axes.A, this.axes.A.map(function (axis) { return `i${axis}` }))
-        this.indices.B = symbolicIndex('B', this.axes.B, this.axes.B.map(function (axis) { return `i${axis}` }))
+
+        this.indices.R = symbolicIndex(
+            'let RIndex = R.offset',
+            this.axes.R.map(function (axis) { return `R.strides[${axis}]` }),
+            this.axes.R.map(function (axis) { return `i${axis}` })
+        )
+
+        this.indices.A = symbolicIndex(
+            'let AIndex = A.offset',
+            this.axes.A.map(function (axis) { return `A.strides[${axis}]` }),
+            this.axes.A.map(function (axis) { return `i${axis}` })
+        )
+
+        this.indices.B = symbolicIndex(
+            'let BIndex = B.offset',
+            this.axes.B.map(function (axis) { return `B.strides[${axis}]` }),
+            this.axes.B.map(function (axis) { return `i${axis}` })
+        )
 
         this.variables = {}
         this.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })

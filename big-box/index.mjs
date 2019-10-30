@@ -31,19 +31,12 @@ for (const [name, Operation] of Object.entries(Operations)) {
 
     /** Instance operations */
     Tensor.prototype[name] = function (args = {}) {
-        const [A, B] = Type.promote(
-            this,
-            Tensor.tensor({ data: args.with })
-        )
+        let operation = Operation.get(this, args.with, args.result, args)
 
-        const R = args.result || Tensor.zeros(Operation.resultant(A, B, null, args))
+        if (!operation)
+            operation = Operation.set(this, args.with, args.result, args)
 
-        let func = Tensor.cache.get(A, B, R, name)
-
-        if (!func.invoke)
-            func = Tensor.cache.set(new Operation(A, B, R, args))
-
-        return func.invoke(A, B, R, args)
+        return operation()
     }
 }
 

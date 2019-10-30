@@ -1,12 +1,22 @@
 
-export const symbolicLoop = function (axis) {
-    return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
+export const intersection = function (a1, a2) {
+    return a1.filter(function (value) { return a2.includes(value) })
 }
 
-export const symbolicIndex = function (name, strides, axes) {
-    return axes.reduce(function (symbol, _, i) {
-        return `${symbol} + ${name}.strides[${strides[i]}] * ${axes[i]}`
-    }, `const ${name}Index = ${name}.offset`)
+export const difference = function (a1, a2) {
+    return a1.filter(function (value) { return !a2.includes(value) })
+}
+
+export const loop = function (axes, tensor) {
+    return axes.map(function (axis) {
+        return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
+    }, tensor)
+}
+
+export const index = function (axes, tensor) {
+    return axes.reduce(function (index, axis) {
+        return `${index} + ${tensor.name}.strides[${axis}] * i${axis}`
+    }, `let ${tensor.index} = ${tensor.name}.offset`)
 }
 
 export const nonZeroAxes = function (_, index) {

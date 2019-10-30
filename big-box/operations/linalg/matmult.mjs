@@ -3,8 +3,6 @@ import Algebra from '../algebra'
 
 export default class MatrixMultiplication {
     constructor(A, B, R) {
-
-
         this.A = A
         this.B = B
         this.R = R
@@ -15,8 +13,6 @@ export default class MatrixMultiplication {
 
         /** Symbolic Matrix Multiplication */
         if (this.like > 50) {
-            this.symbolic = {}
-
             this.indices = {}
             this.indices.A = `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`
             this.indices.B = `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`
