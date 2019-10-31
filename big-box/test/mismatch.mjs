@@ -24,11 +24,11 @@ export default jest.suite(function () {
         ],
     })
 
-    const J = bb.tensor({ data: [[[1, 2], [3, 4]], [[5, 6], [7, 8]]] })
+    const J = bb.tensor({ data: [[1, 2], [3, 4]] })
 
 
 
-    this.expect(J.repeat({ count: 2, axes: [1] })).toEqual(["1", "1", "2", "2", "3", "3", "4", "4"])
+    this.expect(J.repeat({ count: 2 })).toEqual(["1", "1", "2", "2", "3", "3", "4", "4"])
     this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', ':2'], with: 255 })).toEqual([["255", "255", "0"]])
     this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', 1], with: 255 }).toString()).toEqual([["0", "255", "0"]])
     this.expect(bb.ones({ shape: [2, 2] }).negate()).toEqual([["-1", "-1"], ["-1", "-1"]])

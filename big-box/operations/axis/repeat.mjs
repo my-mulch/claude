@@ -34,17 +34,29 @@ export default class Repeat {
         /** Indices */
         this.indices = {}
         this.indices.A = index(this.axes.total, this.tensors.A)
+        this.indices.R = index(this.axes.inner.length ? this.axes.outer : [], this.tensors.R)
 
         /** Source */
         this.source = [
             ...this.loops.outer,
+
+            this.indices.R,
+
             ...this.loops.inner,
 
             this.indices.A,
-            'console.log(AIndex)',
 
-            '}'.repeat(this.loops.inner.length),
-            '}'.repeat(this.loops.outer.length),
+            `for(let r = 0; r < ${this.count}; r++){`,
+
+            `${this.axes.inner.length === 0
+                ? `console.log(RIndex + (${this.count} * i${this.axes.outer[this.axes.outer.length - 1]} + r) * R.strides[0])`
+                : `console.log(RIndex + (${this.count} * i${this.axes.inner[0]} + r) * R.strides[${this.axes.inner[0]}])`
+            }`,
+
+            `}`,
+            `}`.repeat(this.loops.inner.length),
+            `}`.repeat(this.loops.outer.length),
+
         ].join('\n')
 
         this.operation = new Function('A,B,R,args', this.source)
@@ -59,11 +71,12 @@ export default class Repeat {
             null,
             repeat.tensors.A,
             repeat.tensors.B,
-            repeat.tensors.R)
+            repeat.tensors.R,
+            meta)
     }
 
     resultant() {
-        if (!this.axes.length)
+        if (!this.axes.inner.length)
             return bb.zeros({
                 type: this.tensors.A.type,
                 shape: [this.tensors.A.size * this.count]
