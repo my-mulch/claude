@@ -7,10 +7,10 @@ export const difference = function (a1, a2) {
     return a1.filter(function (value) { return !a2.includes(value) })
 }
 
-export const loop = function (axes, tensor) {
+export const loop = function (axes, bounds) {
     return axes.map(function (axis) {
-        return `for(let i${axis}=0; i${axis} < ${this.shape[axis]}; i${axis}++){`
-    }, tensor)
+        return `for(let i${axis}=0; i${axis} < ${bounds[axis]}; i${axis}++){`
+    })
 }
 
 export const index = function (axes, tensor) {

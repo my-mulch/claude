@@ -28,13 +28,26 @@ export default class Repeat {
 
         /** Loops */
         this.loops = {}
-        this.loops.outer = loop(this.axes.outer, this.tensors.A)
-        this.loops.inner = loop(this.axes.inner, this.tensors.A)
+        this.loops.outer = loop(this.axes.outer, this.tensors.A.shape)
+        this.loops.inner = loop(this.axes.inner, this.tensors.A.shape)
 
         /** Indices */
         this.indices = {}
         this.indices.A = index(this.axes.total, this.tensors.A)
-        true
+
+        /** Source */
+        this.source = [
+            ...this.loops.outer,
+            ...this.loops.inner,
+
+            this.indices.A,
+            'console.log(AIndex)',
+
+            '}'.repeat(this.loops.inner.length),
+            '}'.repeat(this.loops.outer.length),
+        ].join('\n')
+
+        this.operation = new Function('A,B,R,args', this.source)
     }
 
     static get() { return null }
@@ -42,6 +55,11 @@ export default class Repeat {
     static set(A, B, R, meta) {
         const repeat = new Repeat(A, B, R, meta)
 
+        return repeat.operation.bind(
+            null,
+            repeat.tensors.A,
+            repeat.tensors.B,
+            repeat.tensors.R)
     }
 
     resultant() {
