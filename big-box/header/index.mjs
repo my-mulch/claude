@@ -35,6 +35,15 @@ export default class Header {
         return true
     }
 
+    static nonZeroAxes(_, index) {
+        const ri = this.shape.length - index - 1
+
+        if (ri < 0) return false
+        if (this.shape[ri] > 1) return true
+
+        return false
+    }
+
     static strides(shape, type, lastStride) {
         const strides = new Array(shape.length)
 

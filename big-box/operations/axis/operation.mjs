@@ -1,4 +1,4 @@
-import Algebra from '../algebra'
+import Algebra from '../../algebra'
 
 import { loop, index } from '../../operations/utils'
 

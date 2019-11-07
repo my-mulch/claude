@@ -1,4 +1,4 @@
-import Algebra from '../algebra'
+import Algebra from '../../algebra'
 import { __Math__ } from '../../resources'
 import { loop, index, nonZeroAxes } from '../../operations/utils'
 

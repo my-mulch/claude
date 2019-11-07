@@ -10,6 +10,24 @@ export default class Tensor {
         this.data = this.type.array(data || this.size)
     }
 
+    static intersection(a1, a2) {
+        if (a1.constructor === Tensor && a2.constructor === Tensor) {
+            a1 = a1.toRawFlat()
+            a2 = a2.toRawFlat()
+        }
+
+        return a1.filter(function (value) { return a2.includes(value) })
+    }
+
+    static difference(a1, a2) {
+        if (a1.constructor === Tensor && a2.constructor === Tensor) {
+            a1 = a1.toRawFlat()
+            a2 = a2.toRawFlat()
+        }
+
+        return a1.filter(function (value) { return !a2.includes(value) })
+    }
+
     static shape(array, shape = []) {
         if (array.constructor === Tensor)
             return array.shape
@@ -152,6 +170,8 @@ export default class Tensor {
             return this.toRaw(i * this.strides[depth] + index, depth + 1)
         }, this)
     }
+
+    toRawFlat() { return this.toRaw().flat(Number.POSITIVE_INFINITY) }
 
     valueOf() { return this.data[this.offset] }
 

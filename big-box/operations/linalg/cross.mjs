@@ -1,5 +1,5 @@
 
-import Algebra from '../algebra'
+import Algebra from '../../algebra'
 
 export default class CrossProduct {
     constructor(A, B, R) {
