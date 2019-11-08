@@ -30,12 +30,12 @@ export default jest.suite(function () {
 
     this.expect(new bb.repeat({ of: J, count: 2, axes: [0] }).invoke()).toEqual([["1", "2"], ["1", "2"], ["3", "4"], ["3", "4"]])
     this.expect(new bb.assignment({ of: bb.zeros({ shape: [1, 3] }), region: [':', ':2'], with: 255 }).invoke()).toEqual([["255", "255", "0"]])
-    this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', 1], with: 255 }).toString()).toEqual([["0", "255", "0"]])
-    this.expect(bb.ones({ shape: [2, 2] }).negate()).toEqual([["-1", "-1"], ["-1", "-1"]])
-    this.expect(bb.zeros({ shape: [3, 3] }).assign({ region: [":", 1], with: 1 })).toEqual([["0", "1", "0"], ["0", "1", "0"], ["0", "1", "0"]])
-    this.expect(bb.tensor({ data: `${Math.PI}i` }).exp()).toEqual("-1-8.742277657347586e-8i")
-    this.expect(A.multiply({ with: 10 })).toEqual([['100+20i'], ['400+30i'], ['500+10i']])
-    this.expect(K.multiply({ with: D })).toEqual([["0", "4+2i", "8+16i", "27+21i"], ["0", "9+2i", "8+8i", "12+24i"], ["0", "4+3i", "10+2i", "21+21i"], ["0", "7+3i", "6+10i", "21+9i"]])
+    this.expect(new bb.assignment({ of: bb.zeros({ shape: [1, 3] }), region: [':', 1], with: 255 }).invoke()).toEqual([["0", "255", "0"]])
+    this.expect(new bb.negation({ of: bb.ones({ shape: [2, 2] }) }).invoke()).toEqual([["-1", "-1"], ["-1", "-1"]])
+    this.expect(new bb.assignment({ of: bb.zeros({ shape: [3, 3] }), region: [":", 1], with: 1 }).invoke()).toEqual([["0", "1", "0"], ["0", "1", "0"], ["0", "1", "0"]])
+    this.expect(new bb.exponential({ of: `${Math.PI}i` }).invoke()).toEqual("-1-8.742277657347586e-8i")
+    this.expect(new bb.multiplication({ of: A, with: 10 }).invoke()).toEqual([['100+20i'], ['400+30i'], ['500+10i']])
+    this.expect(new bb.multiplication({ of: K, with: D }).invoke()).toEqual([["0", "4+2i", "8+16i", "27+21i"], ["0", "9+2i", "8+8i", "12+24i"], ["0", "4+3i", "10+2i", "21+21i"], ["0", "7+3i", "6+10i", "21+9i"]])
 
     console.log('\n\n-------- End Mismatch Suite --------\n\n')
 })

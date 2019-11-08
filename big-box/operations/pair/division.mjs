@@ -1,23 +1,23 @@
 import Algebra from '../../algebra'
 import PairOperation from './operation'
 
-export default class Assignment extends PairOperation {
+export default class Division extends PairOperation {
     constructor(args) {
-        const A = args.of.slice({ region: args.region || [] })
-        super({ ...args, of: A, result: A })
-
-        this.tensors.original = args.of
+        super(args)
 
         this.invoke = new Function([
             this.loops.total.join('\n'),
 
             Object.values(this.indices).join('\n'),
 
-            Algebra.assign(this.variables.A, this.variables.B),
+            Algebra.divide(
+                this.variables.R,
+                this.variables.A,
+                this.variables.B),
 
             '}'.repeat(this.axes.total.length),
 
-            'return this.tensors.original',
+            'return this.tensors.R',
         ].join('\n')).bind(this)
     }
 }
