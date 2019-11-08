@@ -4,11 +4,11 @@ import {
     PARTIAL_SLICE, NUMBER, SLICE_CHARACTER, // slice resources
 } from '../resources'
 
-import Type from '../type'
+import Types from '../types'
 
 export default class Header {
     constructor(opts) {
-        this.type = opts.type !== undefined ? opts.type : Type.Float32
+        this.type = opts.type !== undefined ? opts.type : Types.Float32
         this.shape = opts.shape !== undefined ? opts.shape : []
         this.offset = opts.offset !== undefined ? opts.offset : 0
         this.contig = opts.contig !== undefined ? opts.contig : true

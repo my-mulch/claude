@@ -1,5 +1,5 @@
 import util from 'util'
-import Type from '../type'
+import Types from '../types'
 import Header from '../header'
 
 import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER, PRECISION } from '../resources'
@@ -32,7 +32,7 @@ export default class Tensor {
         if (array.constructor === Tensor)
             return array.shape
 
-        if (Type.isTypedArray(array))
+        if (Types.isTypedArray(array))
             return [array.length]
 
         if (array.constructor !== Array)
@@ -53,7 +53,7 @@ export default class Tensor {
         if (data.constructor === String || data.constructor === Number || data.constructor === Array)
             data = [data].flat(Number.POSITIVE_INFINITY)
 
-        type = type || Type.resolve(data[0])
+        type = type || Types.resolve(data[0])
 
         return new Tensor({ data, header: new Header({ type, shape }) })
     }

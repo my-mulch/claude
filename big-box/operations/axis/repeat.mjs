@@ -4,14 +4,14 @@ import Algebra from '../../algebra'
 import Template from '../../template'
 
 export default class Repeat {
-    constructor(A, B, R, { axes, count }) {
+    constructor(args) {
         /** Repeat count */
-        this.count = count || 1
+        this.count = args.count || 1
 
         /** Axes */
         this.axes = {}
-        this.axes.inner = axes || []
-        this.axes.total = [...A.shape.keys()]
+        this.axes.inner = args.axes || []
+        this.axes.total = [...args.of.shape.keys()]
         this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
         this.axes.order = this.axes.outer.concat(this.axes.inner)
         this.axes.last = this.axes.order[this.axes.order.length - 1]
@@ -19,8 +19,8 @@ export default class Repeat {
 
         /** Tensors */
         this.tensors = {}
-        this.tensors.A = A
-        this.tensors.R = R || this.resultant()
+        this.tensors.A = args.of
+        this.tensors.R = args.result || this.resultant()
 
         /** Dimensions */
         this.dimensions = {}
@@ -49,12 +49,12 @@ export default class Repeat {
         this.indices.A = Template.index('AIndex', this.scalars.A, this.strides.A, this.tensors.A.offset)
         this.indices.R = Template.index('RIndex', this.scalars.R, this.strides.R, this.tensors.R.offset)
 
+        /** Variables */
         this.variables = {}
-        this.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.tensors.A.type.size })
-        this.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.tensors.R.type.size })
+        this.variables.A = Algebra.variable({ symbol: 'this.tensors.A.data', index: 'AIndex', size: this.tensors.A.type.size })
+        this.variables.R = Algebra.variable({ symbol: 'this.tensors.R.data', index: 'RIndex', size: this.tensors.R.type.size })
 
-        /** Source */
-        this.source = [
+        this.invoke = new Function('', [
             ...this.loops.outer,
             ...this.loops.inner,
 
@@ -70,24 +70,9 @@ export default class Repeat {
             `}`.repeat(this.loops.inner.length),
             `}`.repeat(this.loops.outer.length),
 
-            `return R`
+            `return this.tensors.R`
 
-        ].join('\n')
-
-        this.operation = new Function('A,B,R,args', this.source)
-    }
-
-    static get() { return null }
-
-    static set(A, B, R, meta) {
-        const repeat = new Repeat(A, B, R, meta)
-
-        return repeat.operation.bind(
-            null,
-            repeat.tensors.A,
-            repeat.tensors.B,
-            repeat.tensors.R,
-            meta)
+        ].join('\n')).bind(this)
     }
 
     resultant() {
@@ -98,5 +83,4 @@ export default class Repeat {
             }, this)
         })
     }
-
 }
