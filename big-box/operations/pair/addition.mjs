@@ -12,7 +12,7 @@ export default class Addition extends PairOperation {
 
             Algebra.assign(
                 this.variables.R,
-                Algebra.addition(this.variables.A, this.variables.B)),
+                Algebra.add(this.variables.A, this.variables.B)),
 
             '}'.repeat(this.axes.total.length),
 

@@ -20,14 +20,14 @@ export default class MatrixMultiplication {
             this.indices.R = `const RIndex = r * this.tensors.R.strides[0] + c * this.tensors.R.strides[1] + this.tensors.R.offset`
 
             this.variables = {}
-            this.variables.A = Algebra.variable({ symbol: 'this.tensors.A.data', size: A.type.size, index: 'AIndex' })
-            this.variables.B = Algebra.variable({ symbol: 'this.tensors.B.data', size: B.type.size, index: 'BIndex' })
-            this.variables.R = Algebra.variable({ symbol: 'this.tensors.R.data', size: R.type.size, index: 'RIndex' })
+            this.variables.A = Algebra.variable({ symbol: 'this.tensors.A.data', size: this.tensors.A.type.size, index: 'AIndex' })
+            this.variables.B = Algebra.variable({ symbol: 'this.tensors.B.data', size: this.tensors.B.type.size, index: 'BIndex' })
+            this.variables.R = Algebra.variable({ symbol: 'this.tensors.R.data', size: this.tensors.R.type.size, index: 'RIndex' })
 
             this.symbolic = {}
             this.symbolic.source = this.symbolicSource()
 
-            this.invoke = new Function(`${this.source}; return this.tensors.R`).bind(this)
+            this.invoke = new Function(`${this.symbolic.source}; return this.tensors.R`).bind(this)
             return
         }
 
@@ -51,13 +51,13 @@ export default class MatrixMultiplication {
 
     symbolicSource() {
         return [
-            `for (let r = 0; r < A.shape[0]; r++){`,
-            `for (let c = 0; c < B.shape[1]; c++){`,
+            `for (let r = 0; r < this.tensors.A.shape[0]; r++){`,
+            `for (let c = 0; c < this.tensors.B.shape[1]; c++){`,
 
             this.indices.R,
             `this.tensors.R.data[RIndex] = 0`,
 
-            `for (let s = 0; s < A.shape[1]; s++) {`,
+            `for (let s = 0; s < this.tensors.A.shape[1]; s++) {`,
 
             this.indices.A,
             this.indices.B,

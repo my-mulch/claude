@@ -1,6 +1,5 @@
 import {
     __Math__, // misc resources
-    TYPE, SHAPE, OFFSET, CONTIG, STRIDES, // init resources
     PARTIAL_SLICE, NUMBER, SLICE_CHARACTER, // slice resources
 } from '../resources'
 
@@ -14,7 +13,6 @@ export default class Header {
         this.contig = opts.contig !== undefined ? opts.contig : true
         this.strides = opts.strides !== undefined ? opts.strides : Header.strides(this.shape, this.type)
 
-        this.id = `${this.type.size}|${this.shape}|${this.strides}|${this.offset}`
         this.size = this.shape.reduce(__Math__.multiply, 1)
         this.lastStride = this.strides[this.strides.length - 1]
     }

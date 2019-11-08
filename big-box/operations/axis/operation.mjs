@@ -16,15 +16,15 @@ export default class ElementOperation {
         this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
 
         this.axes.A = this.axes.total
-        this.axes.R = this.axes.inner
+        this.axes.R = this.axes.outer
 
         /** Result */
         this.tensors.R = args.result || this.resultant()
 
         /** Dimensions */
         this.dimensions = {}
-        this.dimensions.A = Header.strides(this.tensors.A.shape, this.tensors.A.type)
-        this.dimensions.R = Header.strides(this.tensors.R.shape, this.tensors.R.type)
+        this.dimensions.inner = this.axes.inner.reduce(function (size, axis) { return size * this.tensors.A.shape[axis] }.bind(this), 1)
+        this.dimensions.outer = this.axes.inner.reduce(function (size, axis) { return size * this.tensors.A.shape[axis] }.bind(this), 1)
 
         /** Loops */
         this.loops = {}
@@ -41,7 +41,7 @@ export default class ElementOperation {
         /** Scalars */
         this.scalars = {}
         this.scalars.A = this.axes.total.map(Template.prefix)
-        this.scalars.R = (this.axes.inner.length ? this.axes.inner : this.axes.total).map(Template.prefix)
+        this.scalars.R = (this.axes.outer.length ? this.axes.outer : this.axes.total).map(Template.prefix)
 
         /** Indices */
         this.indices = {}
