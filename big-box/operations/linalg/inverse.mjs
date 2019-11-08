@@ -1,38 +1,39 @@
+import Tensor from '../../tensor'
 import Algebra from '../../algebra'
-
-
 import Adjugate from './adjugate'
 import Determinant from './determinant'
 
 export default class Inverse {
-    constructor(A, B, R) {
+    constructor(args) {
+        this.tensors = {}
+        this.tensors.A = Tensor.tensor({ data: args.of })
+        this.tensors.R = args.result || this.resultant()
 
-
-        this.A = A
-        this.B = B
-        this.R = R
-
-        this.rows = this.A.shape[0]
-        this.cols = this.A.shape[1]
+        this.rows = this.tensors.A.shape[0]
+        this.cols = this.tensors.A.shape[1]
         this.size = this.rows
 
         /** Pointwise Inverse */
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource()
-        this.pointwise.method = new Function('A,B,R', `
-            const temp = new Array(${this.A.type.size})
-            const determinant = new Array(${this.A.type.size})
-            ${this.pointwise.source.join('\n')};
-            return R
-        `)
 
-        this.invoke = this.pointwise.method
+        this.invoke = new Function(`
+            const temp = new Array(${this.tensors.A.type.size})
+            const determinant = new Array(${this.tensors.A.type.size})
+            ${this.pointwise.source.join('\n')};
+            return this.tensors.R`
+        ).bind(this)
     }
 
-    static resultant(A) { return { shape: A.shape, type: A.type } }
+    resultant() {
+        return Tensor.zeros({
+            shape: this.tensors.A.shape,
+            type: this.tensors.A.type
+        })
+    }
 
     pointwiseSource() {
-        this.adjugate = new Adjugate(this.A, this.B, this.R)
+        this.adjugate = new Adjugate({ of: this.tensors.A, result: this.tensors.R })
         this.determinant = Determinant.fromAdjugate(this.adjugate)
 
         const operations = []
@@ -40,19 +41,19 @@ export default class Inverse {
             for (let c = 0; c < this.size; c++) {
                 const D = Algebra.variable({
                     symbol: 'determinant',
-                    size: this.A.type.size,
+                    size: this.tensors.A.type.size,
                     index: 0
                 })
 
                 const R = Algebra.variable({
-                    index: this.R.header.flatIndex([r, c]),
-                    symbol: 'R.data',
-                    size: this.R.type.size,
+                    index: this.tensors.R.header.flatIndex([r, c]),
+                    symbol: 'this.tensors.R.data',
+                    size: this.tensors.R.type.size,
                 })
 
                 const T = Algebra.variable({
                     symbol: 'temp',
-                    size: this.A.type.size,
+                    size: this.tensors.A.type.size,
                     index: 0
                 })
 

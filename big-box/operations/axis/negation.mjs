@@ -1,7 +1,7 @@
 import Algebra from '../../algebra'
-import ElementOperation from './operation'
+import AxisOperation from './operation'
 
-export default class Negatation extends ElementOperation {
+export default class Negatation extends AxisOperation {
     constructor(args) {
         super(args)
 

@@ -1,26 +1,33 @@
+import Tensor from '../../tensor'
 import Algebra from '../../algebra'
-
 import Determinant from './determinant'
-
 import { indexTemplate } from './utils.mjs'
 
-export default class Adjugate  {
-    constructor(A, B, R) {
-        this.A = A
-        this.B = B
-        this.R = R
-        this.size = this.A.shape[0]
+export default class Adjugate {
+    constructor(args) {
+        this.tensors = {}
+        this.tensors.A = Tensor.tensor({ data: args.of })
+        this.tensors.R = args.result || this.resultant()
 
-        this.determinant = new Determinant(A, B, R)
+        this.size = this.tensors.A.shape[0]
+
+        this.determinant = new Determinant(args)
 
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource()
-        this.pointwise.method = new Function('A,B,R', `${this.pointwise.source}; return R`)
 
-        this.invoke = this.pointwise.method
+        this.invoke = new Function([
+            this.pointwise.source.join('\n'),
+            'return this.tensors.R'
+        ].join('\n')).bind(this)
     }
 
-    static resultant(A) { return { shape: A.shape, type: A.type } }
+    resultant() {
+        return Tensor.zeros({
+            shape: this.tensors.A.shape,
+            type: this.tensors.A.type
+        })
+    }
 
     pointwiseSource() {
         const adjugate = []
@@ -33,9 +40,9 @@ export default class Adjugate  {
                 const cofactor = sign < 0 ? Algebra.negate(determinant) : determinant
 
                 adjugate.push(Algebra.assign(Algebra.variable({
-                    index: this.R.header.flatIndex([r, c]),
-                    symbol: 'R.data',
-                    size: this.R.type.size
+                    index: this.tensors.R.header.flatIndex([r, c]),
+                    symbol: 'this.tensors.R.data',
+                    size: this.tensors.R.type.size
                 }), cofactor))
             }
         }
