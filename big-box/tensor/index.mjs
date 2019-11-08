@@ -10,6 +10,10 @@ export default class Tensor {
         this.data = this.type.array(data || this.size)
     }
 
+    static keys(count) {
+        return [...new Array(count).keys()]
+    }
+
     static intersection(a1, a2) {
         if (a1.constructor === Tensor && a2.constructor === Tensor) {
             a1 = a1.toRawFlat()

@@ -54,7 +54,7 @@ export default class Repeat {
         this.variables.A = Algebra.variable({ symbol: 'this.tensors.A.data', index: 'AIndex', size: this.tensors.A.type.size })
         this.variables.R = Algebra.variable({ symbol: 'this.tensors.R.data', index: 'RIndex', size: this.tensors.R.type.size })
 
-        this.invoke = new Function('', [
+        this.invoke = new Function([
             ...this.loops.outer,
             ...this.loops.inner,
 

@@ -1,91 +1,77 @@
+import Tensor from '../../tensor'
+import Header from '../../header'
 import Algebra from '../../algebra'
+import Template from '../../template'
 import { __Math__ } from '../../resources'
-import { loop, index, nonZeroAxes } from '../../operations/utils'
 
 export default class PairOperation {
-    constructor(A, B, R, operation) {
-        this.A = A
-        this.B = B
-        this.R = R
+    constructor(args) {
+        /** Tensors */
+        this.tensors = {}
+        this.tensors.A = Tensor.tensor({ data: args.of })
+        this.tensors.B = Tensor.tensor({ data: args.with })
+        this.tensors.R = args.result || this.resultant()
 
-        this.totalAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
-        this.totalLoops = this.totalAxes.map(symbolicLoop, R)
-
+        /** Axes */
         this.axes = {}
-        this.axes.R = this.totalAxes
-        this.axes.A = this.totalAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
-        this.axes.B = this.totalAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
+        this.axes.total = Tensor.keys(__Math__.max(
+            this.tensors.A.shape.length,
+            this.tensors.B.shape.length))
 
+        this.axes.R = this.axes.total
+        this.axes.A = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.tensors.A).reverse()
+        this.axes.B = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.tensors.B).reverse()
+
+        /** Loops */
+        this.loops = {}
+        this.loops.total = Template.loopAxes(this.axes.total, this.tensors.R)
+
+        /** Strides */
+        this.strides = {}
+        this.strides.A = this.tensors.A.strides
+        this.strides.B = this.tensors.B.strides
+        this.strides.R = this.tensors.R.strides
+
+        /** Scalars */
+        this.scalars = {}
+        this.scalars.A = this.axes.total.map(function (axis) { return this.axes.A.includes(axis) ? Template.prefix(axis) : 0 }, this)
+        this.scalars.B = this.axes.total.map(function (axis) { return this.axes.B.includes(axis) ? Template.prefix(axis) : 0 }, this)
+        this.scalars.R = this.axes.total.map(function (axis) { return this.axes.R.includes(axis) ? Template.prefix(axis) : 0 }, this)
+
+        /** Indices */
         this.indices = {}
+        this.indices.A = Template.index('AIndex', this.scalars.A, this.strides.A, this.tensors.A.offset)
+        this.indices.B = Template.index('BIndex', this.scalars.B, this.strides.B, this.tensors.B.offset)
+        this.indices.R = Template.index('RIndex', this.scalars.R, this.strides.R, this.tensors.R.offset)
 
-        this.indices.R = symbolicIndex(
-            'let RIndex = R.offset',
-            this.axes.R.map(function (axis) { return `R.strides[${axis}]` }),
-            this.axes.R.map(function (axis) { return `i${axis}` })
-        )
-
-        this.indices.A = symbolicIndex(
-            'let AIndex = A.offset',
-            this.axes.A.map(function (axis) { return `A.strides[${axis}]` }),
-            this.axes.A.map(function (axis) { return `i${axis}` })
-        )
-
-        this.indices.B = symbolicIndex(
-            'let BIndex = B.offset',
-            this.axes.B.map(function (axis) { return `B.strides[${axis}]` }),
-            this.axes.B.map(function (axis) { return `i${axis}` })
-        )
-
+        /** Variables */
         this.variables = {}
-        this.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
-        this.variables.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
-        this.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
-
-        this.operation = operation.call(this)
-
-        this.source = this.symbolicSource()
-        this.method = new Function('A,B,R,args', `${this.source}; return R`)
-
-        this.invoke = this.method
+        this.variables.A = Algebra.variable({ symbol: 'this.tensors.A.data', index: 'AIndex', size: this.tensors.A.type.size })
+        this.variables.B = Algebra.variable({ symbol: 'this.tensors.B.data', index: 'BIndex', size: this.tensors.B.type.size })
+        this.variables.R = Algebra.variable({ symbol: 'this.tensors.R.data', index: 'RIndex', size: this.tensors.R.type.size })
     }
 
-    static resultant(A, B) {
-        const maxLen = __Math__.max(A.shape.length, B.shape.length)
+    resultant() {
+        const maxLen = __Math__.max(
+            this.tensors.A.shape.length,
+            this.tensors.B.shape.length)
+
         const shape = []
 
         for (let i = 0; i < maxLen; i++) {
-            const bi = B.shape.length - 1 - i
-            const ai = A.shape.length - 1 - i
+            const bi = this.tensors.B.shape.length - 1 - i
+            const ai = this.tensors.A.shape.length - 1 - i
 
-            if (B.shape[bi] === 1 || B.shape[bi] === undefined)
-                shape.push(A.shape[ai])
+            if (this.tensors.B.shape[bi] === 1 || this.tensors.B.shape[bi] === undefined)
+                shape.push(this.tensors.A.shape[ai])
 
-            else if (A.shape[ai] === 1 || A.shape[ai] === undefined)
-                shape.push(B.shape[bi])
+            else if (this.tensors.A.shape[ai] === 1 || this.tensors.A.shape[ai] === undefined)
+                shape.push(this.tensors.B.shape[bi])
 
-            else if (B.shape[bi] === A.shape[ai])
-                shape.push(A.shape[ai])
+            else if (this.tensors.B.shape[bi] === this.tensors.A.shape[ai])
+                shape.push(this.tensors.A.shape[ai])
         }
 
-        return { shape: shape.reverse(), type: A.type }
-    }
-
-    symbolicSource() {
-        return [
-            this.operation.before,
-
-            this.totalLoops.join('\n'),
-
-            this.indices.A,
-            this.indices.B,
-            this.indices.R,
-
-            this.operation.inside,
-
-            '}'.repeat(this.totalAxes.length),
-
-            this.operation.after,
-
-        ].join('\n')
+        return Tensor.zeros({ shape: shape.reverse(), type: this.tensors.A.type })
     }
 }
