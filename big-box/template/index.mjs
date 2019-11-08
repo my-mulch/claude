@@ -16,7 +16,7 @@ export default class Template {
     static prefix(axis) { return `i${axis}` }
 
     static index(variable, scalars, strides, offset) {
-        return new Array(scalars.length).fill(null).reduce(function (index, _, i) {
+        return new Array(strides.length).fill(null).reduce(function (index, _, i) {
             return `${index} + ${strides[i]} * ${scalars[i]}`
         }, `const ${variable} = ${offset}`)
     }

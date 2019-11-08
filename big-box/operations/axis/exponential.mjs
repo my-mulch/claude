@@ -1,7 +1,7 @@
 import Algebra from '../../algebra'
-import ElementOperation from './operation'
+import AxisOperation from './operation'
 
-export default class Sine extends ElementOperation {
+export default class Exponential extends AxisOperation {
     constructor(args) {
         super(args)
 
@@ -13,7 +13,7 @@ export default class Sine extends ElementOperation {
 
             Algebra.assign(
                 this.variables.R,
-                Algebra.sin(this.variables.A)
+                Algebra.exp(this.variables.A)
             ),
 
             '}'.repeat(this.axes.total.length),

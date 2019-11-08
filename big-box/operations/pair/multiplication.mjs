@@ -1,25 +1,22 @@
 import Algebra from '../../algebra'
-import ElementOperation from './operation'
+import PairOperation from './operation'
 
-export default class Sine extends ElementOperation {
+export default class Multiplication extends PairOperation {
     constructor(args) {
         super(args)
 
         this.invoke = new Function([
             this.loops.total.join('\n'),
 
-            this.indices.A,
-            this.indices.R,
+            Object.values(this.indices).join('\n'),
 
             Algebra.assign(
                 this.variables.R,
-                Algebra.sin(this.variables.A)
-            ),
+                Algebra.multiply(this.variables.A, this.variables.B)),
 
             '}'.repeat(this.axes.total.length),
 
-            `return this.tensors.R`
+            'return this.tensors.R',
         ].join('\n')).bind(this)
     }
 }
-

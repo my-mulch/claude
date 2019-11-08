@@ -1,66 +1,71 @@
+import Tensor from '../../tensor'
 import Algebra from '../../algebra'
 
-
 export default class MatrixMultiplication {
-    constructor(A, B, R) {
-        this.A = A
-        this.B = B
-        this.R = R
+    constructor(args) {
+        this.tensors = {}
+        this.tensors.A = Tensor.tensor({ data: args.of })
+        this.tensors.B = Tensor.tensor({ data: args.with })
+        this.tensors.R = args.result || this.resultant()
 
-        this.rows = this.A.shape[0]
-        this.cols = this.B.shape[1]
-        this.like = this.A.shape[1]
+        this.rows = this.tensors.A.shape[0]
+        this.cols = this.tensors.B.shape[1]
+        this.like = this.tensors.A.shape[1]
 
         /** Symbolic Matrix Multiplication */
         if (this.like > 50) {
             this.indices = {}
-            this.indices.A = `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`
-            this.indices.B = `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`
-            this.indices.R = `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`
+            this.indices.A = `const AIndex = r * this.tensors.A.strides[0] + s * this.tensors.A.strides[1] + this.tensors.A.offset`
+            this.indices.B = `const BIndex = r * this.tensors.B.strides[0] + s * this.tensors.B.strides[1] + this.tensors.B.offset`
+            this.indices.R = `const RIndex = r * this.tensors.R.strides[0] + c * this.tensors.R.strides[1] + this.tensors.R.offset`
 
             this.variables = {}
-            this.variables.A = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
-            this.variables.B = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
-            this.variables.R = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
+            this.variables.A = Algebra.variable({ symbol: 'this.tensors.A.data', size: this.tensors.A.type.size, index: 'AIndex' })
+            this.variables.B = Algebra.variable({ symbol: 'this.tensors.B.data', size: this.tensors.B.type.size, index: 'BIndex' })
+            this.variables.R = Algebra.variable({ symbol: 'this.tensors.R.data', size: this.tensors.R.type.size, index: 'RIndex' })
 
-            this.source = this.symbolicSource()
-            this.method = new Function('A,B,R', `${this.source}; return R`)
-            
-            this.invoke = this.method
+            this.symbolic = {}
+            this.symbolic.source = this.symbolicSource()
 
+            this.invoke = new Function(`${this.symbolic.source}; return this.tensors.R`).bind(this)
             return
         }
 
         /** Pointwise Matrix Multiplication */
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource()
-        this.pointwise.method = new Function('A,B,R', `${this.pointwise.source}; return R`)
 
-        this.invoke = this.pointwise.method
+        this.invoke = new Function(`${this.pointwise.source}; return this.tensors.R`).bind(this)
     }
 
-    static resultant(A, B) { return { shape: [A.shape[0], B.shape[1]], type: A.type } }
+    resultant() {
+        return Tensor.zeros({
+            type: this.tensors.A.type,
+            shape: [
+                this.tensors.A.shape[0],
+                this.tensors.B.shape[1]
+            ]
+        })
+    }
 
 
     symbolicSource() {
         return [
-            `for (let r = 0; r < A.shape[0]; r++){`,
-            `for (let c = 0; c < B.shape[1]; c++){`,
+            `for (let r = 0; r < this.tensors.A.shape[0]; r++){`,
+            `for (let c = 0; c < this.tensors.B.shape[1]; c++){`,
 
             this.indices.R,
-            `R.data[RIndex] = 0`,
+            `this.tensors.R.data[RIndex] = 0`,
 
-            `for (let s = 0; s < A.shape[1]; s++) {`,
+            `for (let s = 0; s < this.tensors.A.shape[1]; s++) {`,
 
             this.indices.A,
             this.indices.B,
 
-            `${[
-                Algebra.assign(
-                    this.variables.R,
-                    Algebra.multiply(this.variables.A, this.variables.B), '+='
-                )
-            ]}`,
+            Algebra.assign(
+                this.variables.R,
+                Algebra.multiply(this.variables.A, this.variables.B), '+='
+            ),
 
             `}}}`,
         ].join('\n')
@@ -73,20 +78,20 @@ export default class MatrixMultiplication {
             for (let c = 0; c < this.cols; c++) {
                 operations.push(Algebra.assign(
                     Algebra.variable({
-                        symbol: 'R.data',
-                        size: this.R.type.size,
-                        index: this.R.header.flatIndex([r, c])
+                        symbol: 'this.tensors.R.data',
+                        size: this.tensors.R.type.size,
+                        index: this.tensors.R.header.flatIndex([r, c])
                     }), new Array(this.like).fill(null).map(function (_, s) {
                         return Algebra.multiply(
                             Algebra.variable({
-                                symbol: 'A.data',
-                                size: this.A.type.size,
-                                index: this.A.header.flatIndex([r, s])
+                                symbol: 'this.tensors.A.data',
+                                size: this.tensors.A.type.size,
+                                index: this.tensors.A.header.flatIndex([r, s])
                             }),
                             Algebra.variable({
-                                symbol: 'B.data',
-                                size: this.B.type.size,
-                                index: this.B.header.flatIndex([s, c])
+                                symbol: 'this.tensors.B.data',
+                                size: this.tensors.B.type.size,
+                                index: this.tensors.B.header.flatIndex([s, c])
                             }))
                     }, this).reduce(Algebra.add)
                 ))
