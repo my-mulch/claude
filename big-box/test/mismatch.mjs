@@ -29,7 +29,7 @@ export default jest.suite(function () {
 
 
     this.expect(new bb.repeat({ of: J, count: 2, axes: [0] }).invoke()).toEqual([["1", "2"], ["1", "2"], ["3", "4"], ["3", "4"]])
-    this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', ':2'], with: 255 })).toEqual([["255", "255", "0"]])
+    this.expect(new bb.assignment({ of: bb.zeros({ shape: [1, 3] }), region: [':', ':2'], with: 255 }).invoke()).toEqual([["255", "255", "0"]])
     this.expect(bb.zeros({ shape: [1, 3] }).assign({ region: [':', 1], with: 255 }).toString()).toEqual([["0", "255", "0"]])
     this.expect(bb.ones({ shape: [2, 2] }).negate()).toEqual([["-1", "-1"], ["-1", "-1"]])
     this.expect(bb.zeros({ shape: [3, 3] }).assign({ region: [":", 1], with: 1 })).toEqual([["0", "1", "0"], ["0", "1", "0"], ["0", "1", "0"]])
