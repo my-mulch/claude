@@ -3,7 +3,7 @@ import jest from '../../test'
 
 export default jest.suite(function () {
 
-    console.log('\n\n-------- Mismatch Suite --------\n\n')
+    console.log('\n\n-------- Assignment Suite --------\n\n')
 
     const A = bb.tensor({
         data: [
@@ -37,5 +37,6 @@ export default jest.suite(function () {
     this.expect(new bb.multiplication({ of: A, with: 10 }).invoke()).toEqual([['100+20i'], ['400+30i'], ['500+10i']])
     this.expect(new bb.multiplication({ of: K, with: D }).invoke()).toEqual([["0", "4+2i", "8+16i", "27+21i"], ["0", "9+2i", "8+8i", "12+24i"], ["0", "4+3i", "10+2i", "21+21i"], ["0", "7+3i", "6+10i", "21+9i"]])
 
+    new bb.unit({of: [1,2,3]}).invoke()
     console.log('\n\n-------- End Mismatch Suite --------\n\n')
 })

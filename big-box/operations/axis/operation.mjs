@@ -1,5 +1,4 @@
 import Tensor from '../../tensor'
-import Header from '../../header'
 import Algebra from '../../algebra'
 import Template from '../../template'
 
