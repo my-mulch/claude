@@ -1,15 +1,14 @@
 import bb from '../../big-box'
 
 export default {
-    CONTEXT_2D: '2d',
-    CONTEXT_WEB_GL: 'webgl',
+    CANVAS: document.createElement('canvas'),
+    CANVAS_STROKE_COLOR: 'white',
+    CANVAS_FILL_COLOR: 'rgba(255, 165, 0, 1)',
 
+    HUD: document.createElement('canvas'),
     HUD_FONT: '18px serif',
     HUD_COLOR: 'rgba(255, 255, 255, 1)',
     HUD_TEXT_LOCATION: [10, 50],
-
-    CANVAS_STROKE_COLOR: 'white',
-    CANVAS_FILL_COLOR: 'rgba(255, 165, 0, 1)',
 
     BINDINGS: {
         'o': { name: 'zoom', args: [true] },
@@ -43,9 +42,12 @@ export default {
         '}\n',
 
 
-    TO_VECTOR: bb.tensor({ data: [[0], [0], [0], [1]], type: bb.Float32 }),
-    UP_VECTOR: bb.tensor({ data: [[0], [1], [0], [1]], type: bb.Float32 }),
-    FROM_VECTOR: bb.tensor({ data: [[5], [5], [5], [1]], type: bb.Float32 }),
+    TO: bb.tensor({ data: [[0], [0], [0], [1]] }),
+    UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
+    FROM: bb.tensor({ data: [[5], [5], [5], [1]] }),
+
+    VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
+    TRANSLATION_MATRIX: bb.eye({ shape: [4, 4] }),
 
     VIEWING_ANGLE: 30,
     ASPECT_RATIO: 1,
@@ -56,9 +58,10 @@ export default {
     PAN_DELTA: Math.PI / 128,
     ACTIVE_VERTICES: 0,
 
-    UP_DIRECTION: 0,
-    DOWN_DIRECTION: 1,
-    LEFT_DIRECTION: 2,
-    RIGHT_DIRECTION: 3,
-
+    DIRECTIONS: {
+        UP: 0,
+        DOWN: 1,
+        LEFT: 2,
+        RIGHT: 3,
+    },
 }

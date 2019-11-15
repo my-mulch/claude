@@ -1,14 +1,15 @@
-import BufferManager from './managers/buffer'
+import BufferManager from './managers/webgl/buffer'
 import CameraManager from './managers/camera'
-import ProgramManager from './managers/program'
-import UniformManager from './managers/uniform'
-import AttributeManager from './managers/attribute'
+import ProgramManager from './managers/webgl/program'
+import UniformManager from './managers/webgl/uniform'
+import AttributeManager from './managers/webgl/attribute'
 
 import config from './resources'
 
 export default class GraphicsEngine {
     constructor() {
-        this.config = config
+        Object.assign(this, config)
+
         this.objects = []
 
         this.pan = this.pan.bind(this)
@@ -17,48 +18,35 @@ export default class GraphicsEngine {
         this.start = this.start.bind(this)
         this.render = this.render.bind(this)
 
-        this.start()
+        /** Displays */
+        this.resize()
+        document.body.prepend(this.HUD)
+        document.body.prepend(this.CANVAS)
+        
+        /** Managers */
+        this.webGLManager = new WebGLManager(this)
+        this.cameraManager = new CameraManager(this)
     }
 
     start() {
-        this.hud = document.createElement('canvas')
-        this.hud.style.zIndex = this.config.HUD_Z_INDEX
-        this.hud.style.position = this.config.HUD_POSITION_STYLE
 
-        this.canvas = document.createElement('canvas')
-        this.canvas.style.zIndex = this.config.CANVAS_Z_INDEX
-        this.canvas.style.position = this.config.CANVAS_POSITION_STYLE
+        this.bufferManager = new BufferManager({ context: this.CANVAS.context })
+        this.programManager = new ProgramManager({ context: this.CANVAS.context })
+        this.uniformManager = new UniformManager({ context: this.CANVAS.context, program: this.programManager.program })
+        this.attributeManager = new AttributeManager({ context: this.CANVAS.context, program: this.programManager.program })
 
-        this.resize() /** Must resize before grabbing context */
+        this.CANVAS.context.useProgram(this.programManager.program)
 
-        this.canvas.context = this.canvas.getContext(this.config.CONTEXT_WEB_GL)
-
-        this.cameraManager = new CameraManager({})
-        this.bufferManager = new BufferManager({ context: this.canvas.context })
-        this.programManager = new ProgramManager({ context: this.canvas.context })
-        this.uniformManager = new UniformManager({ context: this.canvas.context, program: this.programManager.program })
-        this.attributeManager = new AttributeManager({ context: this.canvas.context, program: this.programManager.program })
-
-        this.canvas.context.useProgram(this.programManager.program)
-
-        this.hud.context = this.hud.getContext(this.config.CONTEXT_2D)
-        this.hud.context.font = this.config.HUD_FONT
-        this.hud.context.fillStyle = this.config.HUD_COLOR
-
-        document.body.prepend(this.hud)
-        document.body.prepend(this.canvas)
-
-        return this
     }
 
     resize() {
-        this.canvas.width = window.innerWidth
-        this.canvas.height = window.innerHeight
+        this.CANVAS.width = window.innerWidth
+        this.CANVAS.height = window.innerHeight
 
-        this.hud.width = window.innerWidth * 0.5
-        this.hud.height = window.innerHeight * 0.2
+        this.HUD.width = window.innerWidth * 0.5
+        this.HUD.height = window.innerHeight * 0.2
 
-        this.config.ASPECT_RATIO = this.canvas.width / this.canvas.height
+        this.ASPECT_RATIO = this.CANVAS.width / this.CANVAS.height
     }
 
     plot({ vertices, colors, sizes, mode }) {
@@ -67,7 +55,7 @@ export default class GraphicsEngine {
             colorBuffer: this.bufferManager.createBuffer({ array: colors }),
             vertexBuffer: this.bufferManager.createBuffer({ array: vertices }),
 
-            drawMode: this.canvas.context[mode],
+            drawMode: this.CANVAS.context[mode],
             drawCount: vertices.shape[0]
         })
 
@@ -75,7 +63,7 @@ export default class GraphicsEngine {
     }
 
     render() {
-        this.canvas.context.clear(this.canvas.context.COLOR_BUFFER_BIT)
+        this.CANVAS.context.clear(this.CANVAS.context.COLOR_BUFFER_BIT)
 
         for (const object of this.objects) {
 
@@ -87,7 +75,7 @@ export default class GraphicsEngine {
             this.uniformManager.uniforms.u_ProjMatrix(this.cameraManager.project())
 
 
-            this.canvas.context.drawArrays(object.drawMode, 0, object.drawCount)
+            this.CANVAS.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
     }
 
@@ -98,10 +86,6 @@ export default class GraphicsEngine {
 
     zoom(zoomOut) {
         this.cameraManager.zoom(zoomOut)
-
-        this.hud.context.clearRect(0, 0, this.hud.width, this.hud.height)
-        this.hud.context.fillText(`loc | r: ${Math.round(this.config.FROM_VECTOR.data[0])} g: ${Math.round(this.config.FROM_VECTOR.data[1])}, b: ${Math.round(this.config.FROM_VECTOR.data[2])}`, 10, 70)
-
         this.render()
     }
 
