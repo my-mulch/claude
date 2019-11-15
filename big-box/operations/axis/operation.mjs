@@ -11,7 +11,7 @@ export default class ElementOperation {
         /** Axes */
         this.axes = {}
         this.axes.inner = args.axes || []
-        this.axes.total = Tensor.keys(this.tensors.A.shape.length)
+        this.axes.total = [...this.tensors.A.shape.keys()]
         this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
 
         this.axes.A = this.axes.total

@@ -10,10 +10,6 @@ export default class Tensor {
         this.data = this.type.array(data || this.size)
     }
 
-    static keys(count) {
-        return [...new Array(count).keys()]
-    }
-
     static intersection(a1, a2) {
         if (a1.constructor === Tensor && a2.constructor === Tensor) {
             a1 = a1.toRawFlat()
@@ -166,18 +162,22 @@ export default class Tensor {
         return new Tensor({ header: this.header.reshape(shape), data: this.data })
     }
 
-    toRaw(index = this.offset, depth = 0) {
+    visit(operation = this.toStringAtIndex.bind(this), index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return this.toStringAtIndex(index)
+            return operation(index)
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
-            return this.toRaw(i * this.strides[depth] + index, depth + 1)
+            return this.visit(operation, i * this.strides[depth] + index, depth + 1)
         }, this)
     }
 
-    toRawFlat() { return this.toRaw().flat(Number.POSITIVE_INFINITY) }
-
-    valueOf() { return this.data[this.offset] }
+    toRaw() { return this.visit() }
+    toRawFlat() { return this.visit().flat(Number.POSITIVE_INFINITY) }
+    toIndices() {
+        const indices = []
+        this.visit(function (index) { indices.push(index) })
+        return indices
+    }
 
     toStringAtIndex(index, string = '') {
         for (let i = 0; i < this.type.size; i++) {
@@ -199,6 +199,7 @@ export default class Tensor {
             .stringify(this.toRaw())
             .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
-
+    
+    valueOf() { return this.data[this.offset] }
     [util.inspect.custom]() { return this.toString() }
 }

@@ -14,9 +14,11 @@ export default class PairOperation {
 
         /** Axes */
         this.axes = {}
-        this.axes.total = Tensor.keys(__Math__.max(
-            this.tensors.A.shape.length,
-            this.tensors.B.shape.length))
+        this.axes.total = [
+            ...new Array(__Math__.max(
+                this.tensors.A.shape.length,
+                this.tensors.B.shape.length)).keys()
+        ]
 
         this.axes.R = this.axes.total
         this.axes.A = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.tensors.A).reverse()
