@@ -9,6 +9,8 @@ export default class WebGLManager {
         this.program = this.createProgram()
         this.uniforms = this.createUniforms()
         this.attributes = this.createAttributes()
+
+        this.CONTEXT.useProgram(this.program)
     }
 
     createUniforms() {
@@ -20,13 +22,13 @@ export default class WebGLManager {
             const uniformInfo = this.CONTEXT.getActiveUniform(this.program, i)
             const uniformLocation = this.CONTEXT.getUniformLocation(this.program, uniformInfo.name)
 
-            uniforms[uniformInfo.name] = this.createUniform({ type: uniformInfo.type, location: uniformLocation })
+            uniforms[uniformInfo.name] = this.createUniform(uniformInfo.type, uniformLocation)
         }
 
         return uniforms
     }
 
-    createUniform({ type, location }) {
+    createUniform(type, location) {
         if (type === this.CONTEXT.FLOAT_MAT2)
             return (function (array) { this.CONTEXT.uniformMatrix2fv(location, false, array.data) }).bind(this)
 
@@ -37,36 +39,36 @@ export default class WebGLManager {
             return (function (array) { this.CONTEXT.uniformMatrix4fv(location, false, array.data) }).bind(this)
     }
 
-    createBuffer({ array }) {
+    createBuffer(tensor) {
         const buffer = this.CONTEXT.createBuffer()
 
-        const numberType = this.mapType({ array })
+        const numberType = this.mapType(tensor.type.typed)
         const renderType = this.CONTEXT.STATIC_DRAW
         const bufferType = this.CONTEXT.ARRAY_BUFFER
 
         this.CONTEXT.bindBuffer(bufferType, buffer)
-        this.CONTEXT.bufferData(bufferType, array.data, renderType)
+        this.CONTEXT.bufferData(bufferType, tensor.data, renderType)
 
         return {
             buffer,
-            size: array.shape[1],
-            count: array.shape[0],
+            size: tensor.shape[1],
+            count: tensor.shape[0],
             type: numberType,
             normalize: false,
-            offset: array.offset * array.data.BYTES_PER_ELEMENT,
-            stride: array.strides[0] * array.data.BYTES_PER_ELEMENT
+            offset: tensor.offset * tensor.data.BYTES_PER_ELEMENT,
+            stride: tensor.strides[0] * tensor.data.BYTES_PER_ELEMENT
         }
     }
 
-    mapType({ array }) {
-        if (array.type.typed === Int8Array) { return this.CONTEXT.BYTE }
-        if (array.type.typed === Uint8Array) { return this.CONTEXT.UNSIGNED_BYTE }
-        if (array.type.typed === Uint8ClampedArray) { return this.CONTEXT.UNSIGNED_BYTE }
-        if (array.type.typed === Int16Array) { return this.CONTEXT.SHORT }
-        if (array.type.typed === Uint16Array) { return this.CONTEXT.UNSIGNED_SHORT }
-        if (array.type.typed === Int32Array) { return this.CONTEXT.INT }
-        if (array.type.typed === Uint32Array) { return this.CONTEXT.UNSIGNED_INT }
-        if (array.type.typed === Float32Array) { return this.CONTEXT.FLOAT }
+    mapType(type) {
+        if (type === Int8Array) { return this.CONTEXT.BYTE }
+        if (type === Uint8Array) { return this.CONTEXT.UNSIGNED_BYTE }
+        if (type === Uint8ClampedArray) { return this.CONTEXT.UNSIGNED_BYTE }
+        if (type === Int16Array) { return this.CONTEXT.SHORT }
+        if (type === Uint16Array) { return this.CONTEXT.UNSIGNED_SHORT }
+        if (type === Int32Array) { return this.CONTEXT.INT }
+        if (type === Uint32Array) { return this.CONTEXT.UNSIGNED_INT }
+        if (type === Float32Array) { return this.CONTEXT.FLOAT }
 
         return null
     }
@@ -80,13 +82,13 @@ export default class WebGLManager {
             const attributeInfo = this.CONTEXT.getActiveAttrib(this.program, i)
             const attributeLocation = this.CONTEXT.getAttribLocation(this.program, attributeInfo.name)
 
-            attributes[attributeInfo.name] = this.createAttribute({ location: attributeLocation })
+            attributes[attributeInfo.name] = this.createAttribute(attributeLocation)
         }
 
         return attributes
     }
 
-    createAttribute({ location }) {
+    createAttribute(location) {
         return (function (data) {
             this.CONTEXT.bindBuffer(this.CONTEXT.ARRAY_BUFFER, data.buffer)
             this.CONTEXT.enableVertexAttribArray(location)
@@ -102,7 +104,7 @@ export default class WebGLManager {
         }).bind(this)
     }
 
-    createShader({ type, source }) {
+    createShader(type, source) {
         const shader = this.CONTEXT.createShader(type)
 
         this.CONTEXT.shaderSource(shader, source)
@@ -123,15 +125,15 @@ export default class WebGLManager {
     createProgram() {
         const program = this.CONTEXT.createProgram()
 
-        this.CONTEXT.attachShader(program, this.createShader({
-            type: this.CONTEXT.VERTEX_SHADER,
-            source: this.VERTEX_SOURCE
-        }))
+        this.CONTEXT.attachShader(program, this.createShader(
+            this.CONTEXT.VERTEX_SHADER,
+            this.VERTEX_SOURCE
+        ))
 
-        this.CONTEXT.attachShader(program, this.createShader({
-            type: this.CONTEXT.FRAGMENT_SHADER,
-            source: this.FRAGMENT_SOURCE
-        }))
+        this.CONTEXT.attachShader(program, this.createShader(
+            this.CONTEXT.FRAGMENT_SHADER,
+            this.FRAGMENT_SOURCE
+        ))
 
         this.CONTEXT.linkProgram(program)
 
