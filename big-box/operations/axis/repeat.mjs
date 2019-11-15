@@ -7,21 +7,22 @@ import AxisOperation from './operation'
 export default class Repeat extends AxisOperation {
     constructor(args) {
         super(args)
-        
+
         this.count = args.count || 1
-        
+
         this.axes.order = this.axes.outer.concat(this.axes.inner)
         this.axes.last = this.axes.order[this.axes.order.length - 1]
         this.axes.repeat = this.axes.inner[0] || this.axes.last
 
         this.tensors.R = args.result || this.resultant()
-        
-        this.loops.count = Template.loop([`let r = i${this.axes.last}*${this.count}, c = 0`], [`c < ${this.count}`], ['r++, c++'])
+        this.strides.R = this.tensors.R.strides
         
         this.scalars.R = this.axes.total.map(Template.prefix)
         this.scalars.R[this.axes.repeat] = 'r'
 
         this.indices.R = Template.index('RIndex', this.scalars.R, this.strides.R, this.tensors.R.offset)
+
+        this.loops.count = Template.loop([`let r = i${this.axes.last}*${this.count}, c = 0`], [`c < ${this.count}`], ['r++, c++'])
 
         this.invoke = new Function([
             ...this.loops.outer,
