@@ -4,8 +4,9 @@ import config from '../../resources'
 
 export default class Look {
     constructor() {
+        this.negateFrom = new bb.negation({ of: config.FROM })
+
         this.front = new bb.subtraction({ of: config.FROM, with: config.TO })
-        this.negateFront = new bb.negation({ of: this.front.result })
         this.side = new bb.cross({ of: config.UP, with: this.front.result })
 
         this.unitSide = new bb.unit({ of: this.side.result })
@@ -15,16 +16,17 @@ export default class Look {
         this.assignUpFrame = new bb.assignment({ of: config.VIEW_MATRIX, region: [':3', '1:2'], with: this.unitUp.result })
         this.assignSideFrame = new bb.assignment({ of: config.VIEW_MATRIX, region: [':3', '0:1'], with: this.unitSide.result })
         this.assignFrontFrame = new bb.assignment({ of: config.VIEW_MATRIX, region: [':3', '2:3'], with: this.unitFront.result })
-        this.assignTranslation = new bb.assignment({ of: config.TRANSLATION_MATRIX, region: ['3:4', ':3'], with: this.negateFront.result.T() })
+        this.assignTranslation = new bb.assignment({ of: config.TRANSLATION_MATRIX, region: ['3:4', ':3'], with: this.negateFrom.result.T() })
 
         this.look = new bb.matMult({ of: config.TRANSLATION_MATRIX, with: config.VIEW_MATRIX, result: config.LOOK_MATRIX })
         this.invoke = this.invoke.bind(this)
     }
 
     invoke() {
+        this.negateFrom.invoke()
+        
         this.front.invoke()
         this.side.invoke()
-        this.negateFront.invoke()
 
         this.unitSide.invoke()
         this.unitFront.invoke()
