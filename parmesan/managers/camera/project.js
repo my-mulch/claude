@@ -13,6 +13,8 @@ export default class Project {
         this.sinOfViewingAngle = Math.sin(this.viewingAngle)
         this.cosOfViewingAngle = Math.cos(this.viewingAngle)
         this.cotOfViewingAngle = this.cosOfViewingAngle / this.sinOfViewingAngle
+
+        this.invoke = this.invoke.bind(this)
     }
 
     invoke() {

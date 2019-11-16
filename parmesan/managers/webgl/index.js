@@ -1,10 +1,10 @@
 import config from '../../resources'
 
 export default class WebGLManager {
-    constructor() {
+    constructor({ CANVAS }) {
         Object.assign(this, config)
 
-        this.CONTEXT = document.getElementById('canvas').getContext(this.CONTEXT_WEB_GL)
+        this.CONTEXT = CANVAS.getContext('webgl')
 
         this.program = this.createProgram()
         this.uniforms = this.createUniforms()

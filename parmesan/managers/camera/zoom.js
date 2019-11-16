@@ -14,6 +14,8 @@ export default class Zoom {
 
         this.zoomOutTo = new bb.addition({ of: this.TO, with: this.delta.result, result: this.TO })
         this.zoomOutFrom = new bb.addition({ of: this.FROM, with: this.delta.result, result: this.FROM })
+
+        this.invoke = this.invoke.bind(this)
     }
 
     invoke(zoomOut) {

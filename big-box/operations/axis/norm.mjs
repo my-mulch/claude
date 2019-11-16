@@ -1,9 +1,9 @@
 import Types from '../../types'
 import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
-import ElementOperation from './operation'
+import AxisOperation from './operation'
 
-export default class Norm extends ElementOperation {
+export default class Norm extends AxisOperation {
     constructor(args) {
         super({
             ...args,

@@ -15,17 +15,24 @@ class ParmesanApplication {
         this.objects = []
 
         /** Displays */
+        this.HUD = document.createElement('canvas')
+        this.HUD.id = 'hud'
+
+        this.CANVAS = document.createElement('canvas')
+        this.CANVAS.id = 'main'
+
+        // document.body.prepend(this.HUD)
+        document.body.prepend(this.CANVAS)
         this.resize()
 
         /** Managers */
-        this.webgl = new WebGLManager()
-        this.camera = new CameraManager()
+        this.webgl = new WebGLManager(this)
+        this.camera = new CameraManager(this)
 
         /** Graphics Operations */
         this.pan = this.pan.bind(this)
         this.zoom = this.zoom.bind(this)
         this.plot = this.plot.bind(this)
-        this.start = this.start.bind(this)
         this.render = this.render.bind(this)
 
         /** Input, Output */

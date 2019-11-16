@@ -5,7 +5,7 @@ export default class Look {
         this.TO = TO
         this.UP = UP
         this.FROM = FROM
-        
+
         this.VIEW_MATRIX = VIEW_MATRIX
         this.TRANSLATION_MATRIX = TRANSLATION_MATRIX
 
@@ -17,12 +17,14 @@ export default class Look {
         this.unitFront = new bb.unit({ of: this.front.result })
         this.unitUp = new bb.cross({ of: this.unitFront.result, with: this.unitSide.result })
 
-        this.assignUpFrame = new bb.assignment({ of: this.viewMatrix, region: [':3', '1:2'], with: this.unitUp.result })
-        this.assignSideFrame = new bb.assignment({ of: this.viewMatrix, region: [':3', '0:1'], with: this.unitSide.result })
-        this.assignFrontFrame = new bb.assignment({ of: this.viewMatrix, region: [':3', '2:3'], with: this.unitFront.result })
-        this.assignTranslation = new bb.assignment({ of: this.transMatrix, region: ['3:4', ':3'], with: this.negateFront.result.T() })
+        this.assignUpFrame = new bb.assignment({ of: this.VIEW_MATRIX, region: [':3', '1:2'], with: this.unitUp.result })
+        this.assignSideFrame = new bb.assignment({ of: this.VIEW_MATRIX, region: [':3', '0:1'], with: this.unitSide.result })
+        this.assignFrontFrame = new bb.assignment({ of: this.VIEW_MATRIX, region: [':3', '2:3'], with: this.unitFront.result })
+        this.assignTranslation = new bb.assignment({ of: this.TRANSLATION_MATRIX, region: ['3:4', ':3'], with: this.negateFront.result.T() })
 
-        this.look = new bb.matMult({ of: this.transMatrix, with: this.viewMatrix })
+        this.look = new bb.matMult({ of: this.TRANSLATION_MATRIX, with: this.VIEW_MATRIX })
+        
+        this.invoke = this.invoke.bind(this)
     }
 
     invoke() {

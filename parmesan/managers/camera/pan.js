@@ -23,6 +23,8 @@ export default class Pan {
         this.setRotation = new bb.matMult({ of: this.VIEW_MATRIX_INV_T, with: bb.zeros({ shape: [4, 4] }), template: true })
         this.setViewMatrix = new bb.matMult({ of: this.setRotation.result, with: this.VIEW_MATRIX_T })
         this.setPosition = new bb.matMult({ of: this.setViewMatrix.result, with: this.TO, result: this.TO })
+        
+        this.invoke = this.invoke.bind(this)
     }
 
     rotate(orientation) {

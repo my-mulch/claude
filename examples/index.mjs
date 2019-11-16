@@ -23,8 +23,8 @@ export const points = {
         ]
     }),
 
-    colors: bb.rand({ shape: [10000, 3] }).negate(),
-    sizes: bb.ones({ shape: [10000, 1] }).multiply({ with: 20 }),
+    colors: new bb.addition({ of: bb.rand({ shape: [10000, 3] }), with: 0.5 }).invoke(),
+    sizes: new bb.multiplication({ of: bb.ones({ shape: [10000, 1] }), with: 20 }).invoke(),
     mode: 'POINTS'
 }
 
@@ -33,18 +33,20 @@ export const circle = {
         of: bb.zeros({ shape: [10000, 3], type: bb.ComplexFloat32 }),
         region: [':', 0],
         with: new bb.exponential({
-            of: new bb.mulitplication({
+            of: new bb.multiplication({
                 of: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }),
                 with: 'i'
             }).invoke(),
         }).invoke()
     }).invoke(),
 
-    colors: bb
-        .zeros({ shape: [10000, 3] })
-        .assign({ region: [':', ':2'], with: 255 }),
+    colors: new bb.assignment({
+        of: bb.zeros({ shape: [10000, 3] }),
+        region: [':', ':2'],
+        with: 255
+    }).invoke(),
 
-    sizes: bb.ones({ shape: [10000, 1] }).multiply({ with: 1 }),
+    sizes: new bb.multiplication({ of: bb.ones({ shape: [10000, 1] }), with: 1 }).invoke(),
 
     mode: 'POINTS'
 }

@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra'
-import ElementOperation from './operation'
+import AxisOperation from './operation'
 
-export default class Sine extends ElementOperation {
+export default class Sine extends AxisOperation {
     constructor(args) {
         super(args)
 

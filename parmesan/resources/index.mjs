@@ -1,11 +1,9 @@
 import bb from '../../big-box'
 
 export default {
-    CANVAS: document.createElement('canvas'),
     CANVAS_STROKE_COLOR: 'white',
     CANVAS_FILL_COLOR: 'rgba(255, 165, 0, 1)',
 
-    HUD: document.createElement('canvas'),
     HUD_FONT: '18px serif',
     HUD_COLOR: 'rgba(255, 255, 255, 1)',
     HUD_TEXT_LOCATION: [10, 50],
@@ -42,12 +40,13 @@ export default {
         '}\n',
 
 
-    TO: bb.tensor({ data:[[0], [0], [0], [1]] }),
-    UP: bb.tensor({ data:[[0], [1], [0], [1]] }),
-    FROM: bb.tensor({ data:[[5], [5], [5], [1]] }),
+    TO: bb.tensor({ data: [[0], [0], [0], [1]] }),
+    UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
+    FROM: bb.tensor({ data: [[5], [5], [5], [1]] }),
 
     VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
     TRANSLATION_MATRIX: bb.eye({ shape: [4, 4] }),
+    PROJECTION_MATRIX: bb.zeros({ shape: [4, 4] }),
 
     VIEWING_ANGLE: 30,
     ASPECT_RATIO: 1,

@@ -1,15 +1,23 @@
 import Norm from './norm'
 import Division from '../pair/division'
-import ElementOperation from './operation'
+import AxisOperation from './operation'
 
-export default class Unit extends ElementOperation {
+export default class Unit extends AxisOperation {
     constructor(args) {
         super(args)
 
         this.norm = new Norm({ of: this.of })
-        this.division = new Division({ of: this.of, with: this.norm.invoke(), template: args.template })
+        this.division = new Division({
+            of: this.of,
+            with: this.norm.result,
+            result: this.result,
+            template: args.template
+        })
+    }
 
-        this.invoke = this.division.invoke
+    invoke() {
+        this.norm.invoke()
+        return this.division.invoke()
     }
 }
 

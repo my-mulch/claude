@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra'
-import ElementOperation from './operation'
+import AxisOperation from './operation'
 
-export default class Sum extends ElementOperation {
+export default class Sum extends AxisOperation {
     constructor(args) {
         super({ ...args, axes: args.axes || [...args.of.shape.keys()] })
 

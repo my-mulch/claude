@@ -2,7 +2,7 @@ import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
 import Source from '../../template/source'
 
-export default class ElementOperation {
+export default class AxisOperation {
     constructor(args) {
         /** Inputs */
         this.of = Tensor.tensor({ data:args.of})
