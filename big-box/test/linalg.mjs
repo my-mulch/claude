@@ -32,7 +32,7 @@ export default jest.suite(function () {
         ]
     })
 
-    C = bb.tensor({ data: [["1"], ["2"], ["3"]], })
+    C = bb.tensor({ data:[["1"], ["2"], ["3"]], })
 
     E = bb.tensor({
         data: [[["10", "5", "2"],
@@ -51,23 +51,23 @@ export default jest.suite(function () {
         ["21", "2", "2"]]],
     })
 
-    const F = bb.tensor({ data: [["72 + 91i + 13j + 57k"]], })
-    const G = bb.tensor({ data: [["10 + 72i + 91j + 13k"]], })
+    const F = bb.tensor({ data:[["72 + 91i + 13j + 57k"]], })
+    const G = bb.tensor({ data:[["10 + 72i + 91j + 13k"]], })
 
 
 
 
-    
-    this.expect(F.matMult({ with: G })).toEqual([["-7756+1076i+9603j+8851k"]])
-    this.expect(G.matMult({ with: F })).toEqual([["-7756+11112i+3761j-5839k"]])
-    this.expect(B.matMult({ with: A })).toEqual(([["2507", "2962", "2523", "983"], ["2255", "4338", "4719", "1259"], ["2308", "2758", "2487", "985"]]))
-    this.expect(B.matMult({ with: C })).toEqual([["96"], ["104"], ["89"]])
+
+    this.expect(new bb.matMult({ of: F, with: G }).invoke()).toEqual([["-7756+1076i+9603j+8851k"]])
+    this.expect(new bb.matMult({ of: G, with: F }).invoke()).toEqual([["-7756+11112i+3761j-5839k"]])
+    this.expect(new bb.matMult({ of: B, with: A }).invoke()).toEqual(([["2507", "2962", "2523", "983"], ["2255", "4338", "4719", "1259"], ["2308", "2758", "2487", "985"]]))
+    this.expect(new bb.matMult({ of: B, with: C }).invoke()).toEqual([["96"], ["104"], ["89"]])
     this.expect(A.T()).toEqual([["10", "57", "90"], ["72", "44", "66"], ["91", "49", "23"], ["13", "33", "21"]])
-    this.expect(D.inverse()).toEqual([["-0.5", "-0.125", "0.625"], ['1', '0', "-0.5"], ['0', "0.25", "-0.25"]])
-    this.expect(bb.tensor({ data: [[6, 4], [5, 2]], }).inverse()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
-    this.expect(bb.tensor({ data: [[4, 1, 3, 3], [4, 0, 0, 1], [2, 3, 4, 2], [0, 0, 4, 4]], }).inverse()).toEqual([["1.5", '-1', "-0.5", "-0.625"], ['-5', '4', '2', "1.75"], ['6', '-5', '-2', "-2.25"], ['-6', '5', '2', "2.5"]])
-    this.expect(E.slice({ region: ['1:2', 0, ':'] }).T().cross({ with: C })).toEqual([['19'], ['-170'], ['107']])
-    this.expect(E.slice({ region: [':', 0, ':'] }).matMult({ with: C })).toEqual([['26'], ['74'], ['109']])
+    this.expect(new bb.inverse({ of: D }).invoke()).toEqual([["-0.5", "-0.125", "0.625"], ['1', '0', "-0.5"], ['0', "0.25", "-0.25"]])
+    this.expect(new bb.inverse({ of: [[6, 4], [5, 2]] }).invoke()).toEqual([["-0.25", "0.5"], ["0.625", "-0.75"]])
+    this.expect(new bb.inverse({ of: [[4, 1, 3, 3], [4, 0, 0, 1], [2, 3, 4, 2], [0, 0, 4, 4]] }).invoke()).toEqual([["1.5", '-1', "-0.5", "-0.625"], ['-5', '4', '2', "1.75"], ['6', '-5', '-2', "-2.25"], ['-6', '5', '2', "2.5"]])
+    this.expect(new bb.cross({ of: E.slice({ region: ['1:2', 0, ':'] }).T(), with: C }).invoke()).toEqual([['19'], ['-170'], ['107']])
+    this.expect(new bb.matMult({ of: E.slice({ region: [':', 0, ':'] }), with: C }).invoke()).toEqual([['26'], ['74'], ['109']])
 
     console.log('\n\n-------- End Linear Algebra Suite --------\n\n')
 })

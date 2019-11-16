@@ -1,8 +1,8 @@
 
 export default class Mouse {
-    constructor(options) {
-        this.isPressed = options.isPressed || false
-        this.position = options.position || { x: 0, y: 0 }
+    constructor() {
+        this.position = { x: 0, y: 0 }
+        this.isPressed = false
     }
 
     mouseup() { this.isPressed = false }

@@ -1,36 +1,44 @@
-import Algebra from '../algebra'
-
+import Types from '../../types'
+import Tensor from '../../tensor'
+import Algebra from '../../template/algebra'
 
 export default class MatrixMultiplication {
-    constructor(A, B, R) {
+    constructor(args) {
+        /** Santize */
+        this.of = Tensor.tensor({ data: args.of })
+        this.with = Tensor.tensor({ data: args.with })
 
+        /** Promote */
+        this.type = Types.promote(this.of, this.with)
 
-        this.A = A
-        this.B = B
-        this.R = R
+        this.of = this.of.astype({ type: this.type })
+        this.with = this.with.astype({ type: this.type })
+        this.result = args.result || this.resultant()
 
-        this.rows = this.A.shape[0]
-        this.cols = this.B.shape[1]
-        this.like = this.A.shape[1]
+        /** Parametrize */
+        this.rows = this.of.shape[0]
+        this.cols = this.with.shape[1]
+        this.like = this.of.shape[1]
 
         /** Symbolic Matrix Multiplication */
         if (this.like > 50) {
+            this.indices = {}
+            this.indices.of = `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`
+            this.indices.with = `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`
+            this.indices.result = `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`
+
+            this.variables = {}
+            this.variables.of = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: 'AIndex' })
+            this.variables.with = Algebra.variable({ symbol: 'B.data', size: this.with.type.size, index: 'BIndex' })
+            this.variables.result = Algebra.variable({ symbol: 'R.data', size: this.result.type.size, index: 'RIndex' })
+
             this.symbolic = {}
-
-            this.symbolic.indices = {}
-            this.symbolic.indices.A = `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`
-            this.symbolic.indices.B = `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`
-            this.symbolic.indices.R = `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`
-
-            this.symbolic.variables = {}
-            this.symbolic.variables.A = Algebra.variable({ symbol: 'A.data', size: A.type.size, index: 'AIndex' })
-            this.symbolic.variables.B = Algebra.variable({ symbol: 'B.data', size: B.type.size, index: 'BIndex' })
-            this.symbolic.variables.R = Algebra.variable({ symbol: 'R.data', size: R.type.size, index: 'RIndex' })
-
             this.symbolic.source = this.symbolicSource()
-            this.symbolic.method = new Function('A,B,R', `${this.symbolic.source}; return R`)
-            
-            this.invoke = this.symbolic.method
+
+            this.invoke = new Function('A,B,R', `${this.symbolic.source}; return R`)
+
+            if (!args.template)
+                this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
 
             return
         }
@@ -38,12 +46,22 @@ export default class MatrixMultiplication {
         /** Pointwise Matrix Multiplication */
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource()
-        this.pointwise.method = new Function('A,B,R', `${this.pointwise.source}; return R`)
 
-        this.invoke = this.pointwise.method
+        this.invoke = new Function('A,B,R', `${this.pointwise.source}; return R`).bind(this)
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    static resultant(A, B) { return { shape: [A.shape[0], B.shape[1]], type: A.type } }
+    resultant() {
+        return Tensor.zeros({
+            type: this.of.type,
+            shape: [
+                this.of.shape[0],
+                this.with.shape[1]
+            ]
+        })
+    }
 
 
     symbolicSource() {
@@ -51,20 +69,18 @@ export default class MatrixMultiplication {
             `for (let r = 0; r < A.shape[0]; r++){`,
             `for (let c = 0; c < B.shape[1]; c++){`,
 
-            this.symbolic.indices.R,
+            this.indices.result,
             `R.data[RIndex] = 0`,
 
             `for (let s = 0; s < A.shape[1]; s++) {`,
 
-            this.symbolic.indices.A,
-            this.symbolic.indices.B,
+            this.indices.of,
+            this.indices.with,
 
-            `${[
-                Algebra.assign(
-                    this.symbolic.variables.R,
-                    Algebra.multiply(this.symbolic.variables.A, this.symbolic.variables.B), '+='
-                )
-            ]}`,
+            Algebra.assign(
+                this.variables.result,
+                Algebra.multiply(this.variables.of, this.variables.with), '+='
+            ),
 
             `}}}`,
         ].join('\n')
@@ -78,19 +94,19 @@ export default class MatrixMultiplication {
                 operations.push(Algebra.assign(
                     Algebra.variable({
                         symbol: 'R.data',
-                        size: this.R.type.size,
-                        index: this.R.header.flatIndex([r, c])
+                        size: this.result.type.size,
+                        index: this.result.header.flatIndex([r, c])
                     }), new Array(this.like).fill(null).map(function (_, s) {
                         return Algebra.multiply(
                             Algebra.variable({
                                 symbol: 'A.data',
-                                size: this.A.type.size,
-                                index: this.A.header.flatIndex([r, s])
+                                size: this.of.type.size,
+                                index: this.of.header.flatIndex([r, s])
                             }),
                             Algebra.variable({
                                 symbol: 'B.data',
-                                size: this.B.type.size,
-                                index: this.B.header.flatIndex([s, c])
+                                size: this.with.type.size,
+                                index: this.with.header.flatIndex([s, c])
                             }))
                     }, this).reduce(Algebra.add)
                 ))

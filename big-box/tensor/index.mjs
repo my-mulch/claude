@@ -1,5 +1,5 @@
 import util from 'util'
-import Type from '../type'
+import Types from '../types'
 import Header from '../header'
 
 import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER, PRECISION } from '../resources'
@@ -10,11 +10,29 @@ export default class Tensor {
         this.data = this.type.array(data || this.size)
     }
 
+    static intersection(a1, a2) {
+        if (a1.constructor === Tensor && a2.constructor === Tensor) {
+            a1 = a1.toRawFlat()
+            a2 = a2.toRawFlat()
+        }
+
+        return a1.filter(function (value) { return a2.includes(value) })
+    }
+
+    static difference(a1, a2) {
+        if (a1.constructor === Tensor && a2.constructor === Tensor) {
+            a1 = a1.toRawFlat()
+            a2 = a2.toRawFlat()
+        }
+
+        return a1.filter(function (value) { return !a2.includes(value) })
+    }
+
     static shape(array, shape = []) {
         if (array.constructor === Tensor)
             return array.shape
 
-        if (Type.isTypedArray(array))
+        if (Types.isTypedArray(array))
             return [array.length]
 
         if (array.constructor !== Array)
@@ -35,7 +53,7 @@ export default class Tensor {
         if (data.constructor === String || data.constructor === Number || data.constructor === Array)
             data = [data].flat(Number.POSITIVE_INFINITY)
 
-        type = type || Type.resolve(data[0])
+        type = type || Types.resolve(data[0])
 
         return new Tensor({ data, header: new Header({ type, shape }) })
     }
@@ -144,16 +162,22 @@ export default class Tensor {
         return new Tensor({ header: this.header.reshape(shape), data: this.data })
     }
 
-    toRaw(index = this.offset, depth = 0) {
+    visit(operation = this.toStringAtIndex.bind(this), index = this.offset, depth = 0) {
         if (!this.shape.length || depth === this.shape.length)
-            return this.toStringAtIndex(index)
+            return operation(index)
 
         return [...new Array(this.shape[depth]).keys()].map(function (i) {
-            return this.toRaw(i * this.strides[depth] + index, depth + 1)
+            return this.visit(operation, i * this.strides[depth] + index, depth + 1)
         }, this)
     }
 
-    valueOf() { return this.data[this.offset] }
+    toRaw() { return this.visit() }
+    toRawFlat() { return this.visit().flat(Number.POSITIVE_INFINITY) }
+    toIndices() {
+        const indices = []
+        this.visit(function (index) { indices.push(index) })
+        return indices
+    }
 
     toStringAtIndex(index, string = '') {
         for (let i = 0; i < this.type.size; i++) {
@@ -176,5 +200,6 @@ export default class Tensor {
             .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
 
+    valueOf() { return this.data[this.offset] }
     [util.inspect.custom]() { return this.toString() }
 }

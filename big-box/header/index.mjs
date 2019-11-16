@@ -1,20 +1,18 @@
 import {
     __Math__, // misc resources
-    TYPE, SHAPE, OFFSET, CONTIG, STRIDES, // init resources
     PARTIAL_SLICE, NUMBER, SLICE_CHARACTER, // slice resources
 } from '../resources'
 
-import Type from '../type'
+import Types from '../types'
 
 export default class Header {
     constructor(opts) {
-        this.type = opts.type !== undefined ? opts.type : Type.Float32
+        this.type = opts.type !== undefined ? opts.type : Types.Float32
         this.shape = opts.shape !== undefined ? opts.shape : []
         this.offset = opts.offset !== undefined ? opts.offset : 0
         this.contig = opts.contig !== undefined ? opts.contig : true
         this.strides = opts.strides !== undefined ? opts.strides : Header.strides(this.shape, this.type)
 
-        this.id = `${this.type.size}|${this.shape}|${this.strides}|${this.offset}`
         this.size = this.shape.reduce(__Math__.multiply, 1)
         this.lastStride = this.strides[this.strides.length - 1]
     }
@@ -33,6 +31,15 @@ export default class Header {
         }
 
         return true
+    }
+
+    static nonZeroAxes(_, index) {
+        const ri = this.shape.length - index - 1
+
+        if (ri < 0) return false
+        if (this.shape[ri] > 1) return true
+
+        return false
     }
 
     static strides(shape, type, lastStride) {

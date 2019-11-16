@@ -1,79 +1,82 @@
+import Types from '../../types'
+import Tensor from '../../tensor'
+import Header from '../../header'
+import Source from '../../template/source'
+import Algebra from '../../template/algebra'
 
-import Algebra from '../algebra'
 import { __Math__ } from '../../resources'
-import { symbolicLoop, symbolicIndex, nonZeroAxes } from '../../operations/utils'
 
 export default class PairOperation {
-    constructor(A, B, R, operation) {
-        this.A = A
-        this.B = B
-        this.R = R
+    constructor(args) {
+        /** Santize */
+        this.of = Tensor.tensor({ data: args.of })
+        this.with = Tensor.tensor({ data: args.with })
 
-        /** Symbolic PairOperation */
-        this.symbolic = {}
-        this.symbolic.totalLoopAxes = [...new Array(Math.max(A.shape.length, B.shape.length)).keys()]
-        this.symbolic.totalLoops = this.symbolic.totalLoopAxes.map(symbolicLoop, R)
+        /** Promote */
+        this.type = Types.promote(this.of, this.with)
 
-        this.symbolic.axes = {}
-        this.symbolic.axes.R = this.symbolic.totalLoopAxes
-        this.symbolic.axes.A = this.symbolic.totalLoopAxes.slice().reverse().filter(nonZeroAxes, A).reverse()
-        this.symbolic.axes.B = this.symbolic.totalLoopAxes.slice().reverse().filter(nonZeroAxes, B).reverse()
+        this.of = this.of.astype({ type: this.type })
+        this.with = this.with.astype({ type: this.type })
+        this.result = args.result || this.resultant()
 
-        this.symbolic.indices = {}
-        this.symbolic.indices.R = symbolicIndex('R', this.symbolic.axes.R, true)
-        this.symbolic.indices.A = symbolicIndex('A', this.symbolic.axes.A, A.shape.length === R.shape.length)
-        this.symbolic.indices.B = symbolicIndex('B', this.symbolic.axes.B, B.shape.length === R.shape.length)
+        /** Axes */
+        this.axes = {}
+        this.axes.total = [...new Array(__Math__.max(this.of.shape.length, this.with.shape.length)).keys()]
 
-        this.symbolic.variables = {}
-        this.symbolic.variables.A = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: A.type.size })
-        this.symbolic.variables.B = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: B.type.size })
-        this.symbolic.variables.R = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: R.type.size })
+        this.axes.of = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.of).reverse()
+        this.axes.with = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.with).reverse()
+        this.axes.result = this.axes.total
 
-        this.symbolic.operation = operation.call(this)
+        /** Loops */
+        this.loops = {}
+        this.loops.total = Source.loopAxes(this.axes.total, this.result)
 
-        this.symbolic.source = this.symbolicSource()
-        this.symbolic.method = new Function('A,B,R,args', `${this.symbolic.source}; return R`)
+        /** Strides */
+        this.strides = {}
+        this.strides.of = this.of.strides
+        this.strides.with = this.with.strides
+        this.strides.result = this.result.strides
 
-        this.invoke = this.symbolic.method
+        /** Scalars */
+        this.scalars = {}
+        this.scalars.of = this.axes.total.map(function (axis) { return this.axes.of.includes(axis) ? Source.prefix(axis) : 0 }, this)
+        this.scalars.with = this.axes.total.map(function (axis) { return this.axes.with.includes(axis) ? Source.prefix(axis) : 0 }, this)
+        this.scalars.result = this.axes.total.map(function (axis) { return this.axes.result.includes(axis) ? Source.prefix(axis) : 0 }, this)
+
+        /** Indices */
+        this.indices = {}
+        this.indices.of = Source.index('AIndex', this.scalars.of, this.strides.of, this.of.offset)
+        this.indices.with = Source.index('BIndex', this.scalars.with, this.strides.with, this.with.offset)
+        this.indices.result = Source.index('RIndex', this.scalars.result, this.strides.result, this.result.offset)
+
+        /** Variables */
+        this.variables = {}
+        this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.type.size })
+        this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
+        this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
     }
 
-    static resultant(A, B) {
-        const maxLen = __Math__.max(A.shape.length, B.shape.length)
+    resultant() {
+        const maxLen = __Math__.max(
+            this.of.shape.length,
+            this.with.shape.length)
+
         const shape = []
 
         for (let i = 0; i < maxLen; i++) {
-            const bi = B.shape.length - 1 - i
-            const ai = A.shape.length - 1 - i
+            const bi = this.with.shape.length - 1 - i
+            const ai = this.of.shape.length - 1 - i
 
-            if (B.shape[bi] === 1 || B.shape[bi] === undefined)
-                shape.push(A.shape[ai])
+            if (this.with.shape[bi] === 1 || this.with.shape[bi] === undefined)
+                shape.push(this.of.shape[ai])
 
-            else if (A.shape[ai] === 1 || A.shape[ai] === undefined)
-                shape.push(B.shape[bi])
+            else if (this.of.shape[ai] === 1 || this.of.shape[ai] === undefined)
+                shape.push(this.with.shape[bi])
 
-            else if (B.shape[bi] === A.shape[ai])
-                shape.push(A.shape[ai])
+            else if (this.with.shape[bi] === this.of.shape[ai])
+                shape.push(this.of.shape[ai])
         }
 
-        return { shape: shape.reverse(), type: A.type }
-    }
-
-    symbolicSource() {
-        return [
-            this.symbolic.operation.before,
-            
-            this.symbolic.totalLoops.join('\n'),
-
-            this.symbolic.indices.A,
-            this.symbolic.indices.B,
-            this.symbolic.indices.R,
-
-            this.symbolic.operation.inside,
-
-            '}'.repeat(this.symbolic.totalLoopAxes.length),
-            
-            this.symbolic.operation.after,
-
-        ].join('\n')
+        return Tensor.zeros({ shape: shape.reverse(), type: this.of.type })
     }
 }

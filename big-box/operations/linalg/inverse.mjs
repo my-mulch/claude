@@ -1,38 +1,42 @@
-import Algebra from '../algebra'
-
-
+import Tensor from '../../tensor'
+import Algebra from '../../template/algebra'
 import Adjugate from './adjugate'
 import Determinant from './determinant'
 
 export default class Inverse {
-    constructor(A, B, R) {
+    constructor(args) {
+        this.tensors = {}
+        this.of = Tensor.tensor({ data:args.of})
+        this.result = args.result || this.resultant()
 
-
-        this.A = A
-        this.B = B
-        this.R = R
-
-        this.rows = this.A.shape[0]
-        this.cols = this.A.shape[1]
+        this.rows = this.of.shape[0]
+        this.cols = this.of.shape[1]
         this.size = this.rows
 
         /** Pointwise Inverse */
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource()
-        this.pointwise.method = new Function('A,B,R', `
-            const temp = new Array(${this.A.type.size})
-            const determinant = new Array(${this.A.type.size})
-            ${this.pointwise.source.join('\n')};
-            return R
-        `)
 
-        this.invoke = this.pointwise.method
+        this.invoke = new Function('A,B,R', `
+            const temp = new Array(${this.of.type.size})
+            const determinant = new Array(${this.of.type.size})
+            ${this.pointwise.source.join('\n')};
+            return R`
+        )
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    static resultant(A) { return { shape: A.shape, type: A.type } }
+    resultant() {
+        return Tensor.zeros({
+            shape: this.of.shape,
+            type: this.of.type
+        })
+    }
 
     pointwiseSource() {
-        this.adjugate = new Adjugate(this.A, this.B, this.R)
+        this.adjugate = new Adjugate({ of: this.of, result: this.result })
         this.determinant = Determinant.fromAdjugate(this.adjugate)
 
         const operations = []
@@ -40,19 +44,19 @@ export default class Inverse {
             for (let c = 0; c < this.size; c++) {
                 const D = Algebra.variable({
                     symbol: 'determinant',
-                    size: this.A.type.size,
+                    size: this.of.type.size,
                     index: 0
                 })
 
                 const R = Algebra.variable({
-                    index: this.R.header.flatIndex([r, c]),
+                    index: this.result.header.flatIndex([r, c]),
                     symbol: 'R.data',
-                    size: this.R.type.size,
+                    size: this.result.type.size,
                 })
 
                 const T = Algebra.variable({
                     symbol: 'temp',
-                    size: this.A.type.size,
+                    size: this.of.type.size,
                     index: 0
                 })
 

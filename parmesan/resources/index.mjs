@@ -1,15 +1,12 @@
 import bb from '../../big-box'
 
 export default {
-    CONTEXT_2D: '2d',
-    CONTEXT_WEB_GL: 'webgl',
+    CANVAS_STROKE_COLOR: 'white',
+    CANVAS_FILL_COLOR: 'rgba(255, 165, 0, 1)',
 
     HUD_FONT: '18px serif',
     HUD_COLOR: 'rgba(255, 255, 255, 1)',
     HUD_TEXT_LOCATION: [10, 50],
-
-    CANVAS_STROKE_COLOR: 'white',
-    CANVAS_FILL_COLOR: 'rgba(255, 165, 0, 1)',
 
     BINDINGS: {
         'o': { name: 'zoom', args: [true] },
@@ -43,9 +40,30 @@ export default {
         '}\n',
 
 
-    TO_VECTOR: bb.tensor({ data: [[0], [0], [0], [1]], type: bb.Float32 }),
-    UP_VECTOR: bb.tensor({ data: [[0], [1], [0], [1]], type: bb.Float32 }),
-    FROM_VECTOR: bb.tensor({ data: [[5], [5], [5], [1]], type: bb.Float32 }),
+    FROM: bb.tensor({
+        data: [
+            ["-2.4744579792022705"],
+            ["1.3318841457366943"],
+            ["-1.3174865245819092"],
+            ["0.9999984502792358"]
+        ]
+    }),
+
+    UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
+
+    TO: bb.tensor({
+        data: [
+            ["4.2933268547058105"],
+            ["-0.23488782346248627"],
+            ["2.6403963565826416"],
+            ["0.9999958276748657"]
+        ]
+    }),
+
+    LOOK_MATRIX: bb.eye({ shape: [4, 4] }),
+    VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
+    TRANSLATION_MATRIX: bb.eye({ shape: [4, 4] }),
+    PROJECTION_MATRIX: bb.zeros({ shape: [4, 4] }),
 
     VIEWING_ANGLE: 30,
     ASPECT_RATIO: 1,
@@ -54,11 +72,11 @@ export default {
 
     ZOOM_DELTA: 0.02,
     PAN_DELTA: Math.PI / 128,
-    ACTIVE_VERTICES: 0,
 
-    UP_DIRECTION: 0,
-    DOWN_DIRECTION: 1,
-    LEFT_DIRECTION: 2,
-    RIGHT_DIRECTION: 3,
-
+    DIRECTIONS: {
+        UP: 0,
+        DOWN: 1,
+        LEFT: 2,
+        RIGHT: 3,
+    },
 }
