@@ -7,14 +7,7 @@ export default class Type {
     }
 
     static promote(A, B) {
-        if (!B.type) return [A, B]
-
-        const maxType = A.type.size > B.type.size ? A.type : B.type
-
-        return [
-            A.astype({ type: maxType }),
-            B.astype({ type: maxType })
-        ]
+        return A.type.size > B.type.size ? A.type : B.type
     }
 
     static isTypedArray(array) {
@@ -43,6 +36,7 @@ export default class Type {
     static parse(number) {
         let token
         let sign = 1
+
         const result = []
         const tokens = String(number)
             .match(PARSE_NUMBER)
@@ -67,8 +61,7 @@ export default class Type {
                 if (symbol in ID_FROM_SYMBOL) {
                     result[ID_FROM_SYMBOL[symbol]] = result[ID_FROM_SYMBOL[symbol]] || 0
                     result[ID_FROM_SYMBOL[symbol]] += sign * Number(token)
-                }
-                else {
+                } else {
                     result[0] = result[0] || 0
                     result[0] += sign * Number(token)
                 }
@@ -83,10 +76,9 @@ export default class Type {
             return data
 
         if (data.constructor === Array)
-            return new this.typed(data
-                .flatMap(function (number) {
-                    return this.align(Type.parse(number))
-                }, this))
+            return new this.typed(data.flatMap(function (number) {
+                return this.align(Type.parse(number))
+            }, this))
 
         if (data.constructor === Number)
             return new this.typed(data * this.size)

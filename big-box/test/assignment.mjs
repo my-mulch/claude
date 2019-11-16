@@ -28,6 +28,7 @@ export default jest.suite(function () {
 
 
 
+    this.expect(new bb.multiplication({ of: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 2 }), with: 'i' }).invoke()).toEqual(["0", "3.1415927410125732i"])
     this.expect(new bb.repeat({ of: J, count: 2, axes: [0] }).invoke()).toEqual([["1", "2"], ["1", "2"], ["3", "4"], ["3", "4"]])
     this.expect(new bb.assignment({ of: bb.zeros({ shape: [1, 3] }), region: [':', ':2'], with: 255 }).invoke()).toEqual([["255", "255", "0"]])
     this.expect(new bb.assignment({ of: bb.zeros({ shape: [1, 3] }), region: [':', 1], with: 255 }).invoke()).toEqual([["0", "255", "0"]])
@@ -38,16 +39,6 @@ export default jest.suite(function () {
     this.expect(new bb.multiplication({ of: K, with: D }).invoke()).toEqual([["0", "4+2i", "8+16i", "27+21i"], ["0", "9+2i", "8+8i", "12+24i"], ["0", "4+3i", "10+2i", "21+21i"], ["0", "7+3i", "6+10i", "21+9i"]])
     this.expect(new bb.repeat({ of: [[1], [2], [3]], count: 3, axes: [1] }).invoke()).toEqual([["1", "1", "1"], ["2", "2", "2"], ["3", "3", "3"]])
 
-    // a = new bb.assignment({
-    //     of: bb.zeros({ shape: [10000, 3], type: bb.ComplexFloat32 }),
-    //     region: [':', 0],
-    //     with: new bb.exponential({
-    //         of: new bb.multiplication({
-    //             of: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }),
-    //             with: 'i'
-    //         }).invoke(),
-    //     }).invoke()
-    // }).invoke()
 
     console.log('\n\n-------- End Mismatch Suite --------\n\n')
 })

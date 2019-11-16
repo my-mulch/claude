@@ -1,13 +1,21 @@
+import Types from '../../types'
 import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
 
 export default class MatrixMultiplication {
     constructor(args) {
-        this.tensors = {}
+        /** Santize */
         this.of = Tensor.tensor({ data: args.of })
         this.with = Tensor.tensor({ data: args.with })
+
+        /** Promote */
+        this.type = Types.promote(this.of, this.with)
+
+        this.of = this.of.astype({ type: this.type })
+        this.with = this.with.astype({ type: this.type })
         this.result = args.result || this.resultant()
 
+        /** Parametrize */
         this.rows = this.of.shape[0]
         this.cols = this.with.shape[1]
         this.like = this.of.shape[1]
