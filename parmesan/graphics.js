@@ -85,7 +85,8 @@ export default class GraphicsEngine {
 
             this.uniformManager.uniforms.u_ViewMatrix(this.cameraManager.lookAt())
             this.uniformManager.uniforms.u_ProjMatrix(this.cameraManager.project())
-
+            
+            console.log(this.cameraManager.project())
 
             this.canvas.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
