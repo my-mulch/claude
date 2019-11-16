@@ -17,8 +17,7 @@ export default class Look {
         this.assignFrontFrame = new bb.assignment({ of: config.VIEW_MATRIX, region: [':3', '2:3'], with: this.unitFront.result })
         this.assignTranslation = new bb.assignment({ of: config.TRANSLATION_MATRIX, region: ['3:4', ':3'], with: this.negateFront.result.T() })
 
-        this.look = new bb.matMult({ of: config.TRANSLATION_MATRIX, with: config.VIEW_MATRIX })
-
+        this.look = new bb.matMult({ of: config.TRANSLATION_MATRIX, with: config.VIEW_MATRIX, result: config.LOOK_MATRIX })
         this.invoke = this.invoke.bind(this)
     }
 

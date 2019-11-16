@@ -44,6 +44,7 @@ export default {
     UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
     FROM: bb.tensor({ data: [[5], [5], [5], [1]] }),
 
+    LOOK_MATRIX: bb.eye({ shape: [4, 4] }),
     VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
     TRANSLATION_MATRIX: bb.eye({ shape: [4, 4] }),
     PROJECTION_MATRIX: bb.zeros({ shape: [4, 4] }),
