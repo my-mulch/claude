@@ -11,7 +11,7 @@ window.app = parmesan
 window.config = config
 
 export default (async function () {
-    app.plot(await imageCube('http://localhost:3000/Users/trumanpurnell/Pictures/11233270_1146995038650978_3611923540576057298_o.jpg'))
+    // app.plot(await imageCube('http://localhost:3000/Users/trumanpurnell/Pictures/11233270_1146995038650978_3611923540576057298_o.jpg'))
     app.plot(axes)
     // app.plot(rgb)
     app.plot(circle)
