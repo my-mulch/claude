@@ -8,9 +8,6 @@ import config from './resources'
 
 class ParmesanApplication {
     constructor() {
-        /** Integrate configuration */
-        Object.assign(this, config)
-
         /** To Draw */
         this.objects = []
 
@@ -21,8 +18,9 @@ class ParmesanApplication {
         this.CANVAS = document.createElement('canvas')
         this.CANVAS.id = 'main'
 
-        // document.body.prepend(this.HUD)
+        document.body.prepend(this.HUD)
         document.body.prepend(this.CANVAS)
+
         this.resize()
 
         /** Managers */
@@ -45,7 +43,7 @@ class ParmesanApplication {
 
         /** Peripherals */
         this.mouse = new Mouse()
-        this.keyboard = new Keyboard(this.BINDINGS)
+        this.keyboard = new Keyboard(config.BINDINGS)
 
         /** Event Listeners */
         window.addEventListener('resize', this.resize)
@@ -68,7 +66,7 @@ class ParmesanApplication {
         if (binding) {
             event.preventDefault()
 
-            this[binding.name].call(null, binding.args)
+            this[binding.name].call(null, ...binding.args)
         }
     }
 
@@ -79,7 +77,7 @@ class ParmesanApplication {
         this.HUD.width = window.innerWidth * 0.5
         this.HUD.height = window.innerHeight * 0.2
 
-        this.ASPECT_RATIO = this.CANVAS.width / this.CANVAS.height
+        config.ASPECT_RATIO = this.CANVAS.width / this.CANVAS.height
     }
 
     plot({ vertices, colors, sizes, mode }) {

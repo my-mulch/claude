@@ -2,8 +2,6 @@ import config from '../../resources'
 
 export default class WebGLManager {
     constructor({ CANVAS }) {
-        Object.assign(this, config)
-
         this.CONTEXT = CANVAS.getContext('webgl')
 
         this.program = this.createProgram()
@@ -127,12 +125,12 @@ export default class WebGLManager {
 
         this.CONTEXT.attachShader(program, this.createShader(
             this.CONTEXT.VERTEX_SHADER,
-            this.VERTEX_SOURCE
+            config.VERTEX_SOURCE
         ))
 
         this.CONTEXT.attachShader(program, this.createShader(
             this.CONTEXT.FRAGMENT_SHADER,
-            this.FRAGMENT_SOURCE
+            config.FRAGMENT_SOURCE
         ))
 
         this.CONTEXT.linkProgram(program)
