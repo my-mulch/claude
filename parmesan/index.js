@@ -1,10 +1,14 @@
 import Mouse from './peripherals/mouse'
 import Keyboard from './peripherals/keyboard'
 
+import WebGLManager from './managers/webgl'
+import CameraManager from './managers/camera'
+
 import config from './resources'
 
 class ParmesanApplication {
     constructor() {
+        /** Integrate configuration */
         Object.assign(this, config)
 
         /** To Draw */
@@ -12,12 +16,10 @@ class ParmesanApplication {
 
         /** Displays */
         this.resize()
-        document.body.prepend(this.HUD)
-        document.body.prepend(this.CANVAS)
 
         /** Managers */
-        this.webGLManager = new WebGLManager()
-        this.cameraManager = new CameraManager()
+        this.webgl = new WebGLManager()
+        this.camera = new CameraManager()
 
         /** Graphics Operations */
         this.pan = this.pan.bind(this)
@@ -35,8 +37,8 @@ class ParmesanApplication {
         this.mousemove = this.mousemove.bind(this)
 
         /** Peripherals */
-        this.mouse = new Mouse({ x: 0, y: 0 })
-        this.keyboard = new Keyboard(this.config.BINDINGS)
+        this.mouse = new Mouse()
+        this.keyboard = new Keyboard(this.BINDINGS)
 
         /** Event Listeners */
         window.addEventListener('resize', this.resize)
@@ -52,14 +54,14 @@ class ParmesanApplication {
     mousemove(event) { this.mouse.mousemove(event) }
 
     keyup() { this.keyboard.keyup() }
+
     keydown(event) {
         const binding = this.keyboard.keydown(event)
 
         if (binding) {
             event.preventDefault()
 
-            const command = this.graphics[binding.name]
-            command(...binding.args)
+            this[binding.name].call(null, binding.args)
         }
     }
 
@@ -75,11 +77,11 @@ class ParmesanApplication {
 
     plot({ vertices, colors, sizes, mode }) {
         this.objects.push({
-            sizeBuffer: this.webGLManager.createBuffer(sizes),
-            colorBuffer: this.webGLManager.createBuffer(colors),
-            vertexBuffer: this.webGLManager.createBuffer(vertices),
+            sizeBuffer: this.webgl.createBuffer(sizes),
+            colorBuffer: this.webgl.createBuffer(colors),
+            vertexBuffer: this.webgl.createBuffer(vertices),
 
-            drawMode: this.webGLManager.CONTEXT[mode],
+            drawMode: this.webgl.CONTEXT[mode],
             drawCount: vertices.shape[0]
         })
 
@@ -87,29 +89,29 @@ class ParmesanApplication {
     }
 
     render() {
-        this.webGLManager.CONTEXT.clear(this.webGLManager.CONTEXT.COLOR_BUFFER_BIT)
+        this.webgl.CONTEXT.clear(this.webgl.CONTEXT.COLOR_BUFFER_BIT)
 
         for (const object of this.objects) {
 
-            this.webGLManager.attributes.a_Color(object.colorBuffer)
-            this.webGLManager.attributes.a_PointSize(object.sizeBuffer)
-            this.webGLManager.attributes.a_Position(object.vertexBuffer)
+            this.webgl.attributes.a_Color(object.colorBuffer)
+            this.webgl.attributes.a_PointSize(object.sizeBuffer)
+            this.webgl.attributes.a_Position(object.vertexBuffer)
 
-            this.webGLManager.uniforms.u_ViewMatrix(this.cameraManager.look())
-            this.webGLManager.uniforms.u_ProjMatrix(this.cameraManager.project())
+            this.webgl.uniforms.u_ViewMatrix(this.camera.look())
+            this.webgl.uniforms.u_ProjMatrix(this.camera.project())
 
 
-            this.webGLManager.CONTEXT.drawArrays(object.drawMode, 0, object.drawCount)
+            this.webgl.CONTEXT.drawArrays(object.drawMode, 0, object.drawCount)
         }
     }
 
     pan(direction) {
-        this.cameraManager.pan(direction)
+        this.camera.pan(direction)
         this.render()
     }
 
     zoom(zoomOut) {
-        this.cameraManager.zoom(zoomOut)
+        this.camera.zoom(zoomOut)
         this.render()
     }
 }

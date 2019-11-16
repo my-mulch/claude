@@ -199,7 +199,7 @@ export default class Tensor {
             .stringify(this.toRaw())
             .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
-    
+
     valueOf() { return this.data[this.offset] }
     [util.inspect.custom]() { return this.toString() }
 }

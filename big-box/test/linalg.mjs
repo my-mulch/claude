@@ -32,7 +32,7 @@ export default jest.suite(function () {
         ]
     })
 
-    C = bb.tensor({ data: [["1"], ["2"], ["3"]], })
+    C = bb.tensor({ data:[["1"], ["2"], ["3"]], })
 
     E = bb.tensor({
         data: [[["10", "5", "2"],
@@ -51,8 +51,8 @@ export default jest.suite(function () {
         ["21", "2", "2"]]],
     })
 
-    const F = bb.tensor({ data: [["72 + 91i + 13j + 57k"]], })
-    const G = bb.tensor({ data: [["10 + 72i + 91j + 13k"]], })
+    const F = bb.tensor({ data:[["72 + 91i + 13j + 57k"]], })
+    const G = bb.tensor({ data:[["10 + 72i + 91j + 13k"]], })
 
 
 

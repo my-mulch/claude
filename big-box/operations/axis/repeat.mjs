@@ -1,6 +1,6 @@
 import Tensor from '../../tensor'
-import Algebra from '../../algebra'
-import Template from '../../template'
+import Source from '../../template/source'
+import Algebra from '../../template/algebra'
 
 import AxisOperation from './operation'
 
@@ -14,39 +14,42 @@ export default class Repeat extends AxisOperation {
         this.axes.last = this.axes.order[this.axes.order.length - 1]
         this.axes.repeat = this.axes.inner[0] || this.axes.last
 
-        this.tensors.R = args.result || this.resultant()
-        this.strides.R = this.tensors.R.strides
-        
-        this.scalars.R = this.axes.total.map(Template.prefix)
+        this.result = args.result || this.resultant()
+        this.strides.R = this.result.strides
+
+        this.scalars.R = this.axes.total.map(Source.prefix)
         this.scalars.R[this.axes.repeat] = 'r'
 
-        this.indices.R = Template.index('RIndex', this.scalars.R, this.strides.R, this.tensors.R.offset)
+        this.indices.result = Source.index('RIndex', this.scalars.R, this.strides.R, this.result.offset)
 
-        this.loops.count = Template.loop([`let r = i${this.axes.last}*${this.count}, c = 0`], [`c < ${this.count}`], ['r++, c++'])
+        this.loops.count = Source.loop([`let r = i${this.axes.last}*${this.count}, c = 0`], [`c < ${this.count}`], ['r++, c++'])
 
-        this.invoke = new Function([
+        this.invoke = new Function('A,B,R', [
             ...this.loops.outer,
             ...this.loops.inner,
 
-            this.indices.A,
+            this.indices.of,
             this.loops.count,
-            this.indices.R,
+            this.indices.result,
 
-            Algebra.assign(this.variables.R, this.variables.A),
+            Algebra.assign(this.variables.result, this.variables.of),
 
             `}`,
             `}`.repeat(this.loops.inner.length),
             `}`.repeat(this.loops.outer.length),
 
-            `return this.tensors.R`
+            `return R`
 
-        ].join('\n')).bind(this)
+        ].join('\n'))
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
     resultant() {
         return Tensor.zeros({
-            type: this.tensors.A.type,
-            shape: this.tensors.A.shape.map(function (value, axis) {
+            type: this.of.type,
+            shape: this.of.shape.map(function (value, axis) {
                 return axis === this.axes.repeat ? this.count * value : value
             }, this)
         })

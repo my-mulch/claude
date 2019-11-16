@@ -1,25 +1,28 @@
-import Algebra from '../../algebra'
+import Algebra from '../../template/algebra'
 import ElementOperation from './operation'
 
 export default class Sine extends ElementOperation {
     constructor(args) {
         super(args)
 
-        this.invoke = new Function([
+        this.invoke = new Function('A,B,R', [
             this.loops.total.join('\n'),
 
-            this.indices.A,
-            this.indices.R,
+            this.indices.of,
+            this.indices.result,
 
             Algebra.assign(
-                this.variables.R,
-                Algebra.sin(this.variables.A)
+                this.variables.result,
+                Algebra.sin(this.variables.of)
             ),
 
             '}'.repeat(this.axes.total.length),
 
-            `return this.tensors.R`
-        ].join('\n')).bind(this)
+            `return R`
+        ].join('\n'))
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 }
 

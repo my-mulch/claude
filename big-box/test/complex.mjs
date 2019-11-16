@@ -37,8 +37,8 @@ export default jest.suite(function () {
     })
 
 
-    const E = bb.tensor({ data: ['1 + 8i'], })
-    const F = bb.tensor({ data: [['0'], ['1'], ['2'], ['3'], ['4']], })
+    const E = bb.tensor({ data:['1 + 8i'], })
+    const F = bb.tensor({ data:[['0'], ['1'], ['2'], ['3'], ['4']], })
 
     const G = bb.tensor({
         data: [
@@ -71,8 +71,8 @@ export default jest.suite(function () {
 
     })
 
-    const I = bb.tensor({ data: [['1 + 1i', '4 + 6i', '2 - 5i']], })
-    const J = bb.tensor({ data: [['7 - 1i', '2 + 1i', '5 - 9i']], })
+    const I = bb.tensor({ data:[['1 + 1i', '4 + 6i', '2 - 5i']], })
+    const J = bb.tensor({ data:[['7 - 1i', '2 + 1i', '5 - 9i']], })
 
     const K = bb.tensor({
         data: [
@@ -91,7 +91,7 @@ export default jest.suite(function () {
 
     const M = new bb.assignment({
         of: bb.zeros({ shape: [100, 100], type: bb.ComplexFloat32 }),
-        with: bb.tensor({ data: ['1 + 1i'], type: bb.ComplexFloat32 })
+        with: bb.tensor({ data:['1 + 1i'], type: bb.ComplexFloat32 })
     }).invoke()
 
     const N = bb.tensor({
@@ -99,7 +99,7 @@ export default jest.suite(function () {
 
     })
 
-    const O = bb.tensor({ data: [['1. + 3i', '0. + 4i'], ['2. + 1i', '3. + 3i']], })
+    const O = bb.tensor({ data:[['1. + 3i', '0. + 4i'], ['2. + 1i', '3. + 3i']], })
     const P = bb.tensor({
         data: [["0.+4i", "0.+4i", "2.+2i", "0.+1i", "3.+4i"], ["1.+2i", "1.+3i", "4.+0i", "2.+4i", "0.+3i"], ["3.+3i", "4.+1i", "3.+0i", "3.+3i", "0.+1i"], ["0.+3i", "3.+3i", "0.+1i", "1.+4i", "2.+1i"], ["2.+2i", "4.+4i", "3.+3i", "3.+4i", "1.+1i"]],
 
@@ -118,8 +118,8 @@ export default jest.suite(function () {
     this.expect(new bb.mean({ of: B }).invoke()).toEqual('4.464285850524902+4.690476417541504i')
     this.expect(new bb.sum({ of: B }).invoke()).toEqual('375+394i')
     this.expect(new bb.norm({ of: B }).invoke()).toEqual('69.73521423339844')
-    this.expect(new bb.addition({ of: B, with: B }).invoke()).toEqual(new bb.multiplication({ of: B, with: bb.tensor({ data: [2], type: bb.ComplexFloat32 }) }).invoke())
-    this.expect(new bb.subtraction({ of: B, with: B }).invoke()).toEqual(new bb.multiplication({ of: B, with: bb.tensor({ data: [0], type: bb.ComplexFloat32 }) }).invoke())
+    this.expect(new bb.addition({ of: B, with: B }).invoke()).toEqual(new bb.multiplication({ of: B, with: bb.tensor({ data:[2], type: bb.ComplexFloat32 }) }).invoke())
+    this.expect(new bb.subtraction({ of: B, with: B }).invoke()).toEqual(new bb.multiplication({ of: B, with: bb.tensor({ data:[0], type: bb.ComplexFloat32 }) }).invoke())
     this.expect(new bb.division({ of: B, with: B }).invoke()).toEqual([["1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"], ["1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"]])
     this.expect(new bb.subtraction({ of: B, with: C }).invoke()).toEqual(new bb.subtraction({ of: B, with: '0 + 1i' }).invoke())
     this.expect(new bb.multiplication({ of: A, with: E }).invoke()).toEqual([["-6+82i"], ["16+323i"], ["42+401i"]])

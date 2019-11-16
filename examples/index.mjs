@@ -29,19 +29,23 @@ export const points = {
 }
 
 export const circle = {
-    vertices: bb
-        .zeros({ shape: [10000, 3], type: bb.ComplexFloat32 })
-        .assign({
-            region: [':', 0],
-            with: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' }).exp()
-        }),
+    vertices: new bb.assignment({
+        of: bb.zeros({ shape: [10000, 3], type: bb.ComplexFloat32 }),
+        region: [':', 0],
+        with: new bb.exponential({
+            of: new bb.mulitplication({
+                of: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }),
+                with: 'i'
+            }).invoke(),
+        }).invoke()
+    }).invoke(),
 
     colors: bb
         .zeros({ shape: [10000, 3] })
         .assign({ region: [':', ':2'], with: 255 }),
 
     sizes: bb.ones({ shape: [10000, 1] }).multiply({ with: 1 }),
-    
+
     mode: 'POINTS'
 }
 

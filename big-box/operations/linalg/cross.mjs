@@ -1,41 +1,43 @@
 import Tensor from '../../tensor'
-import Algebra from '../../algebra'
+import Algebra from '../../template/algebra'
 
 export default class CrossProduct {
     constructor(args) {
-        this.tensors = {}
-        this.tensors.A = Tensor.tensor({ data: args.of })
-        this.tensors.B = Tensor.tensor({ data: args.with })
-        this.tensors.R = args.result || this.resultant()
+        this.of = Tensor.tensor({ data:args.of})
+        this.with = Tensor.tensor({ data:args.with })
+        this.result = args.result || this.resultant()
 
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource()
 
-        this.invoke = new Function(this.pointwise.source.join('\n')).bind(this)
+        this.invoke = new Function('A,B,R', this.pointwise.source.join('\n')).bind(this)
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    resultant() { return Tensor.zeros({ shape: [3, 1], type: this.tensors.A.type }) }
+    resultant() { return Tensor.zeros({ shape: [3, 1], type: this.of.type }) }
 
     pointwiseSource() {
         const A = [], B = [], R = []
 
         for (let i = 0; i < 3; i++) {
             A.push(Algebra.variable({
-                symbol: 'this.tensors.A.data',
-                index: this.tensors.A.header.flatIndex([i, 0]),
-                size: this.tensors.A.type.size
+                symbol: 'A.data',
+                index: this.of.header.flatIndex([i, 0]),
+                size: this.of.type.size
             }))
 
             B.push(Algebra.variable({
-                symbol: 'this.tensors.B.data',
-                index: this.tensors.B.header.flatIndex([i, 0]),
-                size: this.tensors.B.type.size
+                symbol: 'B.data',
+                index: this.with.header.flatIndex([i, 0]),
+                size: this.with.type.size
             }))
 
             R.push(Algebra.variable({
-                symbol: 'this.tensors.R.data',
-                index: this.tensors.R.header.flatIndex([i, 0]),
-                size: this.tensors.R.type.size
+                symbol: 'R.data',
+                index: this.result.header.flatIndex([i, 0]),
+                size: this.result.type.size
             }))
         }
 
@@ -44,7 +46,7 @@ export default class CrossProduct {
             Algebra.assign(R[1], Algebra.add(Algebra.negate(Algebra.multiply(A[0], B[2])), Algebra.multiply(B[0], A[2]))),
             Algebra.assign(R[2], Algebra.subtract(Algebra.multiply(A[0], B[1]), Algebra.multiply(B[0], A[1]))),
 
-            `return this.tensors.R`
+            `return R`
         ]
     }
 }

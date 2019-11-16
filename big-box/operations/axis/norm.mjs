@@ -1,6 +1,6 @@
 import Types from '../../types'
 import Tensor from '../../tensor'
-import Algebra from '../../algebra'
+import Algebra from '../../template/algebra'
 import ElementOperation from './operation'
 
 export default class Norm extends ElementOperation {
@@ -11,30 +11,33 @@ export default class Norm extends ElementOperation {
             result: args.result || Tensor.zeros({ type: Types.Float32, shape: [] })
         })
 
-        this.invoke = new Function([
-            `const temp = new Array(${this.tensors.A.type.size}).fill(0)`,
+        this.invoke = new Function('A,B,R', [
+            `const temp = new Array(${this.of.type.size}).fill(0)`,
 
             this.loops.outer.join('\n'),
-            this.indices.R,
+            this.indices.result,
             this.loops.inner.join('\n'),
-            this.indices.A,
+            this.indices.of,
 
             Algebra.assign(
-                this.variables.T.slice(0, 1),
-                Algebra.sum(Algebra.square(this.variables.A)), '+=').slice(0, 1),
+                this.variables.temp.slice(0, 1),
+                Algebra.sum(Algebra.square(this.variables.of)), '+=').slice(0, 1),
 
             '}'.repeat(this.loops.inner.length),
 
             Algebra.assign(
-                this.variables.R,
-                Algebra.squareRoot(this.variables.T)),
+                this.variables.result,
+                Algebra.squareRoot(this.variables.temp)),
 
             `temp.fill(0)`,
 
             '}'.repeat(this.loops.outer.length),
 
-            'return this.tensors.R'
+            'return R'
         ].join('\n'))
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 }
 

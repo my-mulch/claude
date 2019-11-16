@@ -1,12 +1,12 @@
 
-export default class Template {
+export default class Source {
     static loop(init, check, delta) {
         return `for(${init}; ${check}; ${delta}){`
     }
 
     static loopAxes(axes, tensor) {
         return axes.map(function (axis) {
-            return Template.loop(
+            return Source.loop(
                 [`let i${axis} = 0`],
                 [`i${axis} < ${tensor.shape[axis]}`],
                 [`i${axis}++`])

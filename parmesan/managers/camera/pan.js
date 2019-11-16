@@ -11,16 +11,16 @@ export default class Pan {
         const s = Math.sin(this.PAN_DELTA)
         const c = Math.cos(this.PAN_DELTA)
 
-        this.upRot = bb.tensor({ data: [[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]] })
-        this.downRot = bb.tensor({ data: [[1, 0, 0, 0], [0, c, s, 0], [0, -s, c, 0], [0, 0, 0, 1]] })
-        this.leftRot = bb.tensor({ data: [[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]] })
-        this.rightRot = bb.tensor({ data: [[c, 0, -s, 0], [0, 1, 0, 0], [s, 0, c, 0], [0, 0, 0, 1]] })
+        this.upRot = bb.tensor({ data:[[1, 0, 0, 0], [0, c, -s, 0], [0, s, c, 0], [0, 0, 0, 1]] })
+        this.downRot = bb.tensor({ data:[[1, 0, 0, 0], [0, c, s, 0], [0, -s, c, 0], [0, 0, 0, 1]] })
+        this.leftRot = bb.tensor({ data:[[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]] })
+        this.rightRot = bb.tensor({ data:[[c, 0, -s, 0], [0, 1, 0, 0], [s, 0, c, 0], [0, 0, 0, 1]] })
 
         this.inverseView = new bb.inverse({ of: this.VIEW_MATRIX })
         this.VIEW_MATRIX_INV = this.inverseView.invoke()
         this.VIEW_MATRIX_INV_T = this.VIEW_MATRIX_INV.T()
 
-        this.setRotation = new bb.matMult({ of: this.VIEW_MATRIX_INV_T, with: bb.template({ shape: [4, 4] }) })
+        this.setRotation = new bb.matMult({ of: this.VIEW_MATRIX_INV_T, with: bb.zeros({ shape: [4, 4] }), template: true })
         this.setViewMatrix = new bb.matMult({ of: this.setRotation.result, with: this.VIEW_MATRIX_T })
         this.setPosition = new bb.matMult({ of: this.setViewMatrix.result, with: this.TO, result: this.TO })
     }

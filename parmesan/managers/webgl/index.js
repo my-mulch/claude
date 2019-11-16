@@ -4,7 +4,7 @@ export default class WebGLManager {
     constructor() {
         Object.assign(this, config)
 
-        this.CONTEXT = this.CANVAS.getContext(this.CONTEXT_WEB_GL)
+        this.CONTEXT = document.getElementById('canvas').getContext(this.CONTEXT_WEB_GL)
 
         this.program = this.createProgram()
         this.uniforms = this.createUniforms()

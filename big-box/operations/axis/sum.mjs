@@ -1,33 +1,36 @@
-import Algebra from '../../algebra'
+import Algebra from '../../template/algebra'
 import ElementOperation from './operation'
 
 export default class Sum extends ElementOperation {
     constructor(args) {
         super({ ...args, axes: args.axes || [...args.of.shape.keys()] })
 
-        this.invoke = new Function([
-            `const temp = new Array(${this.tensors.A.type.size}).fill(0)`,
+        this.invoke = new Function('A,B,R', [
+            `const temp = new Array(${this.of.type.size}).fill(0)`,
 
             this.loops.outer.join('\n'),
-            this.indices.R,
+            this.indices.result,
             this.loops.inner.join('\n'),
-            this.indices.A,
+            this.indices.of,
 
             Algebra.assign(
-                this.variables.T,
-                this.variables.A, '+='),
+                this.variables.temp,
+                this.variables.of, '+='),
 
             '}'.repeat(this.loops.inner.length),
-            
+
             Algebra.assign(
-                this.variables.R,
-                this.variables.T),
+                this.variables.result,
+                this.variables.temp),
 
             `temp.fill(0)`,
 
             '}'.repeat(this.loops.outer.length),
 
-            'return this.tensors.R'
+            'return R'
         ].join('\n'))
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 }

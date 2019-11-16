@@ -1,15 +1,14 @@
 import Tensor from '../../tensor'
-import Algebra from '../../algebra'
+import Algebra from '../../template/algebra'
 import { indexTemplate } from './utils'
 
 export default class Determinant {
     constructor(args) {
-        this.tensors = {}
-        this.tensors.A = Tensor.tensor({ data: args.of })
-        this.tensors.R = args.result || this.resultant()
+        this.of = Tensor.tensor({ data: args.of})
+        this.result = args.result || this.resultant()
 
-        this.rows = this.tensors.A.shape[0]
-        this.cols = this.tensors.A.shape[1]
+        this.rows = this.of.shape[0]
+        this.cols = this.of.shape[1]
         this.size = this.rows
 
         this.matrixTemplate = indexTemplate(this.size)
@@ -17,27 +16,30 @@ export default class Determinant {
         this.pointwise = {}
         this.pointwise.source = this.pointwiseSource(this.matrixTemplate)
 
-        this.invoke = new Function([this.pointwise.source, `return R`].join('\n'))
+        this.invoke = new Function('A,B,R', [this.pointwise.source, `return R`].join('\n'))
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
     static fromAdjugate(adjugate) {
         return Algebra.assign(
             Algebra.variable({
                 symbol: 'determinant',
-                size: adjugate.tensors.A.type.size,
+                size: adjugate.of.type.size,
                 index: 0
             }),
             new Array(adjugate.size).fill(null).map(function (_, i) {
                 return Algebra.multiply(
                     Algebra.variable({
-                        symbol: 'this.tensors.A.data',
-                        size: adjugate.tensors.A.type.size,
-                        index: adjugate.tensors.A.header.flatIndex([0, i])
+                        symbol: 'A.data',
+                        size: adjugate.of.type.size,
+                        index: adjugate.of.header.flatIndex([0, i])
                     }),
                     Algebra.variable({
-                        symbol: 'this.tensors.R.data',
-                        size: adjugate.tensors.A.type.size,
-                        index: adjugate.tensors.R.header.flatIndex([i, 0])
+                        symbol: 'R.data',
+                        size: adjugate.of.type.size,
+                        index: adjugate.result.header.flatIndex([i, 0])
                     }))
             }).reduce(Algebra.add))
     }
@@ -45,16 +47,16 @@ export default class Determinant {
     resultant() {
         return Tensor.zeros({
             shape: [1, 1],
-            type: this.tensors.A.type.size
+            type: this.of.type.size
         })
     }
 
     pointwiseSource(matrix) {
         if (matrix.length === 1)
             return Algebra.variable({
-                symbol: 'this.tensors.A.data',
-                size: this.tensors.A.type.size,
-                index: this.tensors.A.header.flatIndex(matrix[0])
+                symbol: 'A.data',
+                size: this.of.type.size,
+                index: this.of.header.flatIndex(matrix[0])
             })
 
         const subDeterminants = []
@@ -65,9 +67,9 @@ export default class Determinant {
             const subDeterminant = this.pointwiseSource(minor)
 
             const factor = Algebra.variable({
-                symbol: 'this.tensors.A.data',
-                size: this.tensors.A.type.size,
-                index: this.tensors.A.header.flatIndex(matrix[i])
+                symbol: 'A.data',
+                size: this.of.type.size,
+                index: this.of.header.flatIndex(matrix[i])
             })
 
             const cofactor = Algebra.multiply(factor, subDeterminant)

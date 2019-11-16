@@ -42,9 +42,9 @@ export default {
         '}\n',
 
 
-    TO: bb.tensor({ data: [[0], [0], [0], [1]] }),
-    UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
-    FROM: bb.tensor({ data: [[5], [5], [5], [1]] }),
+    TO: bb.tensor({ data:[[0], [0], [0], [1]] }),
+    UP: bb.tensor({ data:[[0], [1], [0], [1]] }),
+    FROM: bb.tensor({ data:[[5], [5], [5], [1]] }),
 
     VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
     TRANSLATION_MATRIX: bb.eye({ shape: [4, 4] }),
@@ -56,7 +56,6 @@ export default {
 
     ZOOM_DELTA: 0.02,
     PAN_DELTA: Math.PI / 128,
-    ACTIVE_VERTICES: 0,
 
     DIRECTIONS: {
         UP: 0,
