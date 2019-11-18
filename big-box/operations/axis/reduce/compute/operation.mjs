@@ -1,11 +1,11 @@
 import AxisOperation from '../../operation'
 
 export default class AxisReduceComputeOperation extends AxisOperation {
-    constructor(args, inside, after) {
+    constructor(args, operations) {
         super(args)
 
-        this.after = after.bind(this)
-        this.inside = inside.bind(this)
+        this.after = operations.after.bind(this)
+        this.inside = operations.inside.bind(this)
 
         this.invoke = new Function('A,B,R', [
             `const temp = new Array(${this.of.type.size}).fill(0)`,

@@ -3,9 +3,23 @@ import PairOperationFactory from './factory'
 
 export default {
     add: PairOperationFactory(Algebra.add),
-    divide: PairOperationFactory(Algebra.divide),
     subtract: PairOperationFactory(Algebra.subtract),
     multiply: PairOperationFactory(Algebra.multiply),
+
+    divide: class extends PairOperation {
+        constructor(args) {
+            const A = args.of.slice({ region: args.region || [] })
+            super({ ...args, of: A, result: A }, {
+                inner: function () {
+                    return Algebra.divide(
+                        this.variables.result,
+                        this.variables.of,
+                        this.variables.with)
+                },
+                after: function () { return 'return R' }
+            })
+        }
+    },
 
     assign: class extends PairOperation {
         constructor(args) {

@@ -9,10 +9,10 @@ import { __Math__ } from '../../resources'
 export default class PairOperation {
     constructor(args, operations) {
         /** Operations */
-        this.operations.inner = operations.inner.bind(this)
-        this.operations.after = operations.after.bind(this)
-        this.operations.before = operations.before.bind(this)
-        
+        this.operations.inner = operations.inner && operations.inner.bind(this)
+        this.operations.after = operations.after && operations.after.bind(this)
+        this.operations.before = operations.before && operations.before.bind(this)
+
         /** Santize */
         this.of = Tensor.tensor({ data: args.of })
         this.with = Tensor.tensor({ data: args.with })
@@ -59,6 +59,19 @@ export default class PairOperation {
         this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.type.size })
         this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
         this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
+
+        /** Source */
+        this.invoke = new Function('A,B,R', [
+            this.operations.before && this.operations.before(),
+            this.loops.total.join('\n'),
+            Object.values(this.indices).join('\n'),
+            this.operations.inner && this.operations.inner(),
+            '}'.repeat(this.axes.total.length),
+            this.operations.after && this.operations.after()
+        ].join('\n')).bind(this)
+
+        if (!args.template)
+            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
 
     resultant() {
