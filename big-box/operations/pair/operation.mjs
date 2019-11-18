@@ -7,7 +7,12 @@ import Algebra from '../../template/algebra'
 import { __Math__ } from '../../resources'
 
 export default class PairOperation {
-    constructor(args) {
+    constructor(args, operations) {
+        /** Operations */
+        this.operations.inner = operations.inner.bind(this)
+        this.operations.after = operations.after.bind(this)
+        this.operations.before = operations.before.bind(this)
+        
         /** Santize */
         this.of = Tensor.tensor({ data: args.of })
         this.with = Tensor.tensor({ data: args.with })
