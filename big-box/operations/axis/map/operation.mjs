@@ -1,9 +1,10 @@
-import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import AxisOperation from '../operation'
 
-export default class Exponential extends AxisOperation {
-    constructor(args) {
+export default class AxisMapOperation extends AxisOperation {
+    constructor(args, operation) {
         super(args)
+        
+        this.operation = operation
 
         this.invoke = new Function('A,B,R', [
             this.loops.total.join('\n'),
@@ -13,7 +14,7 @@ export default class Exponential extends AxisOperation {
 
             Algebra.assign(
                 this.variables.result,
-                Algebra.exp(this.variables.of)
+                this.operation(this.variables.of)
             ),
 
             '}'.repeat(this.axes.total.length),
@@ -25,4 +26,3 @@ export default class Exponential extends AxisOperation {
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 }
-

@@ -1,9 +1,11 @@
-import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import AxisOperation from '../../operation'
 
-export default class Mean extends AxisOperation {
-    constructor(args) {
-        super({ ...args, axes: args.axes || [...args.of.shape.keys()] })
+export default class AxisReduceComputeOperation extends AxisOperation {
+    constructor(args, inside, after) {
+        super(args)
+
+        this.after = after.bind(this)
+        this.inside = inside.bind(this)
 
         this.invoke = new Function('A,B,R', [
             `const temp = new Array(${this.of.type.size}).fill(0)`,
@@ -13,15 +15,11 @@ export default class Mean extends AxisOperation {
             this.loops.inner.join('\n'),
             this.indices.of,
 
-            Algebra.assign(
-                this.variables.temp,
-                this.variables.of, '+='),
+            this.inside(),
 
             '}'.repeat(this.loops.inner.length),
 
-            Algebra.assign(
-                this.variables.result,
-                Algebra.scale(this.variables.temp, 1 / this.dimensions.inner)),
+            this.after(),
 
             `temp.fill(0)`,
 

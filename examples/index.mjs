@@ -152,33 +152,33 @@ export const points = {
         ]
     }),
 
-    sizes: new bb.cached.multiplication({ of: bb.ones({ shape: [10000, 1] }), with: 20 }).invoke(),
+    sizes: new bb.cached.multiply({ of: bb.ones({ shape: [10000, 1] }), with: 20 }).invoke(),
     mode: 'POINTS'
 }
 
 export const circle = {
-    vertices: new bb.cached.assignment({
+    vertices: new bb.cached.assign({
         of: bb.zeros({ shape: [10000, 3], type: bb.ComplexFloat32 }),
         region: [':', 0],
-        with: new bb.cached.exponential({
-            of: new bb.cached.multiplication({
+        with: new bb.cached.exp({
+            of: new bb.cached.multiply({
                 of: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }),
                 with: 'i'
             }).invoke()
         }).invoke()
     }).invoke(),
 
-    colors: new bb.cached.assignment({ of: bb.zeros({ shape: [10000, 3] }), region: [':', ':2'], with: 255 }).invoke(),
-    sizes: new bb.cached.multiplication({ of: bb.ones({ shape: [10000, 1] }), with: 1 }).invoke(),
+    colors: new bb.cached.assign({ of: bb.zeros({ shape: [10000, 3] }), region: [':', ':2'], with: 255 }).invoke(),
+    sizes: new bb.cached.multiply({ of: bb.ones({ shape: [10000, 1] }), with: 1 }).invoke(),
     mode: 'POINTS'
 }
 
 
 /** RGB Cube */
 
-var vertices = new bb.cached.division({ of: bb.randrange({ low: 0, high: 255, shape: [100, 3] }), with: 255 }).invoke()
+var vertices = new bb.cached.divide({ of: bb.randrange({ low: 0, high: 255, shape: [100, 3] }), with: 255 }).invoke()
 var colors = vertices
-var sizes = new bb.cached.multiplication({ of: bb.ones({ shape: [100, 1] }), with: 10 }).invoke()
+var sizes = new bb.cached.multiply({ of: bb.ones({ shape: [100, 1] }), with: 10 }).invoke()
 var mode = 'POINTS'
 
 export const rgb = { vertices, colors, sizes, mode }
@@ -189,9 +189,9 @@ export const rgb = { vertices, colors, sizes, mode }
 export const imageCube = async function (picture = 'http://localhost:3000/Users/trumanpurnell/Pictures/68828786_10217017620425433_2350853209913819136_o.jpg') {
     const { shape, pixels, binary } = await myio.imread(picture)
 
-    var vertices = new bb.cached.division({ of: bb.tensor({ data: pixels, type: bb.Float32 }).reshape({ shape: [-1, 3] }), with: 255 }).invoke()
+    var vertices = new bb.cached.divide({ of: bb.tensor({ data: pixels, type: bb.Float32 }).reshape({ shape: [-1, 3] }), with: 255 }).invoke()
     var colors = vertices
-    var sizes = new bb.cached.multiplication({ of: bb.ones({ shape: [vertices.shape[0], 1] }), with: 1 }).invoke()
+    var sizes = new bb.cached.multiply({ of: bb.ones({ shape: [vertices.shape[0], 1] }), with: 1 }).invoke()
 
     return { vertices, colors, sizes, mode: 'POINTS' }
 }

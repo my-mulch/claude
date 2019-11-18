@@ -1,9 +1,12 @@
 import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import AxisOperation from '../../operation'
 
-export default class Maximum extends AxisOperation {
-    constructor(args) {
-        super({ ...args, axes: args.axes || [...args.of.shape.keys()] })
+export default class AxisReduceCompareOperation extends AxisOperation {
+    constructor(args, placeholder, comparator) {
+        super(args)
+
+        this.comparator = comparator
+        this.placeholder = placeholder
 
         this.invoke = new Function('A,B,R', [
             `const temp = new Array(${this.of.type.size}).fill(0)`,
@@ -11,13 +14,13 @@ export default class Maximum extends AxisOperation {
             this.loops.outer.join('\n'),
             this.indices.result,
 
-            `temp.fill(Number.NEGATIVE_INFINITY)`,
+            `temp.fill(${this.placeholder})`,
 
             this.loops.inner.join('\n'),
             this.indices.of,
 
             Algebra.if(
-                Algebra.greaterThan(this.variables.of, this.variables.temp).slice(0, 1),
+                this.comparator(this.variables.of, this.variables.temp).slice(0, 1),
                 Algebra.assign(this.variables.temp, this.variables.of)
             ),
 

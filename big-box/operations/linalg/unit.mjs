@@ -1,5 +1,5 @@
 import Norm from './norm'
-import Division from '../pair/division'
+import Division from '../pair/divide'
 import AxisOperation from './operation'
 
 export default class Unit extends AxisOperation {
@@ -7,7 +7,7 @@ export default class Unit extends AxisOperation {
         super(args)
 
         this.norm = new Norm({ of: this.of })
-        this.division = new Division({
+        this.divide = new Division({
             of: this.of,
             with: this.norm.result,
             result: this.result,
@@ -17,7 +17,7 @@ export default class Unit extends AxisOperation {
 
     invoke() {
         this.norm.invoke()
-        return this.division.invoke()
+        return this.divide.invoke()
     }
 }
 
