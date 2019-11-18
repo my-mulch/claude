@@ -1,6 +1,6 @@
 import Tensor from '../../../tensor'
 
-export default class MatrixOperation {
+export default class LinearAlgebraOperation {
     constructor(args, { resultant, route, symbolic, pointwise }) {
         /** Operations */
         this.route = route
