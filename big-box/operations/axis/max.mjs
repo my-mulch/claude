@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Maximum extends AxisOperation {
+export default class Maximization extends AxisOperation {
     constructor(args) {
         /** Defaults */
         args.axes = args.axes || [...args.of.shape.keys()]

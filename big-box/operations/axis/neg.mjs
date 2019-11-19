@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Negative extends AxisOperation {
+export default class Negation extends AxisOperation {
     constructor(args) {
         /** Defaults */
         args.axes = args.axes || []

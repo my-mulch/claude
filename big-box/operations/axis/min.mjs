@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Minimum extends AxisOperation {
+export default class Minimization extends AxisOperation {
     constructor(args) {
         /** Defaults */
         args.axes = args.axes || [...args.of.shape.keys()]

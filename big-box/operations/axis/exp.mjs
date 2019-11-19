@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Exponential extends AxisOperation {
+export default class Exponentiation extends AxisOperation {
     constructor(args) {
         /** Defaults */
         args.axes = args.axes || []

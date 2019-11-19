@@ -10,6 +10,8 @@ export default class AxisOperation extends TensorOperation {
         this.axes.inner = args.axes
         this.axes.total = [...this.of.shape.keys()]
         this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
+        this.axes.of = this.axes.total
+        this.axes.result = this.axes.outer
     }
 
     dimension(size, axis) { return size * this.of.shape[axis] }
@@ -27,8 +29,10 @@ export default class AxisOperation extends TensorOperation {
         this.source = [
             this.start(), // implemented by subclass
             this.loops.outer.join('\n'),
+            this.indices.result,
             this.preLoop(), // implemented by subclass
             this.loops.inner.join('\n'),
+            this.indices.of,
             this.inLoop(), // implemented by subclass
             '}'.repeat(this.loops.inner.length),
             this.postLoop(), // implemented by subclass
