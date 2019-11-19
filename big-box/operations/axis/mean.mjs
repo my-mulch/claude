@@ -3,6 +3,10 @@ import AxisOperation from './operation'
 
 export default class Mean extends AxisOperation {
     constructor(args) {
+        /** Defaults */
+        args.axes = args.axes || [...args.of.shape.keys()]
+
+        /** Superclass */
         super(args)
 
         /** Result */

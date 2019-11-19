@@ -4,14 +4,20 @@ import AxisOperation from './operation'
 
 export default class Unit extends AxisOperation {
     constructor(args) {
+        /** Defaults */
+        args.axes = args.axes || []
+
+        /** Superclass */
         super(args)
 
+        /** Norm */
         this.norm = new Norm({ of: this.of })
+
+        /** Divide */
         this.divide = new Division({
             of: this.of,
             with: this.norm.result,
             result: this.result,
-            template: args.template
         })
     }
 
@@ -20,4 +26,3 @@ export default class Unit extends AxisOperation {
         return this.divide.invoke()
     }
 }
-

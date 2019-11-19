@@ -1,31 +1,44 @@
-import Algebra from '../../../template/algebra'
+import Algebra from '../../template/algebra'
+import AxisOperation from './operation'
 
-import AxisReduceOperation from './operation'
-
-export default class Min extends AxisReduceOperation {
+export default class Minimum extends AxisOperation {
     constructor(args) {
-        super(args, {
-            symbolic: {
-                template: {
-                    init: function () {
-                        return `const temp = new Array(${this.of.type.size}).fill(0)`
-                    },
-                    before: function () { },
-                    during: function () {
-                        return Algebra.if(
-                            Algebra.lessThan(this.variables.of, this.variables.temp).slice(0, 1),
-                            Algebra.assign(this.variables.temp, this.variables.of)
-                        )
-                    },
-                    after: function () {
-                        return [
-                            Algebra.assign(this.variables.result, this.variables.temp),
-                            `temp.fill(Number.POSITIVE_INFINITY)`,
-                        ].join('\n')
-                    },
-                    result: function () { return 'return R' }
-                }
-            }
-        })
+        /** Defaults */
+        args.axes = args.axes || [...args.of.shape.keys()]
+
+        /** Superclass */
+        super(args)
+
+        /** Result */
+        this.result = args.result || this.resultant()
+
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.symbolicBoilerplate() // super class method 
+            this.symbolicSourceTemplate() // super class method, utilizes helpers below
+        }
+
+        /** Create */
+        this.invoke = new Function('A,B,R', this.source)
     }
+
+    /** Symbolic Implementation */
+    start() { return `const temp = new Array(${this.of.type.size})` }
+
+    preLoop() { return `temp.fill(Number.POSITIVE_INFINITY)` }
+
+    inLoop() {
+        return Algebra.if(
+            Algebra.lessThan(this.variables.of, this.variables.temp).slice(0, 1),
+            Algebra.assign(this.variables.temp, this.variables.of)
+        )
+    }
+
+    postLoop() {
+        return Algebra.assign(this.variables.result, this.variables.temp)
+    }
+
+    finish() { return 'return R' }
+
+    /** (TODO) Pointwise Implementation */
 }
