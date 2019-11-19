@@ -99,8 +99,8 @@ Type.Uint16 = new (class Uint16 extends Type { })({ size: 1, typed: Uint16Array 
 Type.Uint32 = new (class Uint32 extends Type { })({ size: 1, typed: Uint32Array })
 Type.Float32 = new (class Float32 extends Type { })({ size: 1, typed: Float32Array })
 Type.Float64 = new (class Float64 extends Type { })({ size: 1, typed: Float64Array })
-
 Type.Uint8Clamped = new (class Uint8Clamped extends Type { })({ size: 1, typed: Uint8ClampedArray })
+
 Type.ComplexInt8 = new (class ComplexInt8 extends Type { })({ size: 2, typed: Int8Array })
 Type.ComplexInt16 = new (class ComplexInt16 extends Type { })({ size: 2, typed: Int16Array })
 Type.ComplexInt32 = new (class ComplexInt32 extends Type { })({ size: 2, typed: Int32Array })

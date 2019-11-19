@@ -72,7 +72,10 @@ export default function (operation) {
                         this.operations.before.call(this),
 
                         this.loops.total.join('\n'),
-                        Object.values(this.indices).join('\n'),
+                        
+                        this.indices.of,
+                        this.indices.with,
+                        this.indices.result,
 
                         this.operation.during.call(this),
 
