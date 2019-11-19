@@ -1,8 +1,8 @@
-import Algebra from '../../template/algebra'
 import Adjugate from './adjugate'
-import MatrixOperation from './operation'
+import Algebra from '../../../template/algebra'
+import TensorOperation from '../../operation'
 
-export default class Inverse extends MatrixOperation {
+export default class Inverse extends TensorOperation {
     constructor(args) {
         super(args, {
             route: function () { return this.pointwise() },

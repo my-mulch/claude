@@ -1,9 +1,9 @@
 import Tensor from '../../tensor'
-import Algebra from '../../template/algebra'
-import MatrixOperation from '../operation'
+import Algebra from '../../../template/algebra'
+import TensorOperation from '../../operation'
 import { indexTemplate } from './utils'
 
-export default class Determinant extends MatrixOperation {
+export default class Determinant extends TensorOperation {
     constructor(args) {
         super(args, {
             route: function () { return this.pointwise() },

@@ -1,12 +1,12 @@
 import Tensor from '../../tensor'
-import Algebra from '../../template/algebra'
-import MatrixOperation from '../operation'
+import Algebra from '../../../template/algebra'
+import TensorOperation from '../../operation'
 
-export default class MatrixMultiplication extends MatrixOperation {
+export default class MatrixMultiplication extends TensorOperation {
     constructor(args) {
         super(args, {
             route: function () {
-                if (this.like < 50) return this.pointwise()
+                if (this.of.shape[1] < 50) return this.pointwise()
 
                 return this.symbolic()
             },
@@ -17,21 +17,21 @@ export default class MatrixMultiplication extends MatrixOperation {
                 })
             },
             pointwise: function () {
-                this.source = []
+                const source = []
 
-                for (let r = 0; r < this.size; r++) {
-                    for (let c = 0; c < this.size; c++) {
+                for (let r = 0; r < this.of.shape[1]; r++) {
+                    for (let c = 0; c < this.of.shape[1]; c++) {
                         const A = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex([r, s]) })
                         const B = Algebra.variable({ symbol: 'B.data', size: this.with.type.size, index: this.with.header.flatIndex([s, c]) })
                         const R = Algebra.variable({ symbol: 'R.data', size: this.result.type.size, index: this.result.header.flatIndex([r, c]) })
 
-                        const dot = new Array(this.like).fill(null).map(function (_, s) { return Algebra.multiply(A, B) }, this).reduce(Algebra.add)
+                        const dot = new Array(this.of.shape[1]).fill(null).map(function (_, s) { return Algebra.multiply(A, B) }, this).reduce(Algebra.add)
 
-                        this.source.push(Algebra.assign(R, dot))
+                        source.push(Algebra.assign(R, dot))
                     }
                 }
 
-                return this.source.join('\n')
+                return source.join('\n')
             },
             symbolic: function () {
                 this.source = []

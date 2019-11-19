@@ -1,8 +1,8 @@
 import Tensor from '../../../tensor'
 
-export default class LinearAlgebraOperation {
+export default class TensorOperation {
     constructor(args, { resultant, route, symbolic, pointwise }) {
-        /** Operations */
+        /** Initialize */
         this.route = route
         this.symbolic = symbolic
         this.pointwise = pointwise
@@ -18,19 +18,13 @@ export default class LinearAlgebraOperation {
         this.with = this.with.astype({ type: this.type })
         this.result = args.result || this.resultant()
 
-        /** Dimensions */
-        this.rows = this.of.shape[0]
-        this.cols = this.of.shape[1]
-        this.like = this.of.shape[1]
-        this.size = this.rows
-
-        /** Routing */
+        /** Route */
         this.source = this.route()
 
-        /** Invocation */
-        this.invoke = new Function('A,B,R', [this.source, 'return R'].flat())
+        /** Create */
+        this.invoke = new Function('A,B,R', this.source)
 
-        /** Templating */
+        /** Template */
         if (!args.template)
             this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }

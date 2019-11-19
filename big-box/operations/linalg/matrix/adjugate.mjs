@@ -1,9 +1,9 @@
-import Algebra from '../../template/algebra'
 import Determinant from './determinant'
-import MatrixOperation from './operation'
+import Algebra from '../../../template/algebra'
+import TensorOperation from '../../operation'
 import { indexTemplate } from './utils.mjs'
 
-export default class Adjugate extends MatrixOperation {
+export default class Adjugate extends TensorOperation {
     constructor(args) {
         super(args, {
             route: function () { return this.pointwise() },

@@ -1,7 +1,7 @@
-import PairOperation from './operation'
+import TensorOperation from '../operation'
 
 export default function (operation) {
-    return class extends PairOperation {
+    return class extends TensorOperation {
         constructor(args) {
             super(args, {
                 route: function () {
