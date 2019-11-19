@@ -1,3 +1,4 @@
+import Tensor from '../../tensor'
 import TensorOperation from '../operation'
 
 export default class AxisOperation extends TensorOperation {
@@ -12,6 +13,15 @@ export default class AxisOperation extends TensorOperation {
     }
 
     dimension(size, axis) { return size * this.of.shape[axis] }
+
+    resultant() {
+        return Tensor.zeros({
+            type: this.of.type,
+            shape: this.of.shape.filter(function (_, axis) {
+                return !this.axes.inner.includes(axis)
+            }, this)
+        })
+    }
 
     symbolicSourceTemplate() {
         this.source = [

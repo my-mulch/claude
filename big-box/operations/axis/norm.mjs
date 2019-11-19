@@ -19,21 +19,17 @@ export default class Norm extends AxisOperation {
     }
 
     /** Symbolic Implementation */
-    start() { return `const temp = new Array(${this.of.type.size}).fill(0)` }
-    
-    preLoop() { }
-    
+    start() { return `const temp = new Array(${this.of.type.size})` }
+
+    preLoop() { return `temp.fill(0)` }
+
     inLoop() {
         return Algebra.assign(this.variables.temp.slice(0, 1),
             Algebra.sum(Algebra.square(this.variables.of)), '+=').slice(0, 1)
     }
 
     postLoop() {
-        return [
-            Algebra.assign(this.variables.result,
-                Algebra.squareRoot(this.variables.temp)),
-            `temp.fill(0)`
-        ].join('\n')
+        return Algebra.assign(this.variables.result, Algebra.squareRoot(this.variables.temp))
     }
 
     finish() { return 'return R' }
