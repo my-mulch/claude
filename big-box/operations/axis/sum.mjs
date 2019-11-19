@@ -1,28 +1,37 @@
-import Algebra from '../../../template/algebra'
+import Algebra from '../../template/algebra'
+import AxisOperation from './operation'
 
-import AxisReduceOperation from './operation'
-
-export default class Sum extends AxisReduceOperation {
+export default class Sum extends AxisOperation {
     constructor(args) {
-        super(args, {
-            symbolic: {
-                template: {
-                    init: function () {
-                        return `const temp = new Array(${this.of.type.size}).fill(0)`
-                    },
-                    before: function () { },
-                    during: function () {
-                        return Algebra.assign(this.variables.temp, this.variables.of, '+=')
-                    },
-                    after: function () {
-                        return [
-                            Algebra.assign(this.variables.result, this.variables.temp),
-                            'temp.fill(0)'
-                        ].join('\n')
-                    },
-                    result: function () { return 'return R' }
-                },
-            }
-        })
+        super(args)
+
+        /** Result */
+        this.result = args.result || this.resultant()
+
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.symbolicBoilerplate() // super class method 
+            this.symbolicSourceTemplate() // super class method, utilizes helpers below
+        }
+
+        /** Create */
+        this.invoke = new Function('A,B,R', this.source)
     }
+
+    /** Symbolic Implementation */
+    start() { return `const temp = new Array(${this.of.type.size})` }
+
+    preLoop() { return `temp.fill(0)` }
+
+    inLoop() {
+        return Algebra.assign(this.variables.temp, this.variables.of, '+=')
+    }
+
+    postLoop() {
+        return Algebra.assign(this.variables.result, this.variables.temp)
+    }
+
+    finish() { return 'return R' }
+
+    /** (TODO) Pointwise Implementation */
 }
