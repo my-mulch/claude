@@ -157,26 +157,16 @@ export const points = {
 }
 
 export const circle = {
-    vertices: new bb.cached.assign({
-        of: bb.zeros({ shape: [10000, 3], type: bb.ComplexFloat32 }),
-        region: [':', 0],
-        with: new bb.cached.exp({
-            of: new bb.cached.multiply({
-                of: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }),
-                with: 'i'
-            }).invoke()
-        }).invoke()
-    }).invoke(),
-
-    colors: new bb.cached.assign({ of: bb.zeros({ shape: [10000, 3] }), region: [':', ':2'], with: 255 }).invoke(),
-    sizes: new bb.cached.multiply({ of: bb.ones({ shape: [10000, 1] }), with: 1 }).invoke(),
+    vertices: bb.linspace({ start: 0, stop: 2 * Math.PI, num: 10000 }).multiply({ with: 'i' }).exp(),
+    colors: bb.zeros({ shape: [10000, 1], type: bb.QuatFloat32 }).assign({ with: '1 + i + j + k' }),
+    sizes: bb.ones({ shape: [10000, 1] }).multiply({ with: 1 }),
     mode: 'POINTS'
 }
 
 
 /** RGB Cube */
 
-var vertices = new bb.cached.divide({ of: bb.randrange({ low: 0, high: 255, shape: [100, 3] }), with: 255 }).invoke()
+var vertices = new bb.cached.divide({ of: bb.randrange({ low: 0, high: 255, shape: [100, 1], type: bb.QuatFloat32 }), with: 255 }).invoke()
 var colors = vertices
 var sizes = new bb.cached.multiply({ of: bb.ones({ shape: [100, 1] }), with: 10 }).invoke()
 var mode = 'POINTS'
