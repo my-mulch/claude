@@ -20,8 +20,8 @@ export default class LinearAlgebraOperation extends TensorOperation {
     pointwiseSourceTemplate() {
         this.start()
 
-        for (let r = 0; r < this.size; r++)
-            for (let c = 0; c < this.size; c++)
+        for (let r = 0; r < this.rows; r++)
+            for (let c = 0; c < this.cols; c++)
                 this.inLoop()
 
         this.finish()

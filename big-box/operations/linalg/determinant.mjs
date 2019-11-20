@@ -1,33 +1,24 @@
 import Tensor from '../../tensor'
-import Algebra from '../../../template/algebra'
-import TensorOperation from '../../operation'
-import { indexTemplate } from './utils'
+import Algebra from '../../template/algebra'
+import LinearAlgebraOperation from './operation.mjs'
+import { indexTemplate } from './utils.mjs'
 
-export default class Determinant extends TensorOperation {
+export default class Determinant extends LinearAlgebraOperation {
     constructor(args) {
-        super(args, {
-            route: function () { return this.pointwise() },
-            resultant: function () { return Tensor.zeros({ shape: [], type: this.of.type.size }) },
-            pointwise: function (matrix = indexTemplate(this.size)) {
-                if (matrix.length === 1)
-                    return Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex(matrix[0]) })
+        /** Superclass */
+        super(args)
 
-                const subDeterminants = []
-                const size = Math.sqrt(matrix.length)
+        /** Result */
+        this.result = args.result || this.resultant()
 
-                for (let i = 0; i < size; i++) {
-                    const minor = Determinant.minor(matrix, 0, i)
-                    const subDeterminant = this.pointwise(minor)
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.pointwiseSourceBoilerplate() // super class method
+            this.pointwiseSourceTemplate()
+        }
 
-                    const factor = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex(matrix[i]) })
-                    const cofactor = Algebra.multiply(factor, subDeterminant)
-
-                    subDeterminants.push(Math.pow(-1, i % 2) > 0 ? cofactor : Algebra.negate(cofactor))
-                }
-
-                return subDeterminants.reduce(Algebra.add)
-            }
-        })
+        /** Create */
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
     }
 
     static minor(matrix, r, c) {
@@ -40,4 +31,30 @@ export default class Determinant extends TensorOperation {
             return true
         })
     }
+
+    /** Resultant Tensor */
+    resultant() { return Tensor.zeros({ shape: [], type: this.of.type.size }) }
+
+    /** Pointwise Implementation */
+    pointwiseSourceTemplate(matrix = indexTemplate(this.size)) {
+        if (matrix.length === 1)
+            return Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex(matrix[0]) })
+
+        const subDeterminants = []
+        const size = Math.sqrt(matrix.length)
+
+        for (let i = 0; i < size; i++) {
+            const minor = Determinant.minor(matrix, 0, i)
+            const subDeterminant = this.pointwise(minor)
+
+            const factor = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex(matrix[i]) })
+            const cofactor = Algebra.multiply(factor, subDeterminant)
+
+            subDeterminants.push(Math.pow(-1, i % 2) > 0 ? cofactor : Algebra.negate(cofactor))
+        }
+
+        return subDeterminants.reduce(Algebra.add)
+    }
+
+    /** (TODO) Symbolic Implementation */
 }

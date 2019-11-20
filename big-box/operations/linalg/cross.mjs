@@ -10,10 +10,8 @@ export default class CrossProduct extends LinearAlgebraOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.pointwiseSourceBoilerplate() // super class method
-            this.pointwiseSourceTemplate() 
-        }
+        this.pointwiseSourceBoilerplate() // super class method
+        this.pointwiseSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -38,6 +36,4 @@ export default class CrossProduct extends LinearAlgebraOperation {
             Algebra.assign(R[2], Algebra.subtract(Algebra.multiply(A[0], B[1]), Algebra.multiply(B[0], A[1]))),
         ].join('\n')
     }
-
-    /** (TODO) Symbolic Implementation */
 }
