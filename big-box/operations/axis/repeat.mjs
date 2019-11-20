@@ -1,59 +1,79 @@
-import Tensor from '../../../tensor'
-import Source from '../../../template/source'
-import Algebra from '../../../template/algebra'
+import Tensor from '../../tensor'
+import Algebra from '../../template/algebra'
+import AxisOperation from './operation'
 
-import AxisOperation from '../operation'
+export default class Repeat extends AxisOperation {
+    constructor(args) {
+        /** Defaults */
+        args.axes = args.axes || [args.of.shape.length - 1]
 
-export default {
-    repeat: class Repeat extends AxisOperation {
-        constructor(args) {
-            super(args)
+        /** Superclass */
+        super(args)
 
-            this.count = args.count || 1
+        /** Properties */
+        this.count = args.count || 1
 
-            this.axes.order = this.axes.outer.concat(this.axes.inner)
-            this.axes.last = this.axes.order[this.axes.order.length - 1]
-            this.axes.repeat = this.axes.inner[0] || this.axes.last
+        /** Result */
+        this.result = args.result || this.resultant()
 
-            this.result = args.result || this.resultant()
-            this.strides.R = this.result.strides
-
-            this.scalars.R = this.axes.total.map(Source.prefix)
-            this.scalars.R[this.axes.repeat] = 'r'
-
-            this.indices.result = Source.index('RIndex', this.scalars.R, this.strides.R, this.result.offset)
-
-            this.loops.count = Source.loop([`let r = i${this.axes.last}*${this.count}, c = 0`], [`c < ${this.count}`], ['r++, c++'])
-
-            this.invoke = new Function('A,B,R', [
-                ...this.loops.outer,
-                ...this.loops.inner,
-
-                this.indices.of,
-                this.loops.count,
-                this.indices.result,
-
-                Algebra.assign(this.variables.result, this.variables.of),
-
-                `}`,
-                `}`.repeat(this.loops.inner.length),
-                `}`.repeat(this.loops.outer.length),
-
-                `return R`
-
-            ].join('\n'))
-
-            if (!args.template)
-                this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.symbolicBoilerplate()
+            this.symbolicSourceTemplate()
         }
 
-        resultant() {
-            return Tensor.zeros({
-                type: this.of.type,
-                shape: this.of.shape.map(function (value, axis) {
-                    return axis === this.axes.repeat ? this.count * value : value
-                }, this)
-            })
-        }
+        /** Create */
+        this.invoke = new Function('A,B,R', [this.source, 'return R'])
     }
+
+    resultant() {
+        return Tensor.zeros({
+            type: this.of.type,
+            shape: this.of.shape.map(function (value, axis) {
+                return axis === this.axes.inner[0] ? this.count * value : value
+            }, this)
+        })
+    }
+
+    /** Symbolic Implementation */
+    symbolicBoilerplate() {
+        super.symbolicBoilerplate()
+
+        /** Axes */
+        this.axes.order = this.axes.outer.concat(this.axes.inner)
+        this.axes.last = this.axes.order[this.axes.order.length - 1]
+        this.axes.repeat = this.axes.inner[0] || this.axes.last
+
+        /** Strides */
+        this.strides.R = this.result.strides
+
+        /** Scalars */
+        this.scalars.R = this.axes.total.map(Source.prefix)
+        this.scalars.R[this.axes.repeat] = 'r'
+
+        /** Indices */
+        this.indices.result = Source.index('RIndex', this.scalars.R, this.strides.R, this.result.offset)
+
+        /** Loops */
+        this.loops.count = Source.loop([`let r = i${this.axes.last}*${this.count}, c = 0`], [`c < ${this.count}`], ['r++, c++'])
+    }
+
+    symbolicSourceTemplate() {
+        this.source = [
+            ...this.loops.outer,
+            ...this.loops.inner,
+
+            this.indices.of,
+            this.loops.count,
+            this.indices.result,
+
+            Algebra.assign(this.variables.result, this.variables.of),
+
+            `}`,
+            `}`.repeat(this.loops.inner.length),
+            `}`.repeat(this.loops.outer.length),
+        ].join('\n')
+    }
+
+    /** (TODO) Pointwise Implementation */
 }
