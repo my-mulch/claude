@@ -3,26 +3,41 @@ import AxisOperation from './operation'
 
 export default class Cosine extends AxisOperation {
     constructor(args) {
+        /** Defaults */
+        args.axes = args.axes || []
+
+        /** Superclass */
         super(args)
 
-        this.invoke = new Function('A,B,R', [
-            this.loops.total.join('\n'),
+        /** Result */
+        this.result = args.result || this.resultant()
 
-            this.indices.of,
-            this.indices.result,
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.symbolicBoilerplate() // super class method 
+            this.symbolicSourceTemplate() // super class method, utilizes helpers below
+        }
 
-            Algebra.assign(
-                this.variables.result,
-                Algebra.cos(this.variables.of)
-            ),
+        /** Create */
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
 
-            '}'.repeat(this.axes.total.length),
-
-            `return R`
-        ].join('\n'))
-
+        /** Template */
         if (!args.template)
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
-}
 
+    /** Symbolic Implementation */
+    start() { }
+
+    preLoop() { }
+
+    inLoop() {
+        return Algebra.assign(this.variables.result, Algebra.cos(this.variables.of))
+    }
+
+    postLoop() { }
+
+    finish() { }
+
+    /** (TODO) Pointwise Implementation */
+}

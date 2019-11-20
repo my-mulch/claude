@@ -1,11 +1,8 @@
-import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import Algebra from '../../template/algebra.mjs'
+import PairOperation from './operation.mjs'
 
-export default class Sine extends AxisOperation {
+export default class Division extends PairOperation {
     constructor(args) {
-        /** Defaults */
-        args.axes = args.axes || []
-
         /** Superclass */
         super(args)
 
@@ -32,7 +29,7 @@ export default class Sine extends AxisOperation {
     preLoop() { }
 
     inLoop() {
-        return Algebra.assign(this.variables.result, Algebra.sin(this.variables.of))
+        return Algebra.divide(this.variables.result, this.variables.of, this.variables.with)
     }
 
     postLoop() { }

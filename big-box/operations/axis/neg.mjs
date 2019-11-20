@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Sine extends AxisOperation {
+export default class Negation extends AxisOperation {
     constructor(args) {
         /** Defaults */
         args.axes = args.axes || []
@@ -32,7 +32,7 @@ export default class Sine extends AxisOperation {
     preLoop() { }
 
     inLoop() {
-        return Algebra.assign(this.variables.result, Algebra.sin(this.variables.of))
+        return Algebra.assign(this.variables.result, Algebra.negate(this.variables.of))
     }
 
     postLoop() { }

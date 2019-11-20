@@ -4,14 +4,14 @@ import config from '../../resources'
 
 export default class Zoom {
     constructor() {
-        this.look = new bb.subtraction({ of: config.FROM, with: config.TO })
-        this.delta = new bb.multiplication({ of: this.look.result, with: config.ZOOM_DELTA })
+        this.look = new bb.cached.subtract({ of: config.FROM, with: config.TO })
+        this.delta = new bb.cached.multiply({ of: this.look.result, with: config.ZOOM_DELTA })
 
-        this.zoomInTo = new bb.subtraction({ of: config.TO, with: this.delta.result, result: config.TO })
-        this.zoomInFrom = new bb.subtraction({ of: config.FROM, with: this.delta.result, result: config.FROM })
+        this.zoomInTo = new bb.cached.subtract({ of: config.TO, with: this.delta.result, result: config.TO })
+        this.zoomInFrom = new bb.cached.subtract({ of: config.FROM, with: this.delta.result, result: config.FROM })
 
-        this.zoomOutTo = new bb.addition({ of: config.TO, with: this.delta.result, result: config.TO })
-        this.zoomOutFrom = new bb.addition({ of: config.FROM, with: this.delta.result, result: config.FROM })
+        this.zoomOutTo = new bb.cached.add({ of: config.TO, with: this.delta.result, result: config.TO })
+        this.zoomOutFrom = new bb.cached.add({ of: config.FROM, with: this.delta.result, result: config.FROM })
 
         this.invoke = this.invoke.bind(this)
     }

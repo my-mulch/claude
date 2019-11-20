@@ -1,54 +1,65 @@
-import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
 import Determinant from './determinant'
+import LinearAlgebraOperation from './operation.mjs'
 import { indexTemplate } from './utils.mjs'
 
-export default class Adjugate {
+export default class Adjugate extends LinearAlgebraOperation {
     constructor(args) {
-        this.of = Tensor.tensor({ data:args.of})
+        /** Superclass */
+        super(args)
+
+        /** Result */
         this.result = args.result || this.resultant()
 
-        this.size = this.of.shape[0]
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.pointwiseSourceBoilerplate() // super class method
+            this.pointwiseSourceTemplate() // super class method, utilizes helpers below
+        }
 
-        this.determinant = new Determinant(args)
+        /** Create */
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
 
-        this.pointwise = {}
-        this.pointwise.source = this.pointwiseSource()
-
-        this.invoke = new Function('A,B,R', [
-            this.pointwise.source.join('\n'),
-            'return R'
-        ].join('\n')).bind(this)
-
+        /** Template */
         if (!args.template)
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    resultant() {
-        return Tensor.zeros({
-            shape: this.of.shape,
-            type: this.of.type
-        })
+    /** Pointwise Implementation */
+    start() {
+        this.source = []
     }
 
-    pointwiseSource() {
-        const adjugate = []
+    inLoop() {
+        const sign = Math.pow(-1, (this.r + this.c) % 2)
+        const subMatrix = Determinant.subMatrix(indexTemplate(this.size), this.c, this.r)
+        const determinant = Determinant.determinant(this.of, subMatrix)
+        const cofactor = sign < 0 ? Algebra.negate(determinant) : determinant
 
-        for (let r = 0; r < this.size; r++) {
-            for (let c = 0; c < this.size; c++) {
-                const sign = Math.pow(-1, (r + c) % 2)
-                const minor = Determinant.minor(indexTemplate(this.size), c, r)
-                const determinant = this.determinant.pointwiseSource(minor)
-                const cofactor = sign < 0 ? Algebra.negate(determinant) : determinant
-
-                adjugate.push(Algebra.assign(Algebra.variable({
-                    index: this.result.header.flatIndex([r, c]),
-                    symbol: 'R.data',
-                    size: this.result.type.size
-                }), cofactor))
-            }
-        }
-
-        return adjugate
+        this.source.push(Algebra.assign(Algebra.variable({
+            index: this.result.header.flatIndex([this.r, this.c]),
+            symbol: 'R.data',
+            size: this.result.type.size
+        }), cofactor))
     }
+
+    finish() { this.source = this.source.join('\n') }
+
+    determinant() {
+        const source = [`const D = new Array(${this.of.type.size})`]
+
+        const variable = Algebra.variable({ symbol: 'D', size: this.of.type.size, index: 0 })
+
+        const value = new Array(this.size).fill(null).map(function (_, i) {
+            return Algebra.multiply(
+                Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex([0, i]) }),
+                Algebra.variable({ symbol: 'R.data', size: this.of.type.size, index: this.result.header.flatIndex([i, 0]) }))
+        }, this).reduce(Algebra.add)
+
+        source.push(Algebra.assign(variable, value))
+
+        return source.join('\n')
+    }
+
+    /** (TODO) Symbolic Implementation */
 }

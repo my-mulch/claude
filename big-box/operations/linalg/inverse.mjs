@@ -1,74 +1,53 @@
-import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
 import Adjugate from './adjugate'
-import Determinant from './determinant'
+import Determinant from './determinant.mjs'
+import LinearAlgebraOperation from './operation.mjs'
 
-export default class Inverse {
+export default class Inverse extends LinearAlgebraOperation {
     constructor(args) {
-        this.tensors = {}
-        this.of = Tensor.tensor({ data:args.of})
+        /** Superclass */
+        super(args)
+
+        /** Result */
         this.result = args.result || this.resultant()
 
-        this.rows = this.of.shape[0]
-        this.cols = this.of.shape[1]
-        this.size = this.rows
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.pointwiseSourceBoilerplate() // super class method
+            this.pointwiseSourceTemplate() // super class method, utilizes helpers below
+        }
 
-        /** Pointwise Inverse */
-        this.pointwise = {}
-        this.pointwise.source = this.pointwiseSource()
+        /** Create */
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n')).bind(this)
 
-        this.invoke = new Function('A,B,R', `
-            const temp = new Array(${this.of.type.size})
-            const determinant = new Array(${this.of.type.size})
-            ${this.pointwise.source.join('\n')};
-            return R`
-        )
-
+        /** Template */
         if (!args.template)
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    resultant() {
-        return Tensor.zeros({
-            shape: this.of.shape,
-            type: this.of.type
-        })
+    /** Pointwise Implementation */
+    start() {
+        this.adjugate = new Adjugate({ of: this.of })
+
+        this.source = [
+            `const T = new Array(${this.of.type.size})`,
+            this.adjugate.source,
+            this.adjugate.determinant(),
+        ]
     }
 
-    pointwiseSource() {
-        this.adjugate = new Adjugate({ of: this.of, result: this.result })
-        this.determinant = Determinant.fromAdjugate(this.adjugate)
+    inLoop() {
+        const T = Algebra.variable({ symbol: 'T', size: this.of.type.size, index: 0 })
+        const D = Algebra.variable({ symbol: 'D', size: this.of.type.size, index: 0 })
+        const R = Algebra.variable({ symbol: 'R.data', index: this.result.header.flatIndex([this.r, this.c]), size: this.result.type.size })
 
-        const operations = []
-        for (let r = 0; r < this.size; r++) {
-            for (let c = 0; c < this.size; c++) {
-                const D = Algebra.variable({
-                    symbol: 'determinant',
-                    size: this.of.type.size,
-                    index: 0
-                })
-
-                const R = Algebra.variable({
-                    index: this.result.header.flatIndex([r, c]),
-                    symbol: 'R.data',
-                    size: this.result.type.size,
-                })
-
-                const T = Algebra.variable({
-                    symbol: 'temp',
-                    size: this.of.type.size,
-                    index: 0
-                })
-
-                operations.push(Algebra.divide(T, R, D))
-                operations.push(Algebra.assign(R, T))
-            }
-        }
-
-        return [
-            this.adjugate.pointwise.source,
-            this.determinant,
-            operations
-        ].flat(Number.POSITIVE_INFINITY)
+        this.source.push(Algebra.divide(T, R, D))
+        this.source.push(Algebra.assign(R, T))
     }
+
+    finish() {
+        this.source = this.source.flat(Number.POSITIVE_INFINITY).join('\n')
+    }
+
+    /** (TODO) Symbolic Implementation */
 }

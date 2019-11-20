@@ -12,10 +12,10 @@ export default class Pan {
         this.leftRot = bb.tensor({ data: [[c, 0, s, 0], [0, 1, 0, 0], [-s, 0, c, 0], [0, 0, 0, 1]] })
         this.rightRot = bb.tensor({ data: [[c, 0, -s, 0], [0, 1, 0, 0], [s, 0, c, 0], [0, 0, 0, 1]] })
 
-        this.inverseView = new bb.inverse({ of: config.LOOK_MATRIX })
-        this.setRotation = new bb.matMult({ of: this.inverseView.result.T(), with: bb.zeros({ shape: [4, 4] }), template: true })
-        this.setViewMatrix = new bb.matMult({ of: this.setRotation.result, with: config.LOOK_MATRIX.T() })
-        this.setPosition = new bb.matMult({ of: this.setViewMatrix.result, with: config.TO, result: config.TO })
+        this.inverseView = new bb.cached.inverse({ of: config.LOOK_MATRIX })
+        this.setRotation = new bb.cached.matMult({ of: this.inverseView.result.T(), with: bb.zeros({ shape: [4, 4] }), template: true })
+        this.setViewMatrix = new bb.cached.matMult({ of: this.setRotation.result, with: config.LOOK_MATRIX.T() })
+        this.setPosition = new bb.cached.matMult({ of: this.setViewMatrix.result, with: config.TO, result: config.TO })
 
         this.invoke = this.invoke.bind(this)
     }

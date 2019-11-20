@@ -1,28 +1,51 @@
-import Types from '../../types'
-import Tensor from '../../tensor'
 import Header from '../../header'
+import Tensor from '../../tensor'
 import Source from '../../template/source'
 import Algebra from '../../template/algebra'
-
+import TensorOperation from '../operation'
 import { __Math__ } from '../../resources'
 
-export default class PairOperation {
-    constructor(args) {
-        /** Santize */
-        this.of = Tensor.tensor({ data: args.of })
-        this.with = Tensor.tensor({ data: args.with })
+export default class PairOperation extends TensorOperation {
+    constructor(args) { super(args) }
 
-        /** Promote */
-        this.type = Types.promote(this.of, this.with)
+    resultant() {
+        const maxLen = __Math__.max(this.of.shape.length, this.with.shape.length)
 
-        this.of = this.of.astype({ type: this.type })
-        this.with = this.with.astype({ type: this.type })
-        this.result = args.result || this.resultant()
+        const shape = []
+        for (let i = 0; i < maxLen; i++) {
+            const bi = this.with.shape.length - 1 - i
+            const ai = this.of.shape.length - 1 - i
 
+            if (this.with.shape[bi] === 1 || this.with.shape[bi] === undefined)
+                shape.push(this.of.shape[ai])
+
+            else if (this.of.shape[ai] === 1 || this.of.shape[ai] === undefined)
+                shape.push(this.with.shape[bi])
+
+            else if (this.with.shape[bi] === this.of.shape[ai])
+                shape.push(this.of.shape[ai])
+        }
+
+        return Tensor.zeros({ shape: shape.reverse(), type: this.of.type })
+    }
+
+    symbolicSourceTemplate() {
+        this.source = [
+            this.start(),
+            this.loops.total.join('\n'),
+            this.indices.of,
+            this.indices.with,
+            this.indices.result,
+            this.inLoop(),
+            '}'.repeat(this.axes.total.length),
+            this.finish()
+        ].join('\n')
+    }
+
+    symbolicBoilerplate() {
         /** Axes */
         this.axes = {}
         this.axes.total = [...new Array(__Math__.max(this.of.shape.length, this.with.shape.length)).keys()]
-
         this.axes.of = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.of).reverse()
         this.axes.with = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.with).reverse()
         this.axes.result = this.axes.total
@@ -55,28 +78,5 @@ export default class PairOperation {
         this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
         this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
     }
-
-    resultant() {
-        const maxLen = __Math__.max(
-            this.of.shape.length,
-            this.with.shape.length)
-
-        const shape = []
-
-        for (let i = 0; i < maxLen; i++) {
-            const bi = this.with.shape.length - 1 - i
-            const ai = this.of.shape.length - 1 - i
-
-            if (this.with.shape[bi] === 1 || this.with.shape[bi] === undefined)
-                shape.push(this.of.shape[ai])
-
-            else if (this.of.shape[ai] === 1 || this.of.shape[ai] === undefined)
-                shape.push(this.with.shape[bi])
-
-            else if (this.with.shape[bi] === this.of.shape[ai])
-                shape.push(this.of.shape[ai])
-        }
-
-        return Tensor.zeros({ shape: shape.reverse(), type: this.of.type })
-    }
 }
+

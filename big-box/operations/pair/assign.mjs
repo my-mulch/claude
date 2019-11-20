@@ -1,16 +1,17 @@
-import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import Algebra from '../../template/algebra.mjs'
+import PairOperation from './operation.mjs'
 
-export default class Sine extends AxisOperation {
+export default class Assignment extends PairOperation {
     constructor(args) {
         /** Defaults */
-        args.axes = args.axes || []
+        const A = args.of.slice({ region: args.region || [] })
 
         /** Superclass */
-        super(args)
+        super({ ...args, of: A })
 
         /** Result */
-        this.result = args.result || this.resultant()
+        this.result = A
+        this.original = args.of
 
         /** Initialize */
         if (this.of.size > 0) {
@@ -19,11 +20,11 @@ export default class Sine extends AxisOperation {
         }
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
+        this.invoke = new Function('A,B,R', [this.source, 'return this.original'].join('\n')).bind(this)
 
         /** Template */
         if (!args.template)
-            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
+            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
 
     /** Symbolic Implementation */
@@ -32,7 +33,7 @@ export default class Sine extends AxisOperation {
     preLoop() { }
 
     inLoop() {
-        return Algebra.assign(this.variables.result, Algebra.sin(this.variables.of))
+        return Algebra.assign(this.variables.of, this.variables.with)
     }
 
     postLoop() { }

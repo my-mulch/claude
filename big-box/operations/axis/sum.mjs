@@ -1,36 +1,45 @@
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Sum extends AxisOperation {
+export default class Summation extends AxisOperation {
     constructor(args) {
-        super({ ...args, axes: args.axes || [...args.of.shape.keys()] })
+        /** Defaults */
+        args.axes = args.axes || [...args.of.shape.keys()]
 
-        this.invoke = new Function('A,B,R', [
-            `const temp = new Array(${this.of.type.size}).fill(0)`,
+        /** Superclass */
+        super(args)
 
-            this.loops.outer.join('\n'),
-            this.indices.result,
-            this.loops.inner.join('\n'),
-            this.indices.of,
+        /** Result */
+        this.result = args.result || this.resultant()
 
-            Algebra.assign(
-                this.variables.temp,
-                this.variables.of, '+='),
+        /** Initialize */
+        if (this.of.size > 0) {
+            this.symbolicBoilerplate() // super class method 
+            this.symbolicSourceTemplate() // super class method, utilizes helpers below
+        }
 
-            '}'.repeat(this.loops.inner.length),
+        /** Create */
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
 
-            Algebra.assign(
-                this.variables.result,
-                this.variables.temp),
-
-            `temp.fill(0)`,
-
-            '}'.repeat(this.loops.outer.length),
-
-            'return R'
-        ].join('\n'))
-
+        /** Template */
         if (!args.template)
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
+
+    /** Symbolic Implementation */
+    start() { return `const temp = new Array(${this.of.type.size})` }
+
+    preLoop() { return `temp.fill(0)` }
+
+    inLoop() {
+        return Algebra.assign(this.variables.temp, this.variables.of, '+=')
+    }
+
+    postLoop() {
+        return Algebra.assign(this.variables.result, this.variables.temp)
+    }
+
+    finish() { }
+
+    /** (TODO) Pointwise Implementation */
 }
