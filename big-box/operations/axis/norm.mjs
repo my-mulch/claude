@@ -19,8 +19,15 @@ export default class Norm extends AxisOperation {
         }
 
         /** Create */
-        this.invoke = new Function('A,B,R', this.source)
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
+
+        /** Template */
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
+
+    /** Resultant Tensor */
+    resultant() { return Tensor.zeros({ type: Tensor.Float32, shape: [] }) }
 
     /** Symbolic Implementation */
     start() { return `const temp = new Array(${this.of.type.size})` }
@@ -36,10 +43,7 @@ export default class Norm extends AxisOperation {
         return Algebra.assign(this.variables.result, Algebra.squareRoot(this.variables.temp))
     }
 
-    finish() { return 'return R' }
+    finish() { }
 
     /** (TODO) Pointwise Implementation */
-
-    /** Resultant Tensor */
-    resultant() { return Tensor.zeros({ type: Tensor.Float32, shape: [] }) }
 }

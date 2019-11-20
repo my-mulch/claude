@@ -19,7 +19,11 @@ export default class Minimization extends AxisOperation {
         }
 
         /** Create */
-        this.invoke = new Function('A,B,R', this.source)
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
+
+        /** Template */
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
     /** Symbolic Implementation */
@@ -38,7 +42,7 @@ export default class Minimization extends AxisOperation {
         return Algebra.assign(this.variables.result, this.variables.temp)
     }
 
-    finish() { return 'return R' }
+    finish() { }
 
     /** (TODO) Pointwise Implementation */
 }

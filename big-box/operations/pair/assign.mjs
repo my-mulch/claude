@@ -20,7 +20,11 @@ export default class Assignment extends PairOperation {
         }
 
         /** Create */
-        this.invoke = new Function('A,B,R', this.source)
+        this.invoke = new Function('A,B,R', [this.source, 'return this.original'].join('\n')).bind(this)
+
+        /** Template */
+        if (!args.template)
+            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
 
     /** Symbolic Implementation */
@@ -34,7 +38,7 @@ export default class Assignment extends PairOperation {
 
     postLoop() { }
 
-    finish() { return 'return this.original' }
+    finish() { }
 
     /** (TODO) Pointwise Implementation */
 }

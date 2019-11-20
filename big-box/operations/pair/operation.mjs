@@ -1,6 +1,9 @@
 import Header from '../../header'
 import Tensor from '../../tensor'
+import Source from '../../template/source'
+import Algebra from '../../template/algebra'
 import TensorOperation from '../operation'
+import { __Math__ } from '../../resources'
 
 export default class PairOperation extends TensorOperation {
     constructor(args) { super(args) }
