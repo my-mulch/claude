@@ -7,11 +7,11 @@ export default class Assignment extends PairOperation {
         const A = args.of.slice({ region: args.region || [] })
 
         /** Superclass */
-        super({ ...args, of: A, result: A })
+        super({ ...args, of: A })
 
         /** Result */
+        this.result = A
         this.original = args.of
-        this.result = args.result || this.resultant()
 
         /** Initialize */
         if (this.of.size > 0) {
