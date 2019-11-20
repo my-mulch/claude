@@ -1,4 +1,5 @@
 import Tensor from '../../tensor'
+import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
 export default class Norm extends AxisOperation {

@@ -1,5 +1,6 @@
 import Algebra from '../../template/algebra'
 import Adjugate from './adjugate'
+import Determinant from './determinant.mjs'
 import LinearAlgebraOperation from './operation.mjs'
 
 export default class Inverse extends LinearAlgebraOperation {
@@ -17,7 +18,7 @@ export default class Inverse extends LinearAlgebraOperation {
         }
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n')).bind(this)
 
         /** Template */
         if (!args.template)
@@ -26,25 +27,26 @@ export default class Inverse extends LinearAlgebraOperation {
 
     /** Pointwise Implementation */
     start() {
-        this.adjugate = new Adjugate(this)
+        this.adjugate = new Adjugate({ of: this.of })
 
         this.source = [
             `const T = new Array(${this.of.type.size})`,
-            `const D = ${this.adjugate.determinant.invoke()}`,
+            this.adjugate.source,
+            this.adjugate.determinant(),
         ]
     }
 
     inLoop() {
         const T = Algebra.variable({ symbol: 'T', size: this.of.type.size, index: 0 })
-        const R = Algebra.variable({ symbol: 'R.data', index: this.result.header.flatIndex([r, c]), size: this.result.type.size })
-        const D = Algebra.variable({ symbol: 'D.data', size: this.of.type.size, index: 0 })
+        const D = Algebra.variable({ symbol: 'D', size: this.of.type.size, index: 0 })
+        const R = Algebra.variable({ symbol: 'R.data', index: this.result.header.flatIndex([this.r, this.c]), size: this.result.type.size })
 
         this.source.push(Algebra.divide(T, R, D))
         this.source.push(Algebra.assign(R, T))
     }
 
     finish() {
-        this.source = [this.adjugate.source, this.source,].flat(Number.POSITIVE_INFINITY).join('\n')
+        this.source = this.source.flat(Number.POSITIVE_INFINITY).join('\n')
     }
 
     /** (TODO) Symbolic Implementation */

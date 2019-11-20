@@ -33,7 +33,7 @@ export default class Assignment extends PairOperation {
     preLoop() { }
 
     inLoop() {
-        return Algebra.assign(this.variables.result, Algebra.add(this.variables.of, this.variables.with))
+        return Algebra.assign(this.variables.of, this.variables.with)
     }
 
     postLoop() { }

@@ -1,4 +1,5 @@
 import Tensor from '../../tensor'
+import Source from '../../template/source'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
@@ -23,7 +24,11 @@ export default class Repeat extends AxisOperation {
         }
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source, 'return R'])
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
+
+        /** Template */
+        if (!args.template)
+            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
     resultant() {

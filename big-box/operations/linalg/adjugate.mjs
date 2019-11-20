@@ -28,23 +28,38 @@ export default class Adjugate extends LinearAlgebraOperation {
     /** Pointwise Implementation */
     start() {
         this.source = []
-        this.determinant = new Determinant(this)
     }
 
     inLoop() {
-        const sign = Math.pow(-1, (r + c) % 2)
-        const minor = Determinant.minor(indexTemplate(this.size), c, r)
-        const determinant = this.determinant.pointwiseSource(minor)
+        const sign = Math.pow(-1, (this.r + this.c) % 2)
+        const subMatrix = Determinant.subMatrix(indexTemplate(this.size), this.c, this.r)
+        const determinant = Determinant.determinant(this.of, subMatrix)
         const cofactor = sign < 0 ? Algebra.negate(determinant) : determinant
 
         this.source.push(Algebra.assign(Algebra.variable({
-            index: this.result.header.flatIndex([r, c]),
+            index: this.result.header.flatIndex([this.r, this.c]),
             symbol: 'R.data',
             size: this.result.type.size
         }), cofactor))
     }
 
     finish() { this.source = this.source.join('\n') }
+
+    determinant() {
+        const source = [`const D = new Array(${this.of.type.size})`]
+
+        const variable = Algebra.variable({ symbol: 'D', size: this.of.type.size, index: 0 })
+
+        const value = new Array(this.size).fill(null).map(function (_, i) {
+            return Algebra.multiply(
+                Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex([0, i]) }),
+                Algebra.variable({ symbol: 'R.data', size: this.of.type.size, index: this.result.header.flatIndex([i, 0]) }))
+        }, this).reduce(Algebra.add)
+
+        source.push(Algebra.assign(variable, value))
+
+        return source.join('\n')
+    }
 
     /** (TODO) Symbolic Implementation */
 }

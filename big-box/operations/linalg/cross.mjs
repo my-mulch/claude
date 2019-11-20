@@ -1,3 +1,4 @@
+import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
 import LinearAlgebraOperation from './operation.mjs'
 

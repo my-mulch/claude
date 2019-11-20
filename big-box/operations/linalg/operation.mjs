@@ -7,7 +7,7 @@ export default class LinearAlgebraOperation extends TensorOperation {
 
         /** Dimensions */
         this.rows = this.of.shape[0]
-        this.cols = this.with.shape[1]
+        this.cols = this.with.shape[1] || this.of.shape[1]
         this.like = this.of.shape[1]
         this.size = this.rows
     }
@@ -20,8 +20,8 @@ export default class LinearAlgebraOperation extends TensorOperation {
     pointwiseSourceTemplate() {
         this.start()
 
-        for (let r = 0; r < this.rows; r++)
-            for (let c = 0; c < this.cols; c++)
+        for (this.r = 0; this.r < this.rows; this.r++)
+            for (this.c = 0; this.c < this.cols; this.c++)
                 this.inLoop()
 
         this.finish()

@@ -1,4 +1,6 @@
 import Tensor from '../../tensor'
+import Source from '../../template/source'
+import Algebra from '../../template/algebra'
 import TensorOperation from '../operation'
 
 export default class AxisOperation extends TensorOperation {
