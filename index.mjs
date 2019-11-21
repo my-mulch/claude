@@ -17,7 +17,7 @@ export default (async function () {
             .zeros({ shape: [2646000, 2] })
             .assign({
                 region: [':', 0],
-                with: bb.linspace({ start: 0, stop: 20, num: 2646000 })
+                with: bb.linspace({ start: 0, stop: 200, num: 2646000 })
             })
             .assign({
                 region: [':', 1],
@@ -31,7 +31,7 @@ export default (async function () {
         mode: 'POINTS'
     })
 
-    // app.plot(await imageCube('http://localhost:3000/Users/trumanpurnell/Pictures/68828786_10217017620425433_2350853209913819136_o.jpg'))
+    app.plot(await imageCube('http://localhost:3000/Users/trumanpurnell/Pictures/68828786_10217017620425433_2350853209913819136_o.jpg'))
     // app.plot(axes)
     // app.plot(rgb)
     // app.plot(circle)
