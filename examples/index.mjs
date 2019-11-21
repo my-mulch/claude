@@ -14,6 +14,29 @@ export const axes = {
     mode: 'LINES'
 }
 
+export const box = {
+    vertices: bb.tensor({
+        data: [
+            [0, 0, 0], [0, 0, 1],
+            [0, 0, 0], [0, 1, 0],
+            [0, 0, 0], [1, 0, 0],
+            [1, 1, 1], [1, 0, 1],
+            [1, 1, 1], [0, 1, 1],
+            [1, 1, 1], [1, 1, 0],
+            [0, 0, 1], [0, 1, 1],
+            [0, 1, 1], [0, 1, 0],
+            [0, 1, 0], [1, 1, 0],
+            [1, 1, 0], [1, 0, 0],
+            [1, 0, 0], [1, 0, 1],
+            [1, 0, 1], [0, 0, 1],
+        ]
+    }),
+
+    colors: bb.ones({ shape: [10000, 3] }),
+    sizes: bb.ones({ shape: [10000, 1] }),
+    mode: 'LINES'
+}
+
 export const circle = {
     vertices: bb
         .linspace({ start: 0, stop: 2 * Math.PI, num: 10000 })

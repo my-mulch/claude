@@ -1,5 +1,15 @@
 
 export default class MyIO {
+    static async audioread(path) {
+        const context = new AudioContext()
+        
+        const response = await fetch(path)
+        const arrayBuffer = await response.arrayBuffer()
+        const audioBuffer = await context.decodeAudioData(arrayBuffer)
+        
+        return audioBuffer.getChannelData(0)
+    }
+
     static async imread(path) {
         // Build canvas init context
         const canvas = document.createElement('canvas')
