@@ -141,11 +141,28 @@ export default class Tensor {
         const raw = this.toRaw().flat(Number.POSITIVE_INFINITY)
         const data = type.array(this.size)
 
-        for (let i = 0, j = 0; i < raw.length; i += this.type.size, j += type.size)
-            for (let offset = 0; offset < Math.min(type.size, this.type.size); offset++)
-                data[j + offset] = raw[i + offset]
+        for (let i = 0, j = 0; i < raw.length; i++ , j += type.size)
+            for (let o = 0, parsed = Types.parse(raw[i]); o < Math.min(type.size, this.type.size); o++)
+                data[j + o] = parsed[o]
 
         return new Tensor({ header: new Header({ type, shape: this.shape }), data })
+    }
+
+    view({ type }) {
+        if (type === this.type)
+            return this
+
+        if (!this.contig)
+            return this
+        
+        const ratio = this.type.size / type.size
+
+        this.type = type
+        this.size *= ratio
+        this.shape[this.shape.length - 1] *= ratio
+        this.strides[this.strides.length - 1] /= ratio
+
+        return this
     }
 
     copy() { return new Tensor({ header: this.header, data: this.data.slice() }) }
