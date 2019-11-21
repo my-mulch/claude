@@ -155,16 +155,14 @@ export default class Tensor {
         if (!this.contig)
             return this
         
-        const tensor = this.copy()
+        const ratio = this.type.size / type.size
 
-        const ratio = tensor.type.size / type.size
+        this.type = type
+        this.size *= ratio
+        this.shape[this.shape.length - 1] *= ratio
+        this.strides[this.strides.length - 1] /= ratio
 
-        tensor.type = type
-        tensor.size *= ratio
-        tensor.shape[tensor.shape.length - 1] *= ratio
-        tensor.strides[tensor.strides.length - 1] /= ratio
-
-        return tensor
+        return this
     }
 
     copy() { return new Tensor({ header: this.header, data: this.data.slice() }) }

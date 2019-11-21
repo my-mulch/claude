@@ -49,7 +49,7 @@ export default class WebGLManager {
 
         return {
             buffer,
-            size: tensor.type.size,
+            size: tensor.shape[1],
             count: tensor.shape[0],
             type: numberType,
             normalize: false,
