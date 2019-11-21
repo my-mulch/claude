@@ -148,8 +148,21 @@ export default class Tensor {
         return new Tensor({ header: new Header({ type, shape: this.shape }), data })
     }
 
-    view(){
-        
+    view({ type }) {
+        if (type === this.type)
+            return this
+
+        if (!this.contig)
+            return this
+
+        const ratio = this.type.size / type.size
+
+        this.type = type
+        this.size *= ratio
+        this.shape[this.shape.length - 1] *= ratio
+        this.strides[this.strides.length - 1] /= ratio
+
+        return this
     }
 
     copy() { return new Tensor({ header: this.header, data: this.data.slice() }) }

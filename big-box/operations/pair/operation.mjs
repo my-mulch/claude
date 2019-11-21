@@ -46,8 +46,8 @@ export default class PairOperation extends TensorOperation {
         /** Axes */
         this.axes = {}
         this.axes.total = [...new Array(__Math__.max(this.of.shape.length, this.with.shape.length)).keys()]
-        this.axes.of = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.of).reverse()
-        this.axes.with = this.axes.total.slice().reverse().filter(Header.nonZeroAxes, this.with).reverse()
+        this.axes.of = this.axes.total.slice().reverse().filter(this.of.header.nonZeroAxes).reverse()
+        this.axes.with = this.axes.total.slice().reverse().filter(this.with.header.nonZeroAxes).reverse()
         this.axes.result = this.axes.total
 
         /** Loops */
@@ -68,9 +68,9 @@ export default class PairOperation extends TensorOperation {
 
         /** Indices */
         this.indices = {}
-        this.indices.of = Source.index('AIndex', this.scalars.of, this.strides.of, this.of.offset)
-        this.indices.with = Source.index('BIndex', this.scalars.with, this.strides.with, this.with.offset)
-        this.indices.result = Source.index('RIndex', this.scalars.result, this.strides.result, this.result.offset)
+        this.indices.of = Source.index('AIndex', this.scalars.of.slice().reverse(), this.strides.of.slice().reverse(), this.of.offset)
+        this.indices.with = Source.index('BIndex', this.scalars.with.slice().reverse(), this.strides.with.slice().reverse(), this.with.offset)
+        this.indices.result = Source.index('RIndex', this.scalars.result.slice().reverse(), this.strides.result.slice().reverse(), this.result.offset)
 
         /** Variables */
         this.variables = {}

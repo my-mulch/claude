@@ -11,29 +11,32 @@ export default class Header {
         this.shape = opts.shape !== undefined ? opts.shape : []
         this.offset = opts.offset !== undefined ? opts.offset : 0
         this.contig = opts.contig !== undefined ? opts.contig : true
-        this.strides = opts.strides !== undefined ? opts.strides : Header.strides(this.shape, this.type)
-
+        this.strides = opts.strides !== undefined ? opts.strides : this.resolveStrides(this.shape)
         this.size = this.shape.reduce(__Math__.multiply, 1)
-        this.lastStride = this.strides[this.strides.length - 1]
+
+        this.nonZeroAxes = this.nonZeroAxes.bind(this)
     }
 
     static isContigous(index) {
-        let last = -1
+        let last = index.length
 
-        for (let i = 0; i < index.length; i++) {
-            if (last >= 0
-                && index[i].constructor === String
-                && i - last > 1)
-                return false
+        for (let i = index.length - 1; i >= 0; i--) {
+            if (index[i].constructor === String &&
+                index[i].includes(SLICE_CHARACTER)) {
 
-            if (index[i].constructor === String)
+                if (i + 1 !== last)
+                    return false
+
                 last = i
+
+            } else if (last === index.length)
+                return false
         }
 
         return true
     }
 
-    static nonZeroAxes(_, index) {
+    nonZeroAxes(_, index) {
         const ri = this.shape.length - index - 1
 
         if (ri < 0) return false
@@ -42,10 +45,8 @@ export default class Header {
         return false
     }
 
-    static strides(shape, type, lastStride) {
+    resolveStrides(shape, stride = this.type.size) {
         const strides = new Array(shape.length)
-
-        let stride = lastStride || type.size
         strides[strides.length - 1] = stride
 
         for (let i = shape.length - 1; i > 0; i--)
@@ -54,12 +55,12 @@ export default class Header {
         return strides
     }
 
-    static reshape(shape, size) {
+    resolveShape(shape) {
         const reshape = new Array(shape.length)
         const product = shape.reduce(__Math__.multiply, 1)
 
         for (let i = 0; i < shape.length; i++)
-            reshape[i] = shape[i] < 0 ? -size / product : shape[i]
+            reshape[i] = shape[i] < 0 ? -this.size / product : shape[i]
 
         return reshape
     }
@@ -118,25 +119,24 @@ export default class Header {
 
         }
 
-        return new Header({ shape, strides, offset, contig, type: this.type })
+        return new Header({ ...this, shape, strides, offset, contig })
     }
 
     transpose() {
         return new Header({
-            type: this.type,
+            ...this,
+            contig: false,
             shape: this.shape.slice().reverse(),
             strides: this.strides.slice().reverse(),
-            offset: this.offset,
-            contig: false
         })
     }
 
     reshape(shape) {
-        const newShape = Header.reshape(shape, this.size)
-        const newStrides = Header.strides(newShape, this.type, this.lastStride)
+        const newShape = this.resolveShape(shape)
+        const newStrides = this.resolveStrides(newShape)
 
         return new Header({
-            type: this.type,
+            ...this,
             shape: newShape,
             strides: newStrides,
         })
