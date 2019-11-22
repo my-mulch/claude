@@ -101,12 +101,11 @@ export default class Tensor {
         return tensor
     }
 
-
     static rand({ shape, type }) {
         const tensor = new Tensor({ header: new Header({ shape, type }) })
 
         for (let i = 0; i < tensor.data.length; i++)
-            tensor.data[i] = __Math__.random() - 1
+            tensor.data[i] = __Math__.random()
 
         return tensor
     }
@@ -142,7 +141,7 @@ export default class Tensor {
         const data = type.array(this.size)
 
         for (let i = 0, j = 0; i < raw.length; i++ , j += type.size)
-            for (let o = 0, parsed = Types.parse(raw[i]); o < Math.min(type.size, this.type.size); o++)
+            for (let o = 0, parsed = Types.parse(raw[i]); o < __Math__.min(type.size, this.type.size); o++)
                 data[j + o] = parsed[o]
 
         return new Tensor({ header: new Header({ type, shape: this.shape }), data })
@@ -154,7 +153,7 @@ export default class Tensor {
 
         if (!this.contig)
             return this
-        
+
         const ratio = this.type.size / type.size
 
         this.type = type
@@ -186,18 +185,26 @@ export default class Tensor {
         }, this)
     }
 
-    toRaw() { return this.visit() }
-    toRawFlat() { return this.visit().flat(Number.POSITIVE_INFINITY) }
+    toRaw() {
+        return this.visit()
+    }
+
+    toRawFlat() {
+        return this.visit().flat(Number.POSITIVE_INFINITY)
+    }
+
     toIndices() {
         const indices = []
+
         this.visit(function (index) { indices.push(index) })
+
         return indices
     }
 
     toStringAtIndex(index, string = '') {
         for (let i = 0; i < this.type.size; i++) {
-            const sign = Math.sign(this.data[index + i]) < 0 ? '-' : '+'
-            const number = Math.abs(this.data[index + i])
+            const sign = __Math__.sign(this.data[index + i]) < 0 ? '-' : '+'
+            const number = __Math__.abs(this.data[index + i])
 
             if (number)
                 string += `${sign}${number.toPrecision()}${SYMBOL_FROM_ID[i]}`
