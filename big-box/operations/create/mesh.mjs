@@ -4,11 +4,24 @@ import { __Math__ } from '../../resources'
 
 export default class Mesh {
     constructor(args) {
-        this.dimensions = args.of
+        /** Properties */
+        this.of = args.of
+
+        /** Result */
         this.result = args.result || this.resultant()
-        this.invoke = new Function(this.symbolicSourceTemplate())
+
+        /** Initialize */
+        this.symbolicSourceTemplate()
+
+        /** Create */
+        this.invoke = new Function('A,B,R', [this.source.join('\n'), 'return R'].join('\n')).bind(this)
+
+        /** Template */
+        if (!args.template)
+            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
 
+    /** Symbolic Implementation */
     loop(dimension, i) {
         return Source.loop(
             `let i${i} = 0`,
@@ -20,15 +33,12 @@ export default class Mesh {
         this.source = []
 
         this.source.push(`let i = 0`)
-        this.source.push(...this.dimensions.map(this.loop))
+        this.source.push(...this.of.map(this.loop))
 
-        for (let i = 0; i < this.dimensions.length; i++)
-            this.source.push(`this.result.data[i++] = this.dimensions[${i}][i${i}]`)
+        for (let i = 0; i < this.of.length; i++)
+            this.source.push(`R.data[i++] = A[${i}][i${i}]`)
 
-        this.source.push('}'.repeat(this.dimensions.length))
-        this.source.push('return this.result')
-
-        return this.source.join('\n')
+        this.source.push('}'.repeat(this.of.length))
     }
 
     size(all, dimension) {
@@ -38,9 +48,12 @@ export default class Mesh {
     resultant() {
         return Tensor.zeros({
             shape: [
-                this.dimensions.reduce(this.size, 1),
-                this.dimensions.length
+                this.of.reduce(this.size, 1),
+                this.of.length
             ]
         })
     }
+
+    /** (TODO) Pointwise Implementation */
 }
+
