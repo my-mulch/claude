@@ -4,9 +4,9 @@ import myio from '../myio'
 export const grid = function (res) {
     const vertices = bb.mesh({
         of: [
-            bb.linspace({ start: -1, stop: 1, num: res }).toRawFlat(),
-            bb.linspace({ start: -1, stop: 1, num: res }).toRawFlat(),
-            bb.linspace({ start: -1, stop: 1, num: res }).toRawFlat()
+            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat(),
+            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat(),
+            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat()
         ]
     })
 
@@ -15,6 +15,10 @@ export const grid = function (res) {
     const mode = 'POINTS'
 
     return { vertices, colors, sizes, mode }
+}
+
+export const vector = function (x0, y0, z0, x, y, z) {
+    
 }
 
 export const axes = {

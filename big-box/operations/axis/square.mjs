@@ -1,11 +1,10 @@
-import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Norm extends AxisOperation {
+export default class Square extends AxisOperation {
     constructor(args) {
         /** Defaults */
-        args.axes = args.axes || [...args.of.shape.keys()]
+        args.axes = args.axes || []
 
         /** Superclass */
         super(args)
@@ -27,29 +26,16 @@ export default class Norm extends AxisOperation {
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    /** Resultant Tensor */
-    resultant() {
-        return Tensor.zeros({
-            type: Tensor.Float32,
-            shape: this.of.shape.filter(function (_, axis) {
-                return !this.axes.inner.includes(axis)
-            }, this)
-        })
-    }
-
     /** Symbolic Implementation */
-    start() { return `const temp = new Array(${this.of.type.size})` }
+    start() { }
 
-    preLoop() { return `temp.fill(0)` }
+    preLoop() { }
 
     inLoop() {
-        return Algebra.assign(this.variables.temp.slice(0, 1),
-            Algebra.sum(Algebra.square(this.variables.of)), '+=').slice(0, 1)
+        return Algebra.assign(this.variables.result, Algebra.square(this.variables.of))
     }
 
-    postLoop() {
-        return Algebra.assign(this.variables.result, Algebra.squareRoot(this.variables.temp))
-    }
+    postLoop() { }
 
     finish() { }
 
