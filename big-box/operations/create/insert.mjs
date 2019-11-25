@@ -1,4 +1,5 @@
 import Tensor from '../../tensor'
+import Assignment from '../pair/assign'
 import { SLICE_CHARACTER } from '../../resources'
 
 export default class Insert {
@@ -16,31 +17,35 @@ export default class Insert {
         this.symbolicSourceTemplate()
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
+        this.invoke = new Function('A,B,R', [this.source.join('\n'), 'return R'].join('\n'))
 
         /** Template */
         if (!args.template)
-            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
-    }
-
-    static feed(region, source) {
-        return `this.result.assign({ region: ${JSON.stringify(region)}, with: ${source} })`
+            this.invoke = this.invoke.bind(this, this.result, this.with, this.result)
     }
 
     symbolicSourceTemplate() {
         this.source = []
 
         for (let i = 0, seen = 0; i < this.result.shape[this.axes[0]]; i++) {
-            const region = new Array(this.result.shape.length).fill(SLICE_CHARACTER)
+            const region = SLICE_CHARACTER.repeat(this.result.shape.length).split('')
+            const insert = (this.entries[seen] + seen) === i
+
             region[this.axes[0]] = i
 
-            if (this.entries[seen] !== undefined && this.entries[seen] + seen === i) {
-                this.source.push(Insert.feed(region, 'this.with'))
+            if (insert) {
+                this.source.push('A = this.result', 'B = this.with', 'R = this.result')
+                this.source.push(new Assignment({ of: this.result, with: this.with, region, }).source)
                 seen++
-            } else {
+            }
+
+            else {
                 const slice = region.slice()
                 slice[this.axes[0]] = i - seen
-                this.source.push(Insert.feed(region, `this.of.slice({region:${JSON.stringify(slice)} })`))
+                const fill = this.of.slice({ region: slice })
+
+                this.source.push('A = this.result', `B = this.of.slice({region: ${JSON.stringify(slice)}})`, 'R = this.result')
+                this.source.push(new Assignment({ of: this.result, with: fill, region, }).source)
             }
         }
     }
