@@ -1,11 +1,11 @@
 import Tensor from '../../tensor'
 import Assignment from '../pair/assign'
-import { SLICE_CHARACTER } from '../../resources'
+import { SLICE_CHARACTER, __Math__ } from '../../resources'
 
 export default class Insert {
     constructor(args) {
         /** Properties */
-        this.entries = args.entries.sort()
+        this.entries = args.entries.sort(__Math__.subtract)
         this.axes = args.axes || [args.of.shape.length - 1]
 
         /** Result */

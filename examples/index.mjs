@@ -17,8 +17,31 @@ export const grid = function (res) {
     return { vertices, colors, sizes, mode }
 }
 
-export const vector = function (x0, y0, z0, x, y, z) {
-    
+export const vector = function () {
+    const circle = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: 10000 })
+        .multiply({ with: 'i' })
+        .exp()
+        .reshape({ shape: [10000, 1] })
+        .view({ type: bb.Float32 })
+
+    const vertices = circle
+        .insert({
+            with: 1, 
+            entries: [2], 
+            axis: [1]
+        })
+        // .insert({
+        //     with: [0, 0, 1],
+        //     entries: bb.arange({ start: 0, stop: circle.shape[0] + 2, step: 2 }).toRawFlat(),
+        //     axes: [0]
+        // })
+
+    const colors = bb.zeros({ shape: [vertices.shape[0], 3] }).assign({ with: bb.rand({ shape: [3] }) })
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 2 })
+    const mode = 'POINTS'
+
+    return { vertices, colors, sizes, mode }
 }
 
 export const axes = {
