@@ -35,7 +35,7 @@ export default class Insert {
 
             if (insert) {
                 this.source.push('A = this.result', 'B = this.with', 'R = this.result')
-                this.source.push(new Assignment({ of: this.result, with: this.with, region, }).source)
+                this.source.push(new Assignment({ of: this.result, with: this.with, region }).source)
                 seen++
             }
 

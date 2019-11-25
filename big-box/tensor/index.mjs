@@ -156,8 +156,8 @@ export default class Tensor {
 
         const ratio = this.type.size / type.size
 
-        this.type = type
         this.size *= ratio
+        this.header.type = this.type = type
         this.shape[this.shape.length - 1] *= ratio
         this.strides[this.strides.length - 1] /= ratio
 
