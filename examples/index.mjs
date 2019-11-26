@@ -31,11 +31,11 @@ export const vector = function () {
             entries: [2], 
             axis: [1]
         })
-        // .insert({
-        //     with: [0, 0, 1],
-        //     entries: bb.arange({ start: 0, stop: circle.shape[0] + 2, step: 2 }).toRawFlat(),
-        //     axes: [0]
-        // })
+        .insert({
+            with: [0, 0, 1],
+            entries: bb.arange({ start: 0, stop: circle.shape[0] + 2, step: 2 }).toRawFlat(),
+            axes: [0]
+        })
 
     const colors = bb.zeros({ shape: [vertices.shape[0], 3] }).assign({ with: bb.rand({ shape: [3] }) })
     const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 2 })
