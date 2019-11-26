@@ -38,7 +38,7 @@ export const vector = function () {
         })
 
     const colors = bb.zeros({ shape: [vertices.shape[0], 3] }).assign({ with: bb.rand({ shape: [3] }) })
-    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 2 })
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
     const mode = 'POINTS'
 
     return { vertices, colors, sizes, mode }
