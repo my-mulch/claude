@@ -23,6 +23,16 @@ export default class Source {
         }, `const ${variable} = ${offset}`)
     }
 
+    static dot(a, b) {
+        return a.map(function (_, i) { return `${a[i]} * ${b[i]}` }).join('+')
+    }
+
+    plus(value) {
+        this.chain += value ? `+ ${value}` : ''
+
+        return this
+    }
+
     const(name) {
         this.chain += `const ${name}`
 
@@ -30,7 +40,7 @@ export default class Source {
     }
 
     equals(value) {
-        this.chain += `= ${value}`
+        this.chain += ` = ${value}`
 
         return this
     }

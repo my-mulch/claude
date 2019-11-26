@@ -13,8 +13,6 @@ export default class Header {
         this.contig = opts.contig !== undefined ? opts.contig : true
         this.strides = opts.strides !== undefined ? opts.strides : this.resolveStrides(this.shape)
         this.size = this.shape.reduce(__Math__.multiply, 1)
-
-        this.nonZeroAxes = this.nonZeroAxes.bind(this)
     }
 
     static isContigous(index) {

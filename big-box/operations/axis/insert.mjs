@@ -37,23 +37,11 @@ export default class Insert extends AxisOperation {
         this.loops.outer = Source.loopAxes(this.axes.outer, this.result)
         this.loops.inner = Source.loopAxes(this.axes.inner, this.result)
 
-        /** Strides */
-        this.strides = {}
-        this.strides.of = this.of.strides
-        this.strides.with = this.with.strides
-        this.strides.result = this.result.strides
-
         /** Scalars */
         this.scalars = {}
         this.scalars.of = this.axes.total.map(function (axis) { return axis === this.axes.inner[0] ? `(${Source.prefix(axis)} - seen)` : Source.prefix(axis) }, this)
         this.scalars.with = this.axes.total.map(function (axis) { return this.axes.with.includes(axis) ? Source.prefix(axis) : 0 }, this)
         this.scalars.result = this.axes.total.map(Source.prefix)
-
-        /** Indices */
-        this.indices = {}
-        this.indices.of = Source.index('AIndex', this.scalars.of.slice().reverse(), this.strides.of.slice().reverse(), this.of.offset)
-        this.indices.with = Source.index('BIndex', this.scalars.with.slice().reverse(), this.strides.with.slice().reverse(), this.with.offset)
-        this.indices.result = Source.index('RIndex', this.scalars.result.slice().reverse(), this.strides.result.slice().reverse(), this.result.offset)
 
         /** Variables */
         this.variables = {}
@@ -80,20 +68,23 @@ export default class Insert extends AxisOperation {
     preLoop() { return 'seen = 0' }
 
     inLoop() {
-        return [
-            this.indices.of,
-            this.indices.with,
-            this.indices.result,
+        return new Source([
+            /** Indices */
+            new Source().const('AIndex').equals(this.of.offset).plus(Source.dot(this.of.strides.slice().reverse(), this.scalars.of.slice().reverse())),
+            new Source().const('BIndex').equals(this.with.offset).plus(Source.dot(this.with.strides.slice().reverse(), this.scalars.with.slice().reverse())),
+            new Source().const('RIndex').equals(this.result.offset).plus(Source.dot(this.result.strides.slice().reverse(), this.scalars.result.slice().reverse())),
 
+            /** Insertion Check */
             new Source()
                 .const('insert')
                 .equals(`(this.entries[seen] + seen) === i${this.axes.inner[0]}`),
 
+            /** Insertion */
             new Source()
                 .if('insert')
                 .then(['seen++', ...Algebra.assign(this.variables.result, this.variables.with)])
                 .else([...Algebra.assign(this.variables.result, this.variables.of)])
-        ].join('\n')
+        ])
     }
 
     postLoop() { }

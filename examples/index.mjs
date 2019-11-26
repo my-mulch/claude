@@ -19,10 +19,10 @@ export const grid = function (res) {
 
 export const vector = function () {
     const circle = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: 10000 })
+        .linspace({ start: 0, stop: 2 * Math.PI, num: 300 })
         .multiply({ with: 'i' })
         .exp()
-        .reshape({ shape: [10000, 1] })
+        .reshape({ shape: [300, 1] })
         .view({ type: bb.Float32 })
 
     const vertices = circle
@@ -32,14 +32,14 @@ export const vector = function () {
             axis: [1]
         })
         .insert({
-            with: [0, 0, 1],
+            with: [0, 0, -1],
             entries: bb.arange({ start: 0, stop: circle.shape[0] + 2, step: 2 }).toRawFlat(),
             axes: [0]
         })
 
     const colors = bb.zeros({ shape: [vertices.shape[0], 3] }).assign({ with: bb.rand({ shape: [3] }) })
     const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
-    const mode = 'POINTS'
+    const mode = 'TRIANGLES'
 
     return { vertices, colors, sizes, mode }
 }
