@@ -30,12 +30,6 @@ export default class Algebra {
     static POSITIVE_INFINITY(size) { return Array(size).fill(Number.POSITIVE_INFINITY) }
     static NEGATIVE_INFINITY(size) { return Array(size).fill(Number.NEGATIVE_INFINITY) }
 
-    static if(condition, statement) {
-        return `if(${condition}){
-            ${statement}
-        }`
-    }
-
     static noop(o1, o2) {
         [o1, o2] = Algebra.match(o1, o2)
 

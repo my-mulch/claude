@@ -1,3 +1,4 @@
+import Source from '../../template/source'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
@@ -32,10 +33,9 @@ export default class Maximization extends AxisOperation {
     preLoop() { return `temp.fill(Number.NEGATIVE_INFINITY)` }
 
     inLoop() {
-        return Algebra.if(
-            Algebra.greaterThan(this.variables.of, this.variables.temp).slice(0, 1),
-            Algebra.assign(this.variables.temp, this.variables.of)
-        )
+        return new Source()
+            .if(Algebra.greaterThan(this.variables.of, this.variables.temp).slice(0, 1))
+            .then(Algebra.assign(this.variables.temp, this.variables.of))
     }
 
     postLoop() {

@@ -23,7 +23,7 @@ export default class Insert extends AxisOperation {
         this.symbolicSourceTemplate()
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source.join('\n'), 'return R'].join('\n'))
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
 
         /** Template */
         if (!args.template)
@@ -63,35 +63,40 @@ export default class Insert extends AxisOperation {
     }
 
     symbolicSourceTemplate() {
-        this.source = []
-
-        this.source.push('let seen = 0')
-        this.source.push(...this.loops.outer)
-        this.source.push('seen = 0')
-        this.source.push(...this.loops.inner)
-
-        this.source.push(this.indices.of)
-        this.source.push(this.indices.with)
-        this.source.push(this.indices.result)
-
-        this.source.push(`const insert = (this.entries[seen] + seen) === i${this.axes.inner[0]}`)
-
-        this.source.push(`if(insert){`)
-        this.source.push('seen++')
-        this.source.push(Algebra.assign(this.variables.result, this.variables.with).join('\n'))
-        this.source.push(`}`)
-
-        this.source.push('else {')
-        this.source.push(Algebra.assign(this.variables.result, this.variables.of).join('\n'))
-        this.source.push('}')
-
-        this.source.push('}'.repeat(this.axes.order.length))
+        this.source = [
+            this.start(),
+            this.loops.outer.join('\n'),
+            this.preLoop(),
+            this.loops.inner.join('\n'),
+            this.inLoop(),
+            '}'.repeat(this.loops.inner.length),
+            this.postLoop(),
+            '}'.repeat(this.loops.outer.length),
+            this.finish(),
+        ].join('\n')
     }
 
-    start() { }
-    beforeLoop() { }
-    inLoop() { }
-    afterLoop() { }
+    start() { return 'let seen = 0' }
+    preLoop() { return 'seen = 0' }
+
+    inLoop() {
+        return [
+            this.indices.of,
+            this.indices.with,
+            this.indices.result,
+
+            new Source()
+                .const('insert')
+                .equals(`(this.entries[seen] + seen) === i${this.axes.inner[0]}`),
+
+            new Source()
+                .if('insert')
+                .then(['seen++', ...Algebra.assign(this.variables.result, this.variables.with)])
+                .else([...Algebra.assign(this.variables.result, this.variables.of)])
+        ].join('\n')
+    }
+
+    postLoop() { }
     finish() { }
 
     resultant() {

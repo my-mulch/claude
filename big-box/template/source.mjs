@@ -1,5 +1,7 @@
 
 export default class Source {
+    constructor(code = []) { this.chain = code.join('\n') }
+
     static loop(init, check, delta) {
         return `for(${init}; ${check}; ${delta}){`
     }
@@ -20,4 +22,42 @@ export default class Source {
             return `${index} + ${strides[i]} * ${scalars[i]}`
         }, `const ${variable} = ${offset}`)
     }
+
+    const(name) {
+        this.chain += `const ${name}`
+
+        return this
+    }
+
+    equals(value) {
+        this.chain += `= ${value}`
+
+        return this
+    }
+
+    then(statements) {
+        this.chain += ['{', ...statements, '}'].join('\n')
+
+        return this
+    }
+
+    if(condition) {
+        this.chain += `if(${condition})`
+
+        return this
+    }
+
+    else(statements) {
+        this.chain += ['else {', ...statements, '}'].join('\n')
+
+        return this
+    }
+
+    elseIf(condition) {
+        this.chain += `else if(${condition})`
+
+        return this
+    }
+
+    toString() { return this.chain }
 }
