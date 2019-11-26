@@ -14,8 +14,8 @@ export default class AxisOperation extends TensorOperation {
         this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
         this.axes.order = this.axes.outer.concat(this.axes.inner)
         
-        this.axes.of = this.axes.total.slice().reverse().filter(this.of.header.nonZeroAxes.bind(this.of)).reverse()
-        this.axes.with = this.axes.total.slice().reverse().filter(this.with.header.nonZeroAxes.bind(this.with)).reverse()
+        this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
+        this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
     }
 
     dimension(size, axis) { return size * this.of.shape[axis] }

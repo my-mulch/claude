@@ -31,6 +31,19 @@ export default class Insert extends AxisOperation {
     }
 
     symbolicBoilerplate() {
+        
+        // this.axes = {}
+        // this.axes.inner = args.axes
+        // this.axes.total = [...this.of.shape.keys()]
+        // this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
+        // this.axes.order = this.axes.outer.concat(this.axes.inner)
+        
+        // this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
+        // this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
+        
+        /** Axes */
+        this.axis = this.axes.inner[0]
+
         /** Loops */
         this.loops = {}
         this.loops.total = Source.loopAxes(this.axes.order, this.result)
@@ -39,7 +52,10 @@ export default class Insert extends AxisOperation {
 
         /** Scalars */
         this.scalars = {}
-        this.scalars.of = this.axes.total.map(function (axis) { return axis === this.axes.inner[0] ? `(${Source.prefix(axis)} - seen)` : Source.prefix(axis) }, this)
+        
+        this.scalars.of = this.axes.total.map(Source.prefix)
+        this.scalars.of[this.axis] = `(${Source.prefix(this.axis)} - seen)`
+
         this.scalars.with = this.axes.total.map(function (axis) { return this.axes.with.includes(axis) ? Source.prefix(axis) : 0 }, this)
         this.scalars.result = this.axes.total.map(Source.prefix)
 

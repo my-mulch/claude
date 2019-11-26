@@ -34,13 +34,17 @@ export default class Header {
         return true
     }
 
-    nonZeroAxes(_, index) {
-        const ri = this.shape.length - index - 1
+    nonZeroAxes(totalAxes) {
+        const axes = []
 
-        if (ri < 0) return false
-        if (this.shape[ri] > 1) return true
+        let i = this.shape.length - 1
+        let axis = totalAxes.length - 1
 
-        return false
+        for (; i >= 0; i-- , axis--)
+            if (this.shape[i] > 1)
+                axes.push(axis)
+
+        return axes.reverse()
     }
 
     resolveStrides(shape, stride = this.type.size) {

@@ -32,7 +32,7 @@ export const vector = function () {
             axis: [1]
         })
         .insert({
-            with: [0, 0, -1],
+            with: [0, 0, 3],
             entries: bb.arange({ start: 0, stop: circle.shape[0] + 2, step: 2 }).toRawFlat(),
             axes: [0]
         })

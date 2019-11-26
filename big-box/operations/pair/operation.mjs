@@ -45,8 +45,9 @@ export default class PairOperation extends TensorOperation {
         /** Axes */
         this.axes = {}
         this.axes.total = [...new Array(__Math__.max(this.of.shape.length, this.with.shape.length)).keys()]
-        this.axes.of = this.axes.total.slice().reverse().filter(this.of.header.nonZeroAxes.bind(this.of)).reverse()
-        this.axes.with = this.axes.total.slice().reverse().filter(this.with.header.nonZeroAxes.bind(this.with)).reverse()
+        
+        this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
+        this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
         this.axes.result = this.axes.total
 
         /** Loops */
