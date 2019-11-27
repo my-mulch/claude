@@ -31,16 +31,6 @@ export default class Insert extends AxisOperation {
     }
 
     symbolicBoilerplate() {
-        
-        // this.axes = {}
-        // this.axes.inner = args.axes
-        // this.axes.total = [...this.of.shape.keys()]
-        // this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
-        // this.axes.order = this.axes.outer.concat(this.axes.inner)
-        
-        // this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
-        // this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
-        
         /** Axes */
         this.axis = this.axes.inner[0]
 

@@ -24,50 +24,22 @@ export default class Source {
     }
 
     static dot(a, b) {
-        return a.map(function (_, i) { return `${a[i]} * ${b[i]}` }).join('+')
+        return a.map(function (_, i) { return `${a[i]} * ${b[i]}` }).join('+') || 0
     }
 
-    plus(value) {
-        this.chain += value ? `+ ${value}` : ''
+    nestedFor() {
 
-        return this
     }
 
-    const(name) {
-        this.chain += `const ${name}`
-
-        return this
-    }
-
-    equals(value) {
-        this.chain += ` = ${value}`
-
-        return this
-    }
-
-    then(statements) {
-        this.chain += ['{', ...statements, '}'].join('\n')
-
-        return this
-    }
-
-    if(condition) {
-        this.chain += `if(${condition})`
-
-        return this
-    }
-
-    else(statements) {
-        this.chain += ['else {', ...statements, '}'].join('\n')
-
-        return this
-    }
-
-    elseIf(condition) {
-        this.chain += `else if(${condition})`
-
-        return this
-    }
+    let(name) { this.chain += `let ${name}`; return this }
+    plus(value) { this.chain += `+ ${value}`; return this }
+    const(name) { this.chain += `const ${name}`; return this }
+    equals(value) { this.chain += ` = ${value}`; return this }
+    if(condition) { this.chain += `if(${condition})`; return this }
+    elseIf(condition) { this.chain += `else if(${condition})`; return this }
+    then(statements) { this.chain += ['{', ...statements, '}'].join('\n'); return this }
+    dot(map) { this.chain += map.entries(function ([a, b]) { return `${a} * ${b}` }).join('+'); return this }
+    else(statements) { this.chain += ['else {', ...statements, '}'].join('\n'); return this }
 
     toString() { return this.chain }
 }

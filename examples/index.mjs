@@ -19,27 +19,26 @@ export const grid = function (res) {
 
 export const vector = function () {
     const circle = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: 300 })
+        .linspace({ start: 0, stop: 2 * Math.PI, num: 400 })
         .multiply({ with: 'i' })
         .exp()
-        .reshape({ shape: [300, 1] })
+        .reshape({ shape: [400, 1] })
         .view({ type: bb.Float32 })
-
-    const vertices = circle
         .insert({
-            with: 1, 
-            entries: [2], 
+            with: 1,
+            entries: [2],
             axis: [1]
         })
         .insert({
             with: [0, 0, 3],
-            entries: bb.arange({ start: 0, stop: circle.shape[0] + 2, step: 2 }).toRawFlat(),
+            entries: bb.arange({ start: 0, stop: 400 + 2, step: 2 }).toRawFlat(),
             axes: [0]
         })
 
+    const vertices = circle
     const colors = bb.zeros({ shape: [vertices.shape[0], 3] }).assign({ with: bb.rand({ shape: [3] }) })
-    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
-    const mode = 'TRIANGLES'
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 1 })
+    const mode = 'TRIANGLE_FAN'
 
     return { vertices, colors, sizes, mode }
 }

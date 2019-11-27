@@ -8,9 +8,9 @@ export default class PairOperation extends TensorOperation {
     constructor(args) { super(args) }
 
     resultant() {
+        const shape = []
         const maxLen = __Math__.max(this.of.shape.length, this.with.shape.length)
 
-        const shape = []
         for (let i = 0; i < maxLen; i++) {
             const bi = this.with.shape.length - 1 - i
             const ai = this.of.shape.length - 1 - i
@@ -26,6 +26,24 @@ export default class PairOperation extends TensorOperation {
         }
 
         return Tensor.zeros({ shape: shape.reverse(), type: this.of.type })
+    }
+
+    symbolicSourceTemplate2() {
+        return new Source([
+            this.start(),
+
+            new Source()
+                .nestedFor(this.package.result)
+                .then([
+                    new Source().const('AIndex').equals(this.of.offset).plus().dot(this.package.of),
+                    new Source().const('BIndex').equals(this.with.offset).plus().dot(this.package.with),
+                    new Source().const('RIndex').equals(this.result.offset).plus().dot(this.package.result),
+
+                    this.inLoop(),
+                ]),
+
+            this.finish()
+        ])
     }
 
     symbolicSourceTemplate() {
@@ -45,20 +63,25 @@ export default class PairOperation extends TensorOperation {
         /** Axes */
         this.axes = {}
         this.axes.total = [...new Array(__Math__.max(this.of.shape.length, this.with.shape.length)).keys()]
-        
         this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
         this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
         this.axes.result = this.axes.total
 
-        /** Loops */
-        this.loops = {}
-        this.loops.total = Source.loopAxes(this.axes.total, this.result)
+        /** Package */
+        this.package = {}
+        this.package.of = this.of.header.nonZeroStrides(this.axes.total)
+        this.package.with = this.with.header.nonZeroStrides(this.axes.total)
+        this.package.result = this.result.header.nonZeroStrides(this.axes.total)
 
         /** Strides */
         this.strides = {}
         this.strides.of = this.of.strides
         this.strides.with = this.with.strides
         this.strides.result = this.result.strides
+
+        /** Loops */
+        this.loops = {}
+        this.loops.total = Source.loopAxes(this.axes.total, this.result)
 
         /** Scalars */
         this.scalars = {}

@@ -34,19 +34,6 @@ export default class Header {
         return true
     }
 
-    nonZeroAxes(totalAxes) {
-        const axes = []
-
-        let i = this.shape.length - 1
-        let axis = totalAxes.length - 1
-
-        for (; i >= 0; i-- , axis--)
-            if (this.shape[i] > 1)
-                axes.push(axis)
-
-        return axes.reverse()
-    }
-
     resolveStrides(shape, stride = this.type.size) {
         const strides = new Array(shape.length)
         strides[strides.length - 1] = stride
@@ -78,6 +65,32 @@ export default class Header {
             flatIndex += index[i] * this.strides[i]
 
         return flatIndex
+    }
+
+    nonZeroStrides(totalAxes) {
+        const axes = new Map()
+
+        let i = this.shape.length - 1
+        let axis = totalAxes.length - 1
+
+        for (; i >= 0; i-- , axis--)
+            if (this.shape[i] > 1)
+                axes.set(axis, this.strides[i])
+
+        return axes
+    }
+
+    nonZeroAxes(totalAxes) {
+        const axes = []
+
+        let i = this.shape.length - 1
+        let axis = totalAxes.length - 1
+
+        for (; i >= 0; i-- , axis--)
+            if (this.shape[i] > 1)
+                axes.unshift(axis)
+
+        return axes
     }
 
     slice(index) {
