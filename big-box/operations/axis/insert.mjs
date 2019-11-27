@@ -30,44 +30,25 @@ export default class Insert extends AxisOperation {
             this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
 
-    symbolicBoilerplate() {
-        /** Axes */
-        this.axis = this.axes.inner[0]
+    symbolicSourceTemplate() { // .set(`i${this.axes.last}`, `(i${this.axis.last} - seen)`) 
+        /** Dimensions */
+        this.dimensions = {}
+        this.dimensions.inner
+        this.dimensions.outer
 
-        /** Loops */
-        this.loops = {}
-        this.loops.total = Source.loopAxes(this.axes.order, this.result)
-        this.loops.outer = Source.loopAxes(this.axes.outer, this.result)
-        this.loops.inner = Source.loopAxes(this.axes.inner, this.result)
-
-        /** Scalars */
-        this.scalars = {}
-        
-        this.scalars.of = this.axes.total.map(Source.prefix)
-        this.scalars.of[this.axis] = `(${Source.prefix(this.axis)} - seen)`
-
-        this.scalars.with = this.axes.total.map(function (axis) { return this.axes.with.includes(axis) ? Source.prefix(axis) : 0 }, this)
-        this.scalars.result = this.axes.total.map(Source.prefix)
+        /** Indices */
+        this.indices = {}
+        this.indices.of = new Source().const('AIndex').equals(this.of.header.symbolicIndex())
+        this.indices.with = new Source().const('BIndex').equals(this.with.header.symbolicIndex())
+        this.indices.result = new Source().const('RIndex').equals(this.result.header.symbolicIndex())
 
         /** Variables */
         this.variables = {}
         this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.type.size })
         this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
         this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
-    }
 
-    symbolicSourceTemplate() {
-        this.source = [
-            this.start(),
-            this.loops.outer.join('\n'),
-            this.preLoop(),
-            this.loops.inner.join('\n'),
-            this.inLoop(),
-            '}'.repeat(this.loops.inner.length),
-            this.postLoop(),
-            '}'.repeat(this.loops.outer.length),
-            this.finish(),
-        ].join('\n')
+        return super.symbolicSourceTemplate()
     }
 
     start() { return 'let seen = 0' }
@@ -75,10 +56,6 @@ export default class Insert extends AxisOperation {
 
     inLoop() {
         return new Source([
-            /** Indices */
-            new Source().const('AIndex').equals(this.of.offset).plus(Source.dot(this.of.strides.slice().reverse(), this.scalars.of.slice().reverse())),
-            new Source().const('BIndex').equals(this.with.offset).plus(Source.dot(this.with.strides.slice().reverse(), this.scalars.with.slice().reverse())),
-            new Source().const('RIndex').equals(this.result.offset).plus(Source.dot(this.result.strides.slice().reverse(), this.scalars.result.slice().reverse())),
 
             /** Insertion Check */
             new Source()

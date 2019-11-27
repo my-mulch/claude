@@ -67,7 +67,7 @@ export default class Header {
         return flatIndex
     }
 
-    nonZeroStrides(totalAxes) {
+    nonZeroIndices(totalAxes) {
         const axes = new Map()
 
         let i = this.shape.length - 1
@@ -75,20 +75,7 @@ export default class Header {
 
         for (; i >= 0; i-- , axis--)
             if (this.shape[i] > 1)
-                axes.set(axis, this.strides[i])
-
-        return axes
-    }
-
-    nonZeroAxes(totalAxes) {
-        const axes = []
-
-        let i = this.shape.length - 1
-        let axis = totalAxes.length - 1
-
-        for (; i >= 0; i-- , axis--)
-            if (this.shape[i] > 1)
-                axes.unshift(axis)
+                axes.set(`i${axis}`, this.strides[i])
 
         return axes
     }
