@@ -222,6 +222,5 @@ export default class Tensor {
             .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
 
-    valueOf() { return this.data[this.offset] }
     [util.inspect.custom]() { return this.toString() }
 }

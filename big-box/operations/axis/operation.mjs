@@ -33,7 +33,6 @@ export default class AxisOperation extends TensorOperation {
         return Tensor.zeros({
             type: this.of.type,
             shape: this.of.shape.filter(this.unselectedAxes, this),
-            strides: this.of.strides.filter(this.unselectedAxes, this),
         })
     }
 
