@@ -70,21 +70,21 @@ export default class Header {
     symbolicIndex(axes) {
         let symbolicIndex = [`${this.offset}`]
 
-        for (const [axis, strides] of axes)
+        for (const [axis, strides] of Object.values(axes))
             symbolicIndex.push(`(${axis} * ${strides})`)
 
         return symbolicIndex.join('+')
     }
 
     nonZeroAxes(axes) {
-        const nonZeroAxes = new Map()
+        const nonZeroAxes = {}
 
         let i = this.shape.length - 1
         let j = axes.length - 1
 
         for (; i >= 0 && j >= 0; i-- , j--)
             if (this.shape[i] > 1)
-                nonZeroAxes.set(`i${axes[j]}`, this.strides[i])
+                nonZeroAxes[axes[j]] = [`i${axes[j]}`, this.strides[i]]
 
         return nonZeroAxes
     }

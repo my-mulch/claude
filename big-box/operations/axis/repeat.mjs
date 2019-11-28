@@ -50,7 +50,8 @@ export default class Repeat extends AxisOperation {
         /** Axes */
         this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
         this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
-        this.axes.result = this.result.header.nonZeroAxes(this.axes.total).set(`i${this.axes.last}`, `r`)
+        this.axes.result = this.result.header.nonZeroAxes(this.axes.total)
+        this.axes.result[this.axes.last][0] = 'r'
 
         super.symbolicSourceBoilerplate()
     }
