@@ -43,7 +43,7 @@ export default {
     UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
     TO: bb.tensor({ data: [["0"], ["0"], ["0"], ["1"]] }),
     // FROM: bb.tensor({ data: [["7"], ["3"], ["1"], ["1"]] }),
-    FROM: bb.tensor({ data: [[1], [0.5], [0.5], [1]] }),
+    FROM: bb.tensor({ data: [["0.02000032365322113"], ["0.010000161826610565"], ["0.010000161826610565"], ["1"]] }),
 
     LOOK_MATRIX: bb.eye({ shape: [4, 4] }),
     VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
