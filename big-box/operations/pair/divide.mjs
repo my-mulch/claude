@@ -6,12 +6,9 @@ export default class Division extends PairOperation {
         /** Superclass */
         super(args)
 
-        /** Result */
-        this.result = args.result || this.resultant()
-
         /** Initialize */
-        super.symbolicBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))

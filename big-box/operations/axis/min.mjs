@@ -14,8 +14,8 @@ export default class Minimization extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        super.symbolicSourceBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -45,9 +45,13 @@ export default class Minimization extends AxisOperation {
     }
 
     inLoop() {
-        return new Source()
-            .if(Algebra.lessThan(this.variables.of, this.variables.temp).slice(0, 1))
-            .then(Algebra.assign(this.variables.temp, this.variables.of))
+        return new Source([
+            this.indices.of,
+            new Source()
+                .if(Algebra.lessThan(this.variables.of, this.variables.temp).slice(0, 1))
+                .then(Algebra.assign(this.variables.temp, this.variables.of))
+        ])
+
     }
 
     postLoop() {

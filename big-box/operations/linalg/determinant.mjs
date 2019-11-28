@@ -12,7 +12,7 @@ export default class Determinant extends LinearAlgebraOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        super.pointwiseSourceBoilerplate()
+        this.pointwiseSourceBoilerplate()
         this.pointwiseSourceTemplate()
 
         /** Create */

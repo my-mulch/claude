@@ -1,3 +1,4 @@
+import Source from '../../template/source'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
@@ -13,8 +14,8 @@ export default class Negation extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        super.symbolicSourceBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -39,7 +40,10 @@ export default class Negation extends AxisOperation {
     }
 
     inLoop() {
-        return Algebra.assign(this.variables.result, Algebra.negate(this.variables.of))
+        return new Source([
+            this.indices.of,
+            Algebra.assign(this.variables.result, Algebra.negate(this.variables.of))
+        ])
     }
 
     postLoop() { }

@@ -6,12 +6,9 @@ export default class Addition extends PairOperation {
         /** Superclass */
         super(args)
 
-        /** Result */
-        this.result = args.result || this.resultant()
-
         /** Initialize */
-        super.symbolicSourceBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -27,7 +24,7 @@ export default class Addition extends PairOperation {
     preLoop() { }
 
     inLoop() {
-        return Algebra.assign(this.variables.result, Algebra.add(this.variables.of, this.variables.with))
+        return Algebra.assign(this.variables.result, Algebra.add(this.variables.of, this.variables.with)).join('\n')
     }
 
     postLoop() { }

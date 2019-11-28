@@ -19,7 +19,7 @@ export default class Repeat extends AxisOperation {
 
         /** Initialize */
         this.symbolicSourceBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))

@@ -5,7 +5,10 @@ export default class Source {
     nestedFor(axes, shapes, statements) {
         this.chain += axes
             .map(function (_, i) {
-                return this.for(`let i${axes[i]} = 0`, `i < ${shapes[i]}`, `i${axes[i]}++`) + '{'
+                const a = `i${axes[i]}`
+                const s = `${shapes[i]}`
+
+                return `${this.for(`let ${a} = 0`, `${a} < ${s}`, `${a}++`)}{`
             }, this)
             .concat(statements)
             .concat(['}'.repeat(axes.length)])

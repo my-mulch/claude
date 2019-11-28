@@ -14,8 +14,8 @@ export default class Sine extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        super.symbolicSourceBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))

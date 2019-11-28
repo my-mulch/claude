@@ -1,3 +1,4 @@
+import Source from '../../template/source'
 import Tensor from '../../tensor'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
@@ -14,8 +15,8 @@ export default class Norm extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        super.symbolicSourceBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))

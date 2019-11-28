@@ -80,11 +80,11 @@ export default class Header {
         const nonZeroAxes = new Map()
 
         let i = this.shape.length - 1
-        let axis = axes.length - 1
+        let j = axes.length - 1
 
-        for (; i >= 0; i-- , axis--)
+        for (; i >= 0 && j >= 0; i-- , j--)
             if (this.shape[i] > 1)
-                nonZeroAxes.set(`i${axis}`, this.strides[i])
+                nonZeroAxes.set(`i${axes[j]}`, this.strides[i])
 
         return nonZeroAxes
     }

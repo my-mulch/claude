@@ -5,7 +5,11 @@ import { __Math__ } from '../../resources'
 
 export default class PairOperation extends TensorOperation {
     constructor(args) {
+        /** Superclass */
         super(args)
+
+        /** Result */
+        this.result = args.result || this.resultant()
 
         /** Axes */
         this.axes = {}
@@ -41,12 +45,22 @@ export default class PairOperation extends TensorOperation {
         return Tensor.zeros({ shape: shape.reverse(), type: this.of.type })
     }
 
+    symbolicSourceBoilerplate() {
+        /** Axes */
+        this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
+        this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
+        this.axes.result = this.result.header.nonZeroAxes(this.axes.total)
+
+        super.symbolicSourceBoilerplate()
+    }
+
     symbolicSourceTemplate() {
         this.source = new Source([
             this.start(),
 
             new Source()
                 .nestedFor(this.axes.total, this.shapes.total, [
+                    Object.values(this.indices).join('\n'),
                     this.inLoop(),
                 ]),
 

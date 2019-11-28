@@ -6,6 +6,8 @@ export default class Mesh {
     constructor(args) {
         /** Properties */
         this.of = args.of
+        this.axes = [...this.of.keys()]
+        this.shapes = this.of.map(function (dimension) { return dimension.length })
 
         /** Result */
         this.result = args.result || this.resultant()
@@ -14,7 +16,7 @@ export default class Mesh {
         this.symbolicSourceTemplate()
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source.join('\n'), 'return R'].join('\n')).bind(this)
+        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n')).bind(this)
 
         /** Template */
         if (!args.template)
@@ -22,23 +24,15 @@ export default class Mesh {
     }
 
     /** Symbolic Implementation */
-    loop(dimension, i) {
-        return Source.loop(
-            `let i${i} = 0`,
-            `i${i} < ${dimension.length}`,
-            `i${i}++`)
-    }
-
     symbolicSourceTemplate() {
-        this.source = []
-
-        this.source.push(`let i = 0`)
-        this.source.push(...this.of.map(this.loop))
-
-        for (let i = 0; i < this.of.length; i++)
-            this.source.push(`R.data[i++] = A[${i}][i${i}]`)
-
-        this.source.push('}'.repeat(this.of.length))
+        this.source = new Source([
+            `let i = 0`,
+            new Source().nestedFor(this.axes, this.shapes, [
+                this.of.map(function (_, i) {
+                    return `R.data[i++] = A[${i}][i${i}]`
+                })
+            ])
+        ])
     }
 
     size(all, dimension) {

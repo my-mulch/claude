@@ -1,6 +1,7 @@
 import Types from '../types'
 import Tensor from '../tensor'
 import Source from '../template/source'
+import Algebra from '../template/algebra'
 
 export default class TensorOperation {
     constructor(args) {
@@ -23,11 +24,6 @@ export default class TensorOperation {
     }
 
     symbolicSourceBoilerplate() {
-        /** Axes */
-        this.axes.of = this.axes.of || this.of.header.nonZeroAxes(this.axes.total)
-        this.axes.with = this.axes.with || this.with.header.nonZeroAxes(this.axes.total)
-        this.axes.result = this.axes.result || this.result.header.nonZeroAxes(this.axes.total)
-
         /** Indices */
         this.indices = {}
         this.indices.of = new Source([`const AIndex = ${this.of.header.symbolicIndex(this.axes.of)}`])
@@ -39,5 +35,6 @@ export default class TensorOperation {
         this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.type.size })
         this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
         this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
+        this.variables.temp = Algebra.variable({ symbol: 'temp', index: 0, size: this.result.type.size })
     }
 }

@@ -52,7 +52,7 @@ export default class Insert extends AxisOperation {
 
     symbolicSourceBoilerplate() {
         /** Axes */
-        this.axes.of = this.of.header.nonZeroAxes(this.axes.total).set(`i${this.axes.last}`, `i${this.axis.last} - seen`)
+        this.axes.of = this.of.header.nonZeroAxes(this.axes.total).set(`i${this.axes.last}`, `i${this.axes.last} - seen`)
         this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
         this.axes.result = this.result.header.nonZeroAxes(this.axes.total)
 
@@ -63,8 +63,6 @@ export default class Insert extends AxisOperation {
 
         super.symbolicSourceBoilerplate()
     }
-
-    symbolicSourceTemplate() { return super.symbolicSourceTemplate() }
 
     start() { return new Source(['let seen = 0']) }
     preLoop() { return new Source(['seen = 0']) }

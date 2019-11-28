@@ -25,13 +25,25 @@ export default class AxisOperation extends TensorOperation {
         this.sizes.inner = this.axes.inner.reduce(this.size.bind(this.of), 1)
     }
 
+    unselectedAxes(_, axis) {
+        return !this.axes.inner.includes(axis)
+    }
+
     resultant() {
         return Tensor.zeros({
             type: this.of.type,
-            shape: this.of.shape.filter(function (_, axis) {
-                return !this.axes.inner.includes(axis)
-            }, this)
+            shape: this.of.shape.filter(this.unselectedAxes, this),
+            strides: this.of.strides.filter(this.unselectedAxes, this),
         })
+    }
+
+    symbolicSourceBoilerplate() {
+        /** Axes */
+        this.axes.of = this.axes.of || this.of.header.nonZeroAxes(this.axes.total)
+        this.axes.with = this.axes.with || this.with.header.nonZeroAxes(this.axes.inner)
+        this.axes.result = this.axes.result || this.result.header.nonZeroAxes(this.axes.outer)
+
+        super.symbolicSourceBoilerplate()
     }
 
     symbolicSourceTemplate() {

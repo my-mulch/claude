@@ -7,22 +7,18 @@ export default class Assignment extends PairOperation {
         const A = args.of.slice({ region: args.region || [] })
 
         /** Superclass */
-        super({ ...args, of: A })
-
-        /** Result */
-        this.result = A
-        this.original = args.of
+        super({ ...args, of: A, result: args.of })
 
         /** Initialize */
-        super.symbolicBoilerplate()
-        super.symbolicSourceTemplate()
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n')).bind(this)
 
         /** Template */
         if (!args.template)
-            this.invoke = this.invoke.bind(this, this.of, this.with, this.original)
+            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
 
     /** Symbolic Implementation */
@@ -30,7 +26,7 @@ export default class Assignment extends PairOperation {
     preLoop() { }
 
     inLoop() {
-        return Algebra.assign(this.variables.of, this.variables.with)
+        return Algebra.assign(this.variables.of, this.variables.with).join('\n')
     }
 
     postLoop() { }
