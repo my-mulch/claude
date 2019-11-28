@@ -17,32 +17,36 @@ export const grid = function (res) {
     return { vertices, colors, sizes, mode }
 }
 
-export const vectorPoint = function () {
+export const vectorPoint = function (x, y, z) {
+    const count = 3
     const point = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: 1000 })
+        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
         .multiply({ with: 'i' })
         .exp()
-        .reshape({ shape: [1000, 1] })
+        .reshape({ shape: [count, 1] })
         .view({ type: bb.Float32 })
+        .divide({ with: 10 })
         .insert({ with: 0, entries: [2], axis: [1] })
-        .insert({ with: [0, 0, -2], entries: [0], axes: [0] })
+        .insert({ with: [0, 0, -0.2], entries: [0], axes: [0] })
 
     const vertices = point
-    const colors = bb.ones({ shape: [1001, 3] }).divide({ with: 2 })
+    const colors = bb.ones({ shape: [count + 1, 1] }).divide({ with: 7 })
     const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
     const mode = 'TRIANGLE_FAN'
 
     return { vertices, colors, sizes, mode }
 }
 
-export const points = function (count = 100) {
+export const cylinder = function () {
+    const count = 3
     const c1 = bb
         .linspace({ start: 0, stop: 2 * Math.PI, num: count })
         .multiply({ with: 'i' })
         .exp()
         .reshape({ shape: [count, 1] })
         .view({ type: bb.Float32 })
-        .insert({ with: -2, entries: [2], axis: [1] })
+        .divide({ with: 20 })
+        .insert({ with: 0.2, entries: [2], axis: [1] })
 
     const c2 = bb
         .linspace({ start: 0, stop: 2 * Math.PI, num: count })
@@ -50,6 +54,7 @@ export const points = function (count = 100) {
         .exp()
         .reshape({ shape: [count, 1] })
         .view({ type: bb.Float32 })
+        .divide({ with: 20 })
         .insert({ with: 0, entries: [2], axis: [1] })
 
     const vertices = bb
@@ -57,37 +62,7 @@ export const points = function (count = 100) {
         .assign({ region: ['::2'], with: c1 })
         .assign({ region: ['1::2'], with: c2 })
 
-    const colors = bb.ones({ shape: vertices.shape }).divide({ with: 2 })
-    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
-    const mode = 'POINTS'
-
-    return { vertices, colors, sizes, mode }
-}
-
-export const cylinder = function (count = 100) {
-    const c1 = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
-        .multiply({ with: 'i' })
-        .exp()
-        .reshape({ shape: [count, 1] })
-        .view({ type: bb.Float32 })
-        .insert({ with: -2, entries: [2], axis: [1] })
-
-    const c2 = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
-        .multiply({ with: 'i' })
-        .exp()
-        .reshape({ shape: [count, 1] })
-        .view({ type: bb.Float32 })
-        .insert({ with: 0, entries: [2], axis: [1] })
-
-    const vertices = bb
-        .zeros({ shape: [c1.shape[0] + c2.shape[0], 3] })
-        .assign({ region: ['::2'], with: c1 })
-        .assign({ region: ['1::2'], with: c2 })
-        // .slice({ region: [":150"] })
-
-    const colors = bb.ones({ shape: vertices.shape }).divide({ with: 2 })
+    const colors = bb.ones({ shape: [count * 2, 1] }).divide({ with: 4 })
     const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
     const mode = 'TRIANGLE_STRIP'
 
@@ -165,8 +140,8 @@ export const soundWave = async function (sound) {
             with: bb.tensor({ data: soundData, type: bb.Float32 })
         })
 
-    const colors = bb.zeros({ shape: [1e6, 3] }).assign({ with: bb.rand({ shape: [3] }) })
-    const sizes = bb.ones({ shape: [soundData.length, 1] }).multiply({ with: 2 })
+    const colors = bb.zeros({ shape: [vertices.shape[0], 3] }).assign({ with: bb.rand({ shape: [3] }) })
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 2 })
     const mode = 'POINTS'
 
     return { vertices, colors, sizes, mode }
