@@ -18,10 +18,8 @@ export default class Repeat extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate()
-            this.symbolicSourceTemplate()
-        }
+        this.symbolicSourceBoilerplate()
+        super.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -40,45 +38,47 @@ export default class Repeat extends AxisOperation {
         })
     }
 
-    /** Symbolic Implementation */
-    symbolicBoilerplate() {
-        super.symbolicBoilerplate()
+    /** 
+     * 
+     * 
+     * Symbolic Implementation 
+     * 
+     * 
+     * */
 
+    symbolicSourceBoilerplate() {
         /** Axes */
-        this.axes.order = this.axes.outer.concat(this.axes.inner)
-        this.axes.last = this.axes.order[this.axes.order.length - 1]
-        this.axes.repeat = this.axes.inner[0] || this.axes.last
+        this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
+        this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
+        this.axes.result = this.result.header.nonZeroAxes(this.axes.total).set(`i${this.axes.last}`, `r`)
 
-        /** Strides */
-        this.strides.R = this.result.strides
-
-        /** Scalars */
-        this.scalars.R = this.axes.total.map(Source.prefix)
-        this.scalars.R[this.axes.repeat] = 'r'
-
-        /** Indices */
-        this.indices.result = Source.index('RIndex', this.scalars.R, this.strides.R, this.result.offset)
-
-        /** Loops */
-        this.loops.count = Source.loop([`let r = i${this.axes.last}*${this.count}, c = 0`], [`c < ${this.count}`], ['r++, c++'])
+        super.symbolicSourceBoilerplate()
     }
 
-    symbolicSourceTemplate() {
-        this.source = [
-            ...this.loops.outer,
-            ...this.loops.inner,
+    start() { }
+    preLoop() { }
 
+    inLoop() {
+        return new Source([
             this.indices.of,
-            this.loops.count,
-            this.indices.result,
 
-            Algebra.assign(this.variables.result, this.variables.of),
-
-            `}`,
-            `}`.repeat(this.loops.inner.length),
-            `}`.repeat(this.loops.outer.length),
-        ].join('\n')
+            new Source()
+                .for(`let r = i${this.axes.last}*${this.count}, c = 0`, `c < ${this.count}`, 'r++, c++')
+                .then([
+                    this.indices.result,
+                    Algebra.assign(this.variables.result, this.variables.of)
+                ])
+        ])
     }
 
-    /** (TODO) Pointwise Implementation */
+    postLoop() { }
+    finish() { }
+
+    /** 
+     * 
+     * 
+     * (TODO) Literal Implementation 
+     * 
+     * 
+     * */
 }

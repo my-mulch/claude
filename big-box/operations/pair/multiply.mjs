@@ -10,10 +10,8 @@ export default class Multiplication extends PairOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate() // super class method 
-            this.symbolicSourceTemplate() // super class method, utilizes helpers below
-        }
+        super.symbolicBoilerplate()
+        super.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))

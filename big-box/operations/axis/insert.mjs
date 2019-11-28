@@ -6,7 +6,7 @@ import { __Math__ } from '../../resources'
 
 export default class Insert extends AxisOperation {
     constructor(args) {
-        /** Default */
+        /** Defaults */
         args.axes = args.axes || [args.of.shape.length - 1]
 
         /** Superclass */
@@ -19,7 +19,7 @@ export default class Insert extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        this.symbolicBoilerplate()
+        this.symbolicSourceBoilerplate()
         this.symbolicSourceTemplate()
 
         /** Create */
@@ -29,49 +29,6 @@ export default class Insert extends AxisOperation {
         if (!args.template)
             this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
-
-    symbolicSourceTemplate() { // .set(`i${this.axes.last}`, `(i${this.axis.last} - seen)`) 
-        /** Dimensions */
-        this.dimensions = {}
-        this.dimensions.inner
-        this.dimensions.outer
-
-        /** Indices */
-        this.indices = {}
-        this.indices.of = new Source().const('AIndex').equals(this.of.header.symbolicIndex())
-        this.indices.with = new Source().const('BIndex').equals(this.with.header.symbolicIndex())
-        this.indices.result = new Source().const('RIndex').equals(this.result.header.symbolicIndex())
-
-        /** Variables */
-        this.variables = {}
-        this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.type.size })
-        this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
-        this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
-
-        return super.symbolicSourceTemplate()
-    }
-
-    start() { return 'let seen = 0' }
-    preLoop() { return 'seen = 0' }
-
-    inLoop() {
-        return new Source([
-
-            /** Insertion Check */
-            new Source()
-                .const('insert')
-                .equals(`(this.entries[seen] + seen) === i${this.axes.inner[0]}`),
-
-            /** Insertion */
-            new Source()
-                .if('insert')
-                .then(['seen++', ...Algebra.assign(this.variables.result, this.variables.with)])
-                .else([...Algebra.assign(this.variables.result, this.variables.of)])
-        ])
-    }
-
-    postLoop() { }
-    finish() { }
 
     resultant() {
         return Tensor.zeros({
@@ -84,4 +41,58 @@ export default class Insert extends AxisOperation {
             }, this),
         })
     }
+
+    /** 
+     * 
+     * 
+     * Symbolic Implementation 
+     * 
+     * 
+     * */
+
+    symbolicSourceBoilerplate() {
+        /** Axes */
+        this.axes.of = this.of.header.nonZeroAxes(this.axes.total).set(`i${this.axes.last}`, `i${this.axis.last} - seen`)
+        this.axes.with = this.with.header.nonZeroAxes(this.axes.total)
+        this.axes.result = this.result.header.nonZeroAxes(this.axes.total)
+
+        /** Shapes */
+        this.shapes = {}
+        this.shapes.outer = this.axes.outer.map(super.shape.bind(this.result))
+        this.shapes.inner = this.axes.inner.map(super.shape.bind(this.result))
+
+        super.symbolicSourceBoilerplate()
+    }
+
+    symbolicSourceTemplate() { return super.symbolicSourceTemplate() }
+
+    start() { return new Source(['let seen = 0']) }
+    preLoop() { return new Source(['seen = 0']) }
+
+    inLoop() {
+        return new Source([
+            /** Indices */
+            new Source(Object.values(this.indices)),
+
+            /** Insertion Check */
+            new Source([`const insert = (this.entries[seen] + seen) === i${this.axes.inner[0]}`]),
+
+            /** Insertion */
+            new Source()
+                .if('insert')
+                .then(['seen++', ...Algebra.assign(this.variables.result, this.variables.with)])
+                .else([...Algebra.assign(this.variables.result, this.variables.of)])
+        ])
+    }
+
+    postLoop() { }
+    finish() { }
+
+    /** 
+     * 
+     * 
+     * (TODO) Literal Implementation 
+     * 
+     * 
+     * */
 }

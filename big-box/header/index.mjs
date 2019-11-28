@@ -45,39 +45,48 @@ export default class Header {
     }
 
     resolveShape(shape) {
-        const reshape = new Array(shape.length)
+        const newShape = new Array(shape.length)
         const product = shape.reduce(__Math__.multiply, 1)
 
         for (let i = 0; i < shape.length; i++)
-            reshape[i] = shape[i] < 0 ? -this.size / product : shape[i]
+            newShape[i] = shape[i] < 0 ? -this.size / product : shape[i]
 
-        return reshape
+        return newShape
     }
 
     copy() {
         return new Header(JSON.parse(JSON.stringify(this)))
     }
 
-    flatIndex(index) {
-        let flatIndex = this.offset
+    literalIndex(axes) {
+        let literalIndex = this.offset
 
-        for (let i = 0; i < index.length; i++)
-            flatIndex += index[i] * this.strides[i]
+        for (let i = 0; i < axes.length; i++)
+            literalIndex += axes[i] * this.strides[i]
 
-        return flatIndex
+        return literalIndex
     }
 
-    nonZeroIndices(totalAxes) {
-        const axes = new Map()
+    symbolicIndex(axes) {
+        let symbolicIndex = [`${this.offset}`]
+
+        for (const [axis, strides] of axes)
+            symbolicIndex.push(`(${axis} * ${strides})`)
+
+        return symbolicIndex.join('+')
+    }
+
+    nonZeroAxes(axes) {
+        const nonZeroAxes = new Map()
 
         let i = this.shape.length - 1
-        let axis = totalAxes.length - 1
+        let axis = axes.length - 1
 
         for (; i >= 0; i-- , axis--)
             if (this.shape[i] > 1)
-                axes.set(`i${axis}`, this.strides[i])
+                nonZeroAxes.set(`i${axis}`, this.strides[i])
 
-        return axes
+        return nonZeroAxes
     }
 
     slice(index) {

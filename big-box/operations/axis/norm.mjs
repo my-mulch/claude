@@ -14,10 +14,8 @@ export default class Norm extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate() // super class method 
-            this.symbolicSourceTemplate() // super class method, utilizes helpers below
-        }
+        super.symbolicSourceBoilerplate()
+        super.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -37,14 +35,29 @@ export default class Norm extends AxisOperation {
         })
     }
 
-    /** Symbolic Implementation */
-    start() { return `const temp = new Array(${this.of.type.size})` }
+    /** 
+     * 
+     * 
+     * Symbolic Implementation 
+     * 
+     * 
+     * */
 
-    preLoop() { return `temp.fill(0)` }
+    start() {
+        return new Source([`const temp = new Array(${this.of.type.size})`])
+    }
+
+    preLoop() {
+        return new Source([this.indices.result, `temp.fill(0)`])
+    }
 
     inLoop() {
-        return Algebra.assign(this.variables.temp.slice(0, 1),
-            Algebra.sum(Algebra.square(this.variables.of)), '+=').slice(0, 1)
+        return new Source([
+            this.indices.of,
+            Algebra.assign(
+                this.variables.temp.slice(0, 1),
+                Algebra.sum(Algebra.square(this.variables.of)), '+=').slice(0, 1)
+        ])
     }
 
     postLoop() {
@@ -53,5 +66,11 @@ export default class Norm extends AxisOperation {
 
     finish() { }
 
-    /** (TODO) Pointwise Implementation */
+    /** 
+     * 
+     * 
+     * (TODO) Literal Implementation 
+     * 
+     * 
+     * */
 }

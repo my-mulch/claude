@@ -14,10 +14,8 @@ export default class Minimization extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate() // super class method 
-            this.symbolicSourceTemplate() // super class method, utilizes helpers below
-        }
+        super.symbolicSourceBoilerplate()
+        super.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -27,10 +25,24 @@ export default class Minimization extends AxisOperation {
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    /** Symbolic Implementation */
-    start() { return `const temp = new Array(${this.of.type.size})` }
+    /** 
+     * 
+     * 
+     * Symbolic Implementation 
+     * 
+     * 
+     * */
 
-    preLoop() { return `temp.fill(Number.POSITIVE_INFINITY)` }
+    start() {
+        return new Source([`const temp = new Array(${this.of.type.size})`])
+    }
+
+    preLoop() {
+        return new Source([
+            `temp.fill(Number.POSITIVE_INFINITY)`,
+            this.indices.result
+        ])
+    }
 
     inLoop() {
         return new Source()
@@ -44,5 +56,11 @@ export default class Minimization extends AxisOperation {
 
     finish() { }
 
-    /** (TODO) Pointwise Implementation */
+    /** 
+     * 
+     * 
+     * (TODO) Literal Implementation 
+     * 
+     * 
+     * */
 }

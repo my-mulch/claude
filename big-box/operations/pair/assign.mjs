@@ -14,10 +14,8 @@ export default class Assignment extends PairOperation {
         this.original = args.of
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate() // super class method 
-            this.symbolicSourceTemplate() // super class method, utilizes helpers below
-        }
+        super.symbolicBoilerplate()
+        super.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n')).bind(this)
@@ -29,7 +27,6 @@ export default class Assignment extends PairOperation {
 
     /** Symbolic Implementation */
     start() { }
-
     preLoop() { }
 
     inLoop() {
@@ -37,7 +34,6 @@ export default class Assignment extends PairOperation {
     }
 
     postLoop() { }
-
     finish() { }
 
     /** (TODO) Pointwise Implementation */
