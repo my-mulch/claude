@@ -92,10 +92,10 @@ export default class Tensor {
     }
 
     static linspace({ start, stop, num = 50, type }) {
-        const step = (stop - start) / num
+        const step = (stop - start) / (num - 1)
         const tensor = new Tensor({ header: new Header({ type, shape: [num] }) })
 
-        for (let i = start, j = 0; i < stop; i += step, j += tensor.type.size)
+        for (let i = start, j = 0; i <= stop; i += step, j += tensor.type.size)
             tensor.data[j] = i
 
         return tensor
