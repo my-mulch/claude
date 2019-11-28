@@ -1,9 +1,5 @@
-import {
-    __Math__, // misc resources
-    PARTIAL_SLICE, NUMBER, SLICE_CHARACTER, // slice resources
-} from '../resources'
-
 import Types from '../types'
+import { __Math__, PARTIAL_SLICE, NUMBER, SLICE_CHARACTER } from '../resources'
 
 export default class Header {
     constructor(opts) {
@@ -110,15 +106,18 @@ export default class Header {
             */
 
             else if (PARTIAL_SLICE.test(index[i])) {
-                let [low, high] = index[i].split(SLICE_CHARACTER).map(Number)
+                let [low, high, step] = index[i].split(SLICE_CHARACTER).map(Number)
 
                 if (high === 0)
                     high = this.shape[i]
 
+                if (!step)
+                    step = 1
+
                 offset += this.strides[i] * low
 
-                shape.push(high - low)
-                strides.push(this.strides[i])
+                shape.push(__Math__.ceil((high - low) / step))
+                strides.push(this.strides[i] * step)
             }
 
             /** 
