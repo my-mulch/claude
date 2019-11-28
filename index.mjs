@@ -3,7 +3,7 @@ import bb from './big-box'
 import parmesan from './parmesan'
 import config from './parmesan/resources'
 
-import { axes, circle, rgb, imageCube, box, grid, soundWave, vectorPoint, cylinder } from './examples'
+import { axes, circle, rgb, imageCube, box, grid, soundWave, vectorPoint, cylinder, points } from './examples'
 
 window.bb = bb
 window.myio = myio
@@ -18,6 +18,7 @@ export default (async function () {
     // app.plot(grid(1.2e2))
     // app.plot(box)
     app.plot(cylinder())
+    // app.plot(points())
     app.plot(axes)
     // app.plot(vectorPoint())
 })()

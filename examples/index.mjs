@@ -35,17 +35,61 @@ export const vectorPoint = function () {
     return { vertices, colors, sizes, mode }
 }
 
-export const cylinder = function () {
-    const vertices = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: 3 })
+export const points = function (count = 100) {
+    const c1 = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
         .multiply({ with: 'i' })
         .exp()
-        .reshape({ shape: [3, 1] })
+        .reshape({ shape: [count, 1] })
         .view({ type: bb.Float32 })
+        .insert({ with: -2, entries: [2], axis: [1] })
+
+    const c2 = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
+        .multiply({ with: 'i' })
+        .exp()
+        .reshape({ shape: [count, 1] })
+        .view({ type: bb.Float32 })
+        .insert({ with: 0, entries: [2], axis: [1] })
+
+    const vertices = bb
+        .zeros({ shape: [c1.shape[0] + c2.shape[0], 3] })
+        .assign({ region: ['::2'], with: c1 })
+        .assign({ region: ['1::2'], with: c2 })
 
     const colors = bb.ones({ shape: vertices.shape }).divide({ with: 2 })
     const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
     const mode = 'POINTS'
+
+    return { vertices, colors, sizes, mode }
+}
+
+export const cylinder = function (count = 100) {
+    const c1 = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
+        .multiply({ with: 'i' })
+        .exp()
+        .reshape({ shape: [count, 1] })
+        .view({ type: bb.Float32 })
+        .insert({ with: -2, entries: [2], axis: [1] })
+
+    const c2 = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
+        .multiply({ with: 'i' })
+        .exp()
+        .reshape({ shape: [count, 1] })
+        .view({ type: bb.Float32 })
+        .insert({ with: 0, entries: [2], axis: [1] })
+
+    const vertices = bb
+        .zeros({ shape: [c1.shape[0] + c2.shape[0], 3] })
+        .assign({ region: ['::2'], with: c1 })
+        .assign({ region: ['1::2'], with: c2 })
+        // .slice({ region: [":150"] })
+
+    const colors = bb.ones({ shape: vertices.shape }).divide({ with: 2 })
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
+    const mode = 'TRIANGLE_STRIP'
 
     return { vertices, colors, sizes, mode }
 }
