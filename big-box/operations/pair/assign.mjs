@@ -3,11 +3,12 @@ import PairOperation from './operation.mjs'
 
 export default class Assignment extends PairOperation {
     constructor(args) {
-        /** Defaults */
-        const A = args.of.slice({ region: args.region || [] })
-
         /** Superclass */
-        super({ ...args, of: A, result: args.of })
+        super({
+            ...args,
+            of: args.of.slice({ region: args.region || [] }),
+            result: args.of
+        })
 
         /** Initialize */
         this.symbolicSourceBoilerplate()
@@ -19,6 +20,13 @@ export default class Assignment extends PairOperation {
         /** Template */
         if (!args.template)
             this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
+    }
+
+    symbolicSourceBoilerplate() {
+        this.shapes.total = this.axes.total.map(this.shape.bind(this.of))
+        this.sizes.total = this.axes.total.reduce(this.size.bind(this.of), 1)
+
+        super.symbolicSourceBoilerplate()
     }
 
     /** Symbolic Implementation */

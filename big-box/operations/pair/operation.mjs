@@ -17,11 +17,9 @@ export default class PairOperation extends TensorOperation {
 
         /** Shapes */
         this.shapes = {}
-        this.shapes.total = this.axes.total.map(this.shape.bind(this.result))
 
         /** Sizes */
         this.sizes = {}
-        this.sizes.total = this.axes.total.reduce(this.size.bind(this.result), 1)
     }
 
     resultant() {
@@ -46,6 +44,12 @@ export default class PairOperation extends TensorOperation {
     }
 
     symbolicSourceBoilerplate() {
+        /** Shapes */
+        this.shapes.total = this.shapes.total || this.axes.total.map(this.shape.bind(this.result))
+
+        /** Sizes */
+        this.sizes.total = this.sizes.total || this.axes.total.reduce(this.size.bind(this.result), 1)
+
         /** Axes */
         this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
         this.axes.with = this.with.header.nonZeroAxes(this.axes.total)

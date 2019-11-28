@@ -8,7 +8,7 @@ export default class Source {
                 const a = `i${axes[i]}`
                 const s = `${shapes[i]}`
 
-                return `${this.for(`let ${a} = 0`, `${a} < ${s}`, `${a}++`)}{`
+                return `for(let ${a} = 0;${a} < ${s};${a}++){`
             }, this)
             .concat(statements)
             .concat(['}'.repeat(axes.length)])
