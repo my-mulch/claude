@@ -17,21 +17,35 @@ export const grid = function (res) {
     return { vertices, colors, sizes, mode }
 }
 
-export const vector = function () {
+export const vectorPoint = function () {
     const point = bb
         .linspace({ start: 0, stop: 2 * Math.PI, num: 1000 })
         .multiply({ with: 'i' })
         .exp()
         .reshape({ shape: [1000, 1] })
         .view({ type: bb.Float32 })
-        .divide({ with: 10 })
         .insert({ with: 0, entries: [2], axis: [1] })
-        .insert({ with: [0, 0, -0.25], entries: [0], axes: [0] })
+        .insert({ with: [0, 0, -2], entries: [0], axes: [0] })
 
     const vertices = point
-    const colors = bb.ones({ shape: [1001, 3] })
+    const colors = bb.ones({ shape: [1001, 3] }).divide({ with: 2 })
     const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
     const mode = 'TRIANGLE_FAN'
+
+    return { vertices, colors, sizes, mode }
+}
+
+export const cylinder = function () {
+    const vertices = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: 3 })
+        .multiply({ with: 'i' })
+        .exp()
+        .reshape({ shape: [3, 1] })
+        .view({ type: bb.Float32 })
+
+    const colors = bb.ones({ shape: vertices.shape }).divide({ with: 2 })
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
+    const mode = 'POINTS'
 
     return { vertices, colors, sizes, mode }
 }
