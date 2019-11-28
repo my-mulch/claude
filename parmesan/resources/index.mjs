@@ -40,17 +40,9 @@ export default {
         '}\n',
 
 
-    FROM: bb.tensor({
-        data: [
-            [20.47654151916504], [21.77789306640625], [25.31411361694336], [1],
-        ]
-    }),
-
     UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
-
-    TO: bb.tensor({
-        data: [[16.012300491333008], [16.97347640991211], [19.70624542236328], [1]]
-    }),
+    TO: bb.tensor({ data: [["0"], ["0"], ["0"], ["1"]] }),
+    FROM: bb.tensor({ data: [["7"], ["3"], ["1"], ["1"]] }),
 
     LOOK_MATRIX: bb.eye({ shape: [4, 4] }),
     VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
@@ -62,7 +54,7 @@ export default {
     NEAR: 1e-6,
     FAR: 1e6,
 
-    ZOOM_DELTA: 1,
+    ZOOM_DELTA: 0.02,
     PAN_DELTA: Math.PI / 128,
 
     DIRECTIONS: {
@@ -72,4 +64,3 @@ export default {
         RIGHT: 3,
     },
 }
-

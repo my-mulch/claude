@@ -314,10 +314,11 @@ export default jest.suite(function () {
         [7, 6]]]]
     })
 
-    const L = bb.arange({ stop: 100, })
+    const L = bb.arange({ stop: 100 })
+    const X = bb.ones({ shape: [4, 3, 2] })
+    const Y = bb.ones({ shape: [3, 1] })
 
-
-
+    this.expect(bb.add({ of: X, with: Y })).toEqual([[["2", "2"], ["2", "2"], ["2", "2"]], [["2", "2"], ["2", "2"], ["2", "2"]], [["2", "2"], ["2", "2"], ["2", "2"]], [["2", "2"], ["2", "2"], ["2", "2"]]])
     this.expect(new bb.cached.mean({ of: B }).invoke()).toEqual("-15")
     this.expect(new bb.cached.mean({ of: C }).invoke()).toEqual("16.66666603088379")
     this.expect(new bb.cached.mean({ of: K }).invoke()).toEqual("4.525000095367432")

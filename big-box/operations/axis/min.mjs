@@ -1,3 +1,4 @@
+import Source from '../../template/source'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
@@ -13,10 +14,8 @@ export default class Minimization extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate() // super class method 
-            this.symbolicSourceTemplate() // super class method, utilizes helpers below
-        }
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -26,16 +25,33 @@ export default class Minimization extends AxisOperation {
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    /** Symbolic Implementation */
-    start() { return `const temp = new Array(${this.of.type.size})` }
+    /** 
+     * 
+     * 
+     * Symbolic Implementation 
+     * 
+     * 
+     * */
 
-    preLoop() { return `temp.fill(Number.POSITIVE_INFINITY)` }
+    start() {
+        return new Source([`const temp = new Array(${this.of.type.size})`])
+    }
+
+    preLoop() {
+        return new Source([
+            `temp.fill(Number.POSITIVE_INFINITY)`,
+            this.indices.result
+        ])
+    }
 
     inLoop() {
-        return Algebra.if(
-            Algebra.lessThan(this.variables.of, this.variables.temp).slice(0, 1),
-            Algebra.assign(this.variables.temp, this.variables.of)
-        )
+        return new Source([
+            this.indices.of,
+            new Source()
+                .if(Algebra.lessThan(this.variables.of, this.variables.temp).slice(0, 1))
+                .then(Algebra.assign(this.variables.temp, this.variables.of))
+        ])
+
     }
 
     postLoop() {
@@ -44,5 +60,11 @@ export default class Minimization extends AxisOperation {
 
     finish() { }
 
-    /** (TODO) Pointwise Implementation */
+    /** 
+     * 
+     * 
+     * (TODO) Literal Implementation 
+     * 
+     * 
+     * */
 }

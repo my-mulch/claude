@@ -41,11 +41,11 @@ export default class MatrixMultiplication extends LinearAlgebraOperation {
     start() { this.source = [] }
 
     inLoop() {
-        const R = Algebra.variable({ symbol: 'R.data', size: this.result.type.size, index: this.result.header.flatIndex([this.r, this.c]) })
+        const R = Algebra.variable({ symbol: 'R.data', size: this.result.type.size, index: this.result.header.literalIndex([this.r, this.c]) })
 
         const dot = new Array(this.like).fill(null).map(function (_, s) {
-            const A = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex([this.r, s]) })
-            const B = Algebra.variable({ symbol: 'B.data', size: this.with.type.size, index: this.with.header.flatIndex([s, this.c]) })
+            const A = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.literalIndex([this.r, s]) })
+            const B = Algebra.variable({ symbol: 'B.data', size: this.with.type.size, index: this.with.header.literalIndex([s, this.c]) })
 
             return Algebra.multiply(A, B)
         }, this).reduce(Algebra.add)

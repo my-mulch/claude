@@ -1,3 +1,4 @@
+import Source from '../../template/source'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
@@ -13,10 +14,8 @@ export default class Mean extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate() // super class method 
-            this.symbolicSourceTemplate() // super class method, utilizes helpers below
-        }
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -26,21 +25,44 @@ export default class Mean extends AxisOperation {
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    /** Symbolic Implementation */
-    start() { return `const temp = new Array(${this.of.type.size})` }
+    /** 
+     * 
+     * 
+     * Symbolic Implementation 
+     * 
+     * 
+     * */
 
-    preLoop() { return `temp.fill(0)` }
+    start() {
+        return new Source([`const temp = new Array(${this.of.type.size})`])
+    }
+
+    preLoop() {
+        return new Source([
+            this.indices.result,
+            `temp.fill(0)`
+        ])
+    }
 
     inLoop() {
-        return Algebra.assign(this.variables.temp, this.variables.of, '+=')
+        return new Source([
+            this.indices.of,
+            Algebra.assign(this.variables.temp, this.variables.of, '+=')
+        ])
     }
 
     postLoop() {
         return Algebra.assign(this.variables.result,
-            Algebra.scale(this.variables.temp, 1 / this.dimensions.inner))
+            Algebra.scale(this.variables.temp, 1 / this.sizes.inner))
     }
 
     finish() { }
 
-    /** (TODO) Pointwise Implementation */
+    /** 
+     * 
+     * 
+     * (TODO) Literal Implementation 
+     * 
+     * 
+     * */
 }

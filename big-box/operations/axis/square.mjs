@@ -2,7 +2,7 @@ import Source from '../../template/source'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
-export default class Sine extends AxisOperation {
+export default class Square extends AxisOperation {
     constructor(args) {
         /** Defaults */
         args.axes = args.axes || []
@@ -35,14 +35,12 @@ export default class Sine extends AxisOperation {
 
     start() { }
 
-    preLoop() {
-        return new Source([this.indices.result])
-    }
+    preLoop() { return new Source([this.indices.result]) }
 
     inLoop() {
         return new Source([
             this.indices.of,
-            Algebra.assign(this.variables.result, Algebra.sin(this.variables.of))
+            Algebra.assign(this.variables.result, Algebra.square(this.variables.of))
         ])
     }
 

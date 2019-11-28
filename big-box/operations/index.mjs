@@ -1,8 +1,9 @@
 import * as axis from './axis'
 import * as pair from './pair'
 import * as linalg from './linalg'
+import * as create from './create'
 
-const operations = { ...linalg, ...axis, ...pair }
+const operations = { ...linalg, ...axis, ...pair, ...create }
 
 export default {
     ...operations,

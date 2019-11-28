@@ -12,10 +12,9 @@ export default class Adjugate extends LinearAlgebraOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.pointwiseSourceBoilerplate() // super class method
-            this.pointwiseSourceTemplate() // super class method, utilizes helpers below
-        }
+        super.pointwiseSourceBoilerplate() 
+        super.pointwiseSourceTemplate() 
+
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -37,7 +36,7 @@ export default class Adjugate extends LinearAlgebraOperation {
         const cofactor = sign < 0 ? Algebra.negate(determinant) : determinant
 
         this.source.push(Algebra.assign(Algebra.variable({
-            index: this.result.header.flatIndex([this.r, this.c]),
+            index: this.result.header.literalIndex([this.r, this.c]),
             symbol: 'R.data',
             size: this.result.type.size
         }), cofactor))
@@ -52,8 +51,8 @@ export default class Adjugate extends LinearAlgebraOperation {
 
         const value = new Array(this.size).fill(null).map(function (_, i) {
             return Algebra.multiply(
-                Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.flatIndex([0, i]) }),
-                Algebra.variable({ symbol: 'R.data', size: this.of.type.size, index: this.result.header.flatIndex([i, 0]) }))
+                Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.literalIndex([0, i]) }),
+                Algebra.variable({ symbol: 'R.data', size: this.of.type.size, index: this.result.header.literalIndex([i, 0]) }))
         }, this).reduce(Algebra.add)
 
         source.push(Algebra.assign(variable, value))

@@ -13,8 +13,6 @@ export default class Header {
         this.contig = opts.contig !== undefined ? opts.contig : true
         this.strides = opts.strides !== undefined ? opts.strides : this.resolveStrides(this.shape)
         this.size = this.shape.reduce(__Math__.multiply, 1)
-
-        this.nonZeroAxes = this.nonZeroAxes.bind(this)
     }
 
     static isContigous(index) {
@@ -36,15 +34,6 @@ export default class Header {
         return true
     }
 
-    nonZeroAxes(_, index) {
-        const ri = this.shape.length - index - 1
-
-        if (ri < 0) return false
-        if (this.shape[ri] > 1) return true
-
-        return false
-    }
-
     resolveStrides(shape, stride = this.type.size) {
         const strides = new Array(shape.length)
         strides[strides.length - 1] = stride
@@ -56,26 +45,48 @@ export default class Header {
     }
 
     resolveShape(shape) {
-        const reshape = new Array(shape.length)
+        const newShape = new Array(shape.length)
         const product = shape.reduce(__Math__.multiply, 1)
 
         for (let i = 0; i < shape.length; i++)
-            reshape[i] = shape[i] < 0 ? -this.size / product : shape[i]
+            newShape[i] = shape[i] < 0 ? -this.size / product : shape[i]
 
-        return reshape
+        return newShape
     }
 
     copy() {
         return new Header(JSON.parse(JSON.stringify(this)))
     }
 
-    flatIndex(index) {
-        let flatIndex = this.offset
+    literalIndex(axes) {
+        let literalIndex = this.offset
 
-        for (let i = 0; i < index.length; i++)
-            flatIndex += index[i] * this.strides[i]
+        for (let i = 0; i < axes.length; i++)
+            literalIndex += axes[i] * this.strides[i]
 
-        return flatIndex
+        return literalIndex
+    }
+
+    symbolicIndex(axes) {
+        let symbolicIndex = [`${this.offset}`]
+
+        for (const [axis, strides] of Object.values(axes))
+            symbolicIndex.push(`(${axis} * ${strides})`)
+
+        return symbolicIndex.join('+')
+    }
+
+    nonZeroAxes(axes) {
+        const nonZeroAxes = {}
+
+        let i = this.shape.length - 1
+        let j = axes.length - 1
+
+        for (; i >= 0 && j >= 0; i-- , j--)
+            if (this.shape[i] > 1)
+                nonZeroAxes[axes[j]] = [`i${axes[j]}`, this.strides[i]]
+
+        return nonZeroAxes
     }
 
     slice(index) {

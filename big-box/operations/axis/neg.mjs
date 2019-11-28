@@ -1,3 +1,4 @@
+import Source from '../../template/source'
 import Algebra from '../../template/algebra'
 import AxisOperation from './operation'
 
@@ -13,10 +14,8 @@ export default class Negation extends AxisOperation {
         this.result = args.result || this.resultant()
 
         /** Initialize */
-        if (this.of.size > 0) {
-            this.symbolicBoilerplate() // super class method 
-            this.symbolicSourceTemplate() // super class method, utilizes helpers below
-        }
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
 
         /** Create */
         this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
@@ -26,18 +25,36 @@ export default class Negation extends AxisOperation {
             this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
     }
 
-    /** Symbolic Implementation */
+    /** 
+     * 
+     * 
+     * Symbolic Implementation 
+     * 
+     * 
+     * */
+
     start() { }
 
-    preLoop() { }
+    preLoop() {
+        return new Source([this.indices.result])
+    }
 
     inLoop() {
-        return Algebra.assign(this.variables.result, Algebra.negate(this.variables.of))
+        return new Source([
+            this.indices.of,
+            Algebra.assign(this.variables.result, Algebra.negate(this.variables.of))
+        ])
     }
 
     postLoop() { }
 
     finish() { }
 
-    /** (TODO) Pointwise Implementation */
+    /** 
+     * 
+     * 
+     * (TODO) Literal Implementation 
+     * 
+     * 
+     * */
 }

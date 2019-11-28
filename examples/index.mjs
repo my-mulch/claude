@@ -1,4 +1,54 @@
 import bb from '../big-box'
+import myio from '../myio'
+
+export const grid = function (res) {
+    const vertices = bb.mesh({
+        of: [
+            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat(),
+            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat(),
+            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat()
+        ]
+    })
+
+    const colors = bb.zeros({ shape: [res ** 3, 3] }).assign({ with: bb.rand({ shape: [3] }) })
+    const sizes = bb.ones({ shape: [res ** 3, 1] }).multiply({ with: 1 })
+    const mode = 'POINTS'
+
+    return { vertices, colors, sizes, mode }
+}
+
+export const vectorPoint = function () {
+    const point = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: 1000 })
+        .multiply({ with: 'i' })
+        .exp()
+        .reshape({ shape: [1000, 1] })
+        .view({ type: bb.Float32 })
+        .insert({ with: 0, entries: [2], axis: [1] })
+        .insert({ with: [0, 0, -2], entries: [0], axes: [0] })
+
+    const vertices = point
+    const colors = bb.ones({ shape: [1001, 3] }).divide({ with: 2 })
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
+    const mode = 'TRIANGLE_FAN'
+
+    return { vertices, colors, sizes, mode }
+}
+
+export const cylinder = function () {
+    const vertices = bb
+        .linspace({ start: 0, stop: 2 * Math.PI, num: 3 })
+        .multiply({ with: 'i' })
+        .exp()
+        .reshape({ shape: [3, 1] })
+        .view({ type: bb.Float32 })
+
+    const colors = bb.ones({ shape: vertices.shape }).divide({ with: 2 })
+    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
+    const mode = 'POINTS'
+
+    return { vertices, colors, sizes, mode }
+}
 
 export const axes = {
     vertices: bb.tensor({
@@ -9,6 +59,13 @@ export const axes = {
         ]
     }),
 
+    colors: bb.ones({ shape: [10000, 3] }),
+    sizes: bb.ones({ shape: [10000, 1] }),
+    mode: 'LINES'
+}
+
+export const box = {
+    vertices: bb.tensor({ data: [[0, 0, 0], [0, 0, 1], [0, 0, 0], [0, 1, 0], [0, 0, 0], [1, 0, 0], [1, 1, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1], [1, 1, 1], [1, 1, 0], [0, 0, 1], [0, 1, 1], [0, 1, 1], [0, 1, 0], [0, 1, 0], [1, 1, 0], [1, 1, 0], [1, 0, 0], [1, 0, 0], [1, 0, 1], [1, 0, 1], [0, 0, 1],] }),
     colors: bb.ones({ shape: [10000, 3] }),
     sizes: bb.ones({ shape: [10000, 1] }),
     mode: 'LINES'
@@ -39,7 +96,7 @@ export const rgb = { vertices, colors, sizes, mode }
 
 /** Image Cube */
 
-export const imageCube = async function (picture = 'http://localhost:3000/Users/trumanpurnell/Pictures/68828786_10217017620425433_2350853209913819136_o.jpg') {
+export const imageCube = async function (picture) {
     const { shape, pixels, binary } = await myio.imread(picture)
 
     var vertices = new bb.cached.divide({ of: bb.tensor({ data: pixels, type: bb.Float32 }).reshape({ shape: [-1, 3] }), with: 255 }).invoke()
@@ -47,4 +104,26 @@ export const imageCube = async function (picture = 'http://localhost:3000/Users/
     var sizes = new bb.cached.multiply({ of: bb.ones({ shape: [vertices.shape[0], 1] }), with: 1 }).invoke()
 
     return { vertices, colors, sizes, mode: 'POINTS' }
+}
+
+/** Sound wave */
+
+export const soundWave = async function (sound) {
+    const soundData = await myio.audioread(sound)
+
+    const vertices = bb.zeros({ shape: [soundData.length, 2] })
+        .assign({
+            region: [':', 0],
+            with: bb.linspace({ start: 0, stop: 10, num: soundData.length })
+        })
+        .assign({
+            region: [':', 1],
+            with: bb.tensor({ data: soundData, type: bb.Float32 })
+        })
+
+    const colors = bb.zeros({ shape: [1e6, 3] }).assign({ with: bb.rand({ shape: [3] }) })
+    const sizes = bb.ones({ shape: [soundData.length, 1] }).multiply({ with: 2 })
+    const mode = 'POINTS'
+
+    return { vertices, colors, sizes, mode }
 }

@@ -18,7 +18,7 @@ class ParmesanApplication {
         this.CANVAS = document.createElement('canvas')
         this.CANVAS.id = 'main'
 
-        document.body.prepend(this.HUD)
+        // document.body.prepend(this.HUD)
         document.body.prepend(this.CANVAS)
 
         this.resize()
