@@ -1,6 +1,18 @@
 import bb from '../big-box'
 import myio from '../myio'
 
+const COUNT = 30
+
+const CIRCLE = bb
+    .linspace({ start: 0, stop: 2 * Math.PI, num: COUNT })
+    .multiply({ with: 'i' })
+    .exp()
+
+const CYLINDER = CIRCLE
+    .reshape({ shape: [COUNT, 1] })
+    .view({ type: bb.Float32 })
+    .divide({ with: 20 })
+
 export const grid = function (res) {
     const vertices = bb.mesh({
         of: [
@@ -17,71 +29,6 @@ export const grid = function (res) {
     return { vertices, colors, sizes, mode }
 }
 
-export const vectorPoint = function (x, y, z) {
-    const count = 3
-    const point = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
-        .multiply({ with: 'i' })
-        .exp()
-        .reshape({ shape: [count, 1] })
-        .view({ type: bb.Float32 })
-        .divide({ with: 10 })
-        .insert({ with: 0, entries: [2], axis: [1] })
-        .insert({ with: [0, 0, -0.2], entries: [0], axes: [0] })
-
-    const vertices = point
-    const colors = bb.ones({ shape: [count + 1, 1] }).divide({ with: 7 })
-    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
-    const mode = 'TRIANGLE_FAN'
-
-    return { vertices, colors, sizes, mode }
-}
-
-export const cylinder = function () {
-    const count = 3
-    const c1 = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
-        .multiply({ with: 'i' })
-        .exp()
-        .reshape({ shape: [count, 1] })
-        .view({ type: bb.Float32 })
-        .divide({ with: 20 })
-        .insert({ with: 0.2, entries: [2], axis: [1] })
-
-    const c2 = bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: count })
-        .multiply({ with: 'i' })
-        .exp()
-        .reshape({ shape: [count, 1] })
-        .view({ type: bb.Float32 })
-        .divide({ with: 20 })
-        .insert({ with: 0, entries: [2], axis: [1] })
-
-    const vertices = bb
-        .zeros({ shape: [c1.shape[0] + c2.shape[0], 3] })
-        .assign({ region: ['::2'], with: c1 })
-        .assign({ region: ['1::2'], with: c2 })
-
-    const colors = bb.ones({ shape: [count * 2, 1] }).divide({ with: 4 })
-    const sizes = bb.ones({ shape: [vertices.shape[0], 1] }).multiply({ with: 20 })
-    const mode = 'TRIANGLE_STRIP'
-
-    return { vertices, colors, sizes, mode }
-}
-
-export const axes = {
-    vertices: bb.tensor({
-        data: [
-            [0, 0, -10], [0, 0, 10],
-            [0, -10, 0], [0, 10, 0],
-            [-10, 0, 0], [10, 0, 0],
-        ]
-    }),
-
-    colors: bb.ones({ shape: [10000, 3] }),
-    sizes: bb.ones({ shape: [10000, 1] }),
-    mode: 'LINES'
-}
 
 export const box = {
     vertices: bb.tensor({ data: [[0, 0, 0], [0, 0, 1], [0, 0, 0], [0, 1, 0], [0, 0, 0], [1, 0, 0], [1, 1, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1], [1, 1, 1], [1, 1, 0], [0, 0, 1], [0, 1, 1], [0, 1, 1], [0, 1, 0], [0, 1, 0], [1, 1, 0], [1, 1, 0], [1, 0, 0], [1, 0, 0], [1, 0, 1], [1, 0, 1], [0, 0, 1],] }),
@@ -105,7 +52,7 @@ export const circle = {
 
 /** RGB Cube */
 
-var vertices = bb.randrange({ low: 0, high: 255, shape: [1e6, 2] }).divide({ with: 255 })
+var vertices = bb.randrange({ low: 0, high: 255, shape: [1e6, 3] }).divide({ with: 255 })
 var colors = vertices
 var sizes = bb.ones({ shape: [1e6, 1] })
 var mode = 'POINTS'

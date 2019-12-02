@@ -26,7 +26,7 @@ export default class Repeat extends AxisOperation {
 
         /** Template */
         if (!args.template)
-            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
+            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
     }
 
     resultant() {
