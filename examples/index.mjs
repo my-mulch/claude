@@ -1,33 +1,6 @@
 import bb from '../big-box'
 import myio from '../myio'
 
-const COUNT = 30
-
-const CIRCLE = bb
-    .linspace({ start: 0, stop: 2 * Math.PI, num: COUNT })
-    .multiply({ with: 'i' })
-    .exp()
-
-const CYLINDER = CIRCLE
-    .reshape({ shape: [COUNT, 1] })
-    .view({ type: bb.Float32 })
-    .divide({ with: 20 })
-
-export const grid = function (res) {
-    const vertices = bb.mesh({
-        of: [
-            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat(),
-            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat(),
-            bb.linspace({ start: -0.25, stop: 0.25, num: res }).toRawFlat()
-        ]
-    })
-
-    const colors = bb.zeros({ shape: [res ** 3, 3] }).assign({ with: bb.rand({ shape: [3] }) })
-    const sizes = bb.ones({ shape: [res ** 3, 1] }).multiply({ with: 1 })
-    const mode = 'POINTS'
-
-    return { vertices, colors, sizes, mode }
-}
 
 
 export const box = {
@@ -35,18 +8,6 @@ export const box = {
     colors: bb.ones({ shape: [10000, 3] }),
     sizes: bb.ones({ shape: [10000, 1] }),
     mode: 'LINES'
-}
-
-export const circle = {
-    vertices: bb
-        .linspace({ start: 0, stop: 2 * Math.PI, num: 10000 })
-        .multiply({ with: 'i' })
-        .exp()
-        .reshape({ shape: [10000, 1] })
-        .view({ type: bb.Float32 }),
-    colors: bb.zeros({ shape: [10000, 3] }).assign({ with: [255, 255, 255] }),
-    sizes: bb.ones({ shape: [10000, 1] }).multiply({ with: 1 }),
-    mode: 'POINTS'
 }
 
 

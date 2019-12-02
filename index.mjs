@@ -19,7 +19,7 @@ export default (async function () {
     // app.plot(circle)
     // app.plot(grid(10))
 
-    app.plot(new Cone({ height: 2 }).render())
+    app.plot(new Cone({ height: 10 }).render())
     // app.plot(new Cylinder({ height: 2 }).render())
 
     app.plot(new Axes({ length: 5 }).render())

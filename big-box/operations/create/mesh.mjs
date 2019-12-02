@@ -16,11 +16,11 @@ export default class Mesh {
         this.symbolicSourceTemplate()
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n')).bind(this)
-
-        /** Template */
-        if (!args.template)
-            this.invoke = this.invoke.bind(this, this.of, this.with, this.result)
+        this.invoke = new Function(
+            'A = this.of',
+            'B = this.with',
+            'R = this.result',
+            [this.source, 'return R'].join('\n'))
     }
 
     /** Symbolic Implementation */

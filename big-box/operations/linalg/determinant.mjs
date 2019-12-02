@@ -16,11 +16,11 @@ export default class Determinant extends LinearAlgebraOperation {
         this.pointwiseSourceTemplate()
 
         /** Create */
-        this.invoke = new Function('A,B,R', [this.source, 'return R'].join('\n'))
-
-        /** Template */
-        if (!args.template)
-            this.invoke = this.invoke.bind(null, this.of, this.with, this.result)
+        this.invoke = new Function(
+            'A = this.of',
+            'B = this.with',
+            'R = this.result',
+            [this.source, 'return R'].join('\n'))
     }
 
     /** Resultant Tensor */
