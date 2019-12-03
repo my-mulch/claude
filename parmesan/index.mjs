@@ -1,8 +1,8 @@
 import Mouse from './peripherals/mouse.mjs'
 import Keyboard from './peripherals/keyboard.mjs'
 
-import WebGLManager from './managers/webgl.mjs'
-import CameraManager from './managers/camera.mjs'
+import WebGLManager from './managers/webgl/index.mjs'
+import CameraManager from './managers/camera/index.mjs'
 
 import config from './resources/index.mjs'
 

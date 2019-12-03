@@ -1,12 +1,12 @@
-import myio from './myio.mjs'
-import bb from './big-box.mjs'
-import parmesan from '../parmesan.mjs'
+import bb from '../big-box/index.mjs'
+import myio from '../myio/index.mjs'
+import parmesan from '../parmesan/index.mjs'
 
-import config from './parmesan/resources/index.mjs'
-import Axes from './parmesan/primitives/axes.mjs'
-import Cone from './parmesan/primitives/cone.mjs'
-import Circle from './parmesan/primitives/circle.mjs'
-import Cylinder from './parmesan/primitives/cylinder.mjs'
+import config from '../parmesan/resources/index.mjs'
+import Axes from '../parmesan/primitives/axes.mjs'
+import Cone from '../parmesan/primitives/cone.mjs'
+import Circle from '../parmesan/primitives/circle.mjs'
+import Cylinder from '../parmesan/primitives/cylinder.mjs'
 
 window.bb = bb
 window.myio = myio

@@ -1,4 +1,4 @@
-import bb from '../../../big-box.mjs'
+import bb from '../../../big-box/index.mjs'
 
 import config from '../../resources/index.mjs'
 

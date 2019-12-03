@@ -1,4 +1,3 @@
-import util from 'util'
 import Types from '../types/index.mjs'
 import Header from '../header/index.mjs'
 
@@ -221,6 +220,4 @@ export default class Tensor {
             .stringify(this.toRaw())
             .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
-
-    [util.inspect.custom]() { return this.toString() }
 }

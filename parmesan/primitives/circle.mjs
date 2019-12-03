@@ -1,5 +1,5 @@
-import bb from '../../big-box.mjs'
-import Primitive from '..mjs'
+import bb from '../../big-box/index.mjs'
+import Primitive from './index.mjs'
 
 export default class Circle extends Primitive {
     constructor({ radius = 1, center }) {

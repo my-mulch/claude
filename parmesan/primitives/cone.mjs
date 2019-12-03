@@ -1,6 +1,6 @@
-import bb from '../../big-box.mjs'
-import Primitive from '..mjs'
+import bb from '../../big-box/index.mjs'
 import Circle from './circle.mjs'
+import Primitive from './index.mjs'
 
 export default class Cone extends Primitive {
     constructor({ radius = 1, height = 1, center }) {
