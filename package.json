@@ -1,34 +1,26 @@
 {
-  "name": "genghis",
+  "name": "cow",
   "version": "1.0.0",
-  "description": "A sally style summit-blazing visualization engine",
+  "description": "A milk machine",
   "main": "index.js",
   "scripts": {
-    "test": "node --experimental-modules --es-module-specifier-resolution=node big-box/test/index.mjs",
-    "start": "npm run serve & npm run watch & npm run launch",
+    "test": "node --experimental-modules --es-module-specifier-resolution=node test/big-box/index.mjs",
+    "start": "npm run serve & npm run launch",
     "launch": "open docs/index.html",
     "serve": "http-server / -p 3000 --cors",
-    "build": "webpack --devtool source-map",
-    "watch": "nodemon --ignore docs --exec 'npm run build'",
-    "dev": "npm run watch & npm run launch",
     "kill": "lsof -t -i tcp:3000 | xargs kill"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bb-labs/proto.git"
+    "url": "git+https://github.com/bb-labs/cow.git"
   },
   "author": "Truman Purnell",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/bb-labs/proto.git/issues"
+    "url": "https://github.com/bb-labs/cow.git/issues"
   },
-  "homepage": "https://github.com/bb-labs/proto.git#readme",
-  "dependencies": {
-    "http-server": "^0.11.1",
-    "nodemon": "^1.19.4",
-    "webpack": "^4.41.2"
-  },
+  "homepage": "https://github.com/bb-labs/cow.git#readme",
   "devDependencies": {
-    "webpack-cli": "^3.3.10"
+    "http-server": "^0.12.0"
   }
 }

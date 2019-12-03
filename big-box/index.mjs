@@ -1,6 +1,6 @@
-import Types from './types'
-import Tensor from './tensor'
-import Operations from './operations'
+import Types from './types/index.mjs'
+import Tensor from './tensor/index.mjs'
+import Operations from './operations/index.mjs'
 
 /** Numeric Types */
 Object.assign(Tensor, Types)

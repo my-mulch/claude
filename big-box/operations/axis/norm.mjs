@@ -1,7 +1,7 @@
-import Source from '../../template/source'
-import Tensor from '../../tensor'
-import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import Source from '../../template/source.mjs'
+import Tensor from '../../tensor/index.mjs'
+import Algebra from '../../template/algebra.mjs'
+import AxisOperation from './operation.mjs'
 
 export default class Norm extends AxisOperation {
     constructor(args) {

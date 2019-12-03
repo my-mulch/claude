@@ -1,8 +1,7 @@
-import util from 'util'
-import Types from '../types'
-import Header from '../header'
+import Types from '../types/index.mjs'
+import Header from '../header/index.mjs'
 
-import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER, PRECISION } from '../resources'
+import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER, PRECISION } from '../resources/index.mjs'
 
 export default class Tensor {
     constructor({ header, data }) {
@@ -221,6 +220,4 @@ export default class Tensor {
             .stringify(this.toRaw())
             .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
-
-    [util.inspect.custom]() { return this.toString() }
 }

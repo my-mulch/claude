@@ -1,5 +1,5 @@
-import bb from '../big-box'
-import myio from '../myio'
+import bb from '../big-box/index.mjs'
+import myio from '../myio.mjs'
 
 
 

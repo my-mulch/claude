@@ -1,7 +1,7 @@
-import Pan from './pan'
-import Look from './look'
-import Zoom from './zoom'
-import Project from './project'
+import Pan from './pan.mjs'
+import Look from './look.mjs'
+import Zoom from './zoom.mjs'
+import Project from './project.mjs'
 
 export default class CameraManager {
     constructor() {

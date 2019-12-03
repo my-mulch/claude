@@ -1,5 +1,5 @@
-import Types from '../types'
-import { __Math__, PARTIAL_SLICE, NUMBER, SLICE_CHARACTER } from '../resources'
+import Types from '../types/index.mjs'
+import { __Math__, PARTIAL_SLICE, NUMBER, SLICE_CHARACTER } from '../resources/index.mjs'
 
 export default class Header {
     constructor(opts) {

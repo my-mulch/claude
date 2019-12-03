@@ -1,4 +1,4 @@
-import bb from '../../big-box'
+import bb from '../../big-box/index.mjs'
 
 export default class Primitive {
     constructor(center) {

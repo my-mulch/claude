@@ -1,6 +1,6 @@
-import Source from '../../template/source'
-import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import Source from '../../template/source.mjs'
+import Algebra from '../../template/algebra.mjs'
+import AxisOperation from './operation.mjs'
 
 export default class Summation extends AxisOperation {
     constructor(args) {

@@ -1,5 +1,5 @@
-import bb from '../../big-box'
-import Primitive from '.'
+import bb from '../../big-box/index.mjs'
+import Primitive from './index.mjs'
 
 export default class Axes extends Primitive {
     constructor({ length = 10 }) {

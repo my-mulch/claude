@@ -1,6 +1,6 @@
-import bb from '../../../big-box'
+import bb from '../../../big-box/index.mjs'
 
-import config from '../../resources'
+import config from '../../resources/index.mjs'
 
 export default class Zoom {
     constructor() {

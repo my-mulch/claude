@@ -1,5 +1,5 @@
-import Algebra from '../../template/algebra'
-import Adjugate from './adjugate'
+import Algebra from '../../template/algebra.mjs'
+import Adjugate from './adjugate.mjs'
 import Determinant from './determinant.mjs'
 import LinearAlgebraOperation from './operation.mjs'
 

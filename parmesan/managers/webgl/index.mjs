@@ -1,4 +1,4 @@
-import config from '../../resources'
+import config from '../../resources/index.mjs'
 
 export default class WebGLManager {
     constructor({ CANVAS }) {
