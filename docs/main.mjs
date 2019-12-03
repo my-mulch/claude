@@ -1,6 +1,6 @@
 import myio from './myio'
 import bb from './big-box'
-import parmesan from './parmesan'
+import parmesan from '../parmesan'
 
 import config from './parmesan/resources'
 import Axes from './parmesan/primitives/axes'
@@ -13,16 +13,15 @@ window.myio = myio
 window.app = parmesan
 window.config = config
 
-export default (async function () {
-    // app.plot(await soundWave('http://localhost:3000/Users/trumanpurnell/Music/PinkPanther60.wav'))
-    // app.plot(await imageCube('http://localhost:3000/Users/trumanpurnell/Pictures/68828786_10217017620425433_2350853209913819136_o.jpg'))
-    // app.plot(circle)
-    // app.plot(grid(10))
+// app.plot(await soundWave('http://localhost:3000/Users/trumanpurnell/Music/PinkPanther60.wav'))
+// app.plot(await imageCube('http://localhost:3000/Users/trumanpurnell/Pictures/68828786_10217017620425433_2350853209913819136_o.jpg'))
+// app.plot(circle)
+// app.plot(grid(10))
 
-    app.plot(new Cone({ height: 10 }).render())
-    // app.plot(new Cylinder({ height: 2 }).render())
+app.plot(new Cone({ height: 10 }).render())
+// app.plot(new Cylinder({ height: 2 }).render())
 
-    app.plot(new Axes({ length: 5 }).render())
+app.plot(new Axes({ length: 5 }).render())
     // app.plot(new Circle({ center: [[0, 0, 0, 1]] }).render())
     // app.plot(new Circle({ center: [[0, 0, 1, 1]] }).render())
     // app.plot(new Circle({ center: [[0, 1, 0, 1]] }).render())
@@ -37,5 +36,5 @@ export default (async function () {
     // app.plot(box)
     // app.plot(rgb)
     // app.plot(axes)
-})()
+
 
