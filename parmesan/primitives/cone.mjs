@@ -1,5 +1,5 @@
-import bb from '../../big-box'
-import Primitive from '.'
+import bb from '../../big-box.mjs'
+import Primitive from '..mjs'
 import Circle from './circle.mjs'
 
 export default class Cone extends Primitive {

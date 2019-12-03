@@ -1,10 +1,10 @@
-import Mouse from './peripherals/mouse'
-import Keyboard from './peripherals/keyboard'
+import Mouse from './peripherals/mouse.mjs'
+import Keyboard from './peripherals/keyboard.mjs'
 
-import WebGLManager from './managers/webgl'
-import CameraManager from './managers/camera'
+import WebGLManager from './managers/webgl.mjs'
+import CameraManager from './managers/camera.mjs'
 
-import config from './resources'
+import config from './resources/index.mjs'
 
 class ParmesanApplication {
     constructor() {

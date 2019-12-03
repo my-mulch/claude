@@ -1,6 +1,6 @@
-import bb from '../../big-box'
-import Circle from './circle'
-import Primitive from '.'
+import bb from '../../big-box.mjs'
+import Circle from './circle.mjs'
+import Primitive from '..mjs'
 
 export default class Cylinder extends Primitive {
     constructor({ radius = 1, height = 1, center }) {

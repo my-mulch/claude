@@ -1,1 +1,1 @@
-export { default as mesh } from './mesh'
+export { default as mesh } from './mesh.mjs'

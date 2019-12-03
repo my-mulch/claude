@@ -1,6 +1,6 @@
-import Tensor from '../../tensor'
-import Source from '../../template/source'
-import TensorOperation from '../operation'
+import Tensor from '../../tensor/index.mjs'
+import Source from '../../template/source.mjs'
+import TensorOperation from '../operation.mjs'
 
 export default class AxisOperation extends TensorOperation {
     constructor(args) {

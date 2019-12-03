@@ -1,7 +1,7 @@
-import Tensor from '../../tensor'
-import Source from '../../template/source'
-import Algebra from '../../template/algebra'
-import AxisOperation from './operation'
+import Tensor from '../../tensor/index.mjs'
+import Source from '../../template/source.mjs'
+import Algebra from '../../template/algebra.mjs'
+import AxisOperation from './operation.mjs'
 
 export default class Repeat extends AxisOperation {
     constructor(args) {

@@ -1,5 +1,5 @@
-import Algebra from '../../template/algebra'
-import Determinant from './determinant'
+import Algebra from '../../template/algebra.mjs'
+import Determinant from './determinant.mjs'
 import LinearAlgebraOperation from './operation.mjs'
 import { indexTemplate } from './utils.mjs'
 

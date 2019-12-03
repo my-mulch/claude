@@ -1,4 +1,4 @@
-import { PARSE_NUMBER, ID_FROM_SYMBOL, SPACE } from '../resources'
+import { PARSE_NUMBER, ID_FROM_SYMBOL, SPACE } from '../resources/index.mjs'
 
 export default class Type {
     constructor({ size, typed }) {

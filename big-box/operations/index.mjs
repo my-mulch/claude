@@ -1,7 +1,7 @@
-import * as axis from './axis'
-import * as pair from './pair'
-import * as linalg from './linalg'
-import * as create from './create'
+import * as axis from './axis/index.mjs'
+import * as pair from './pair/index.mjs'
+import * as linalg from './linalg/index.mjs'
+import * as create from './create/index.mjs'
 
 const operations = { ...linalg, ...axis, ...pair, ...create }
 

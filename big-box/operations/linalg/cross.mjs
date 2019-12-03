@@ -1,5 +1,5 @@
-import Tensor from '../../tensor'
-import Algebra from '../../template/algebra'
+import Tensor from '../../tensor/index.mjs'
+import Algebra from '../../template/algebra.mjs'
 import LinearAlgebraOperation from './operation.mjs'
 
 export default class CrossProduct extends LinearAlgebraOperation {

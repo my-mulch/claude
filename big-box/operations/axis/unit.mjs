@@ -1,7 +1,7 @@
-import Norm from './norm'
-import Division from '../pair/divide'
-import Tensor from '../../tensor'
-import AxisOperation from './operation'
+import Norm from './norm.mjs'
+import Division from '../pair/divide.mjs'
+import Tensor from '../../tensor/index.mjs'
+import AxisOperation from './operation.mjs'
 
 export default class Unit extends AxisOperation {
     constructor(args) {

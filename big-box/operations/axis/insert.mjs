@@ -1,8 +1,8 @@
-import Source from '../../template/source'
-import Algebra from '../../template/algebra'
-import Tensor from '../../tensor'
-import AxisOperation from './operation'
-import { __Math__ } from '../../resources'
+import Source from '../../template/source.mjs'
+import Algebra from '../../template/algebra.mjs'
+import Tensor from '../../tensor/index.mjs'
+import AxisOperation from './operation.mjs'
+import { __Math__ } from '../../resources/index.mjs'
 
 export default class Insert extends AxisOperation {
     constructor(args) {

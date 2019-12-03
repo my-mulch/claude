@@ -1,9 +1,9 @@
-import bb from '../../big-box'
+import bb from '../../big-box.mjs'
 
-import Cone from './cone'
-import Circle from './circle'
-import Cylinder from './cylinder'
-import Primitive from '.'
+import Cone from './cone.mjs'
+import Circle from './circle.mjs'
+import Cylinder from './cylinder.mjs'
+import Primitive from '..mjs'
 
 export default class Vector extends Primitive {
 

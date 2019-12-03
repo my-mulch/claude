@@ -1,5 +1,5 @@
-import Tensor from '../../tensor'
-import TensorOperation from '../operation'
+import Tensor from '../../tensor/index.mjs'
+import TensorOperation from '../operation.mjs'
 
 export default class LinearAlgebraOperation extends TensorOperation {
     constructor(args) {

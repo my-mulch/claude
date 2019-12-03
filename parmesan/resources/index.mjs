@@ -1,4 +1,4 @@
-import bb from '../../big-box'
+import bb from '../../big-box.mjs'
 
 export default {
     CANVAS_STROKE_COLOR: 'white',
