@@ -40,10 +40,6 @@ export default class MyIO {
 
         dataWithAlpha = null
 
-        return {
-            shape: [bitmap.width, bitmap.height, 3],
-            pixels: dataWithoutAlpha,
-            binary: bitmap
-        }
+        return dataWithoutAlpha
     }
 }
