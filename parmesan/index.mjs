@@ -80,7 +80,7 @@ class ParmesanApplication {
         config.ASPECT_RATIO = this.CANVAS.width / this.CANVAS.height
     }
 
-    plot(...objects) {
+    plot(objects) {
         for (const { vertices, colors, sizes, mode } of objects) {
             this.objects.push({
                 sizeBuffer: this.webgl.createBuffer(sizes),

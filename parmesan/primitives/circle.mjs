@@ -17,10 +17,19 @@ export default class Circle extends Primitive {
     constructor({ radius = 1, center }) {
         super(center)
 
-        this.radius = radius
+        this.radius = bb.tensor({ data: radius })
+        this.points = bb.zerosLike({ tensor: Circle.template })
 
-        this.points = Circle.template.add({
-            with: Primitive.offset.invoke(this.center, null, Primitive.offset.result)
-        })
+        Primitive.scale.invoke(Circle.template, this.radius, this.points)
+        Primitive.offset.invoke(this.points, this.center, this.points)
+    }
+
+    render() {
+        return [{
+            vertices: this.points,
+            colors: this.points,
+            sizes: this.points,
+            mode: 'LINE_STRIP'
+        }]
     }
 }

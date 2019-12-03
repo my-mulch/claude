@@ -41,11 +41,11 @@ export default class ImageCube extends Primitive {
                 entries: [0]
             })
 
-        return {
+        return [{
             vertices: this.points,
             colors: bb.ones({ shape: [this.samples.length, 2] }),
             sizes: bb.ones({ shape: [this.samples.length, 1] }),
             mode: 'POINTS'
-        }
+        }]
     }
 }

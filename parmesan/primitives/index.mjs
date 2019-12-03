@@ -1,26 +1,22 @@
 import bb from '../../big-box/index.mjs'
 
 export default class Primitive {
-    static VERTEX_COUNT = 50
-    
-    static offset = new bb.cached.repeat({
-        of: bb.zeros({ shape: [1, 3] }),
-        axes: [0],
-        count: Primitive.VERTEX_COUNT,
-        template: true
-    })
+    static VERTEX_COUNT = 3
+
+    static offset = new bb.cached.add({ of: bb.zeros({ shape: [Primitive.VERTEX_COUNT, 3] }), with: [[0, 0, 0]] })
+    static scale = new bb.cached.multiply({ of: bb.zeros({ shape: [Primitive.VERTEX_COUNT, 3] }), with: 0 })
 
     constructor(center) {
-        this.center = bb.tensor({ data: center || [[0, 0, 0, 1]] })
+        this.center = bb.tensor({ data: center || [[0, 0, 0]] })
     }
 
     render() {
-        return {
+        return [{
             vertices: this.points,
             colors: bb.ones({ shape: this.points.shape }),
             sizes: bb.ones({ shape: this.points.shape }),
             mode: 'POINTS'
-        }
+        }]
     }
 }
 

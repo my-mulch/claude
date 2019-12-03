@@ -9,11 +9,11 @@ export default class RGBCube extends Primitive {
     }
 
     render() {
-        return {
+        return [{
             vertices: this.points,
             colors: this.points,
             sizes: bb.ones({ shape: [Primitive.VERTEX_COUNT ** 3, 1] }),
             mode: 'POINTS'
-        }
+        }]
     }
 }

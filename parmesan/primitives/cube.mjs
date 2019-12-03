@@ -36,11 +36,11 @@ export default class Cube extends Primitive {
     }
 
     render(){
-        return {
+        return [{
             vertices: this.points,
             colors: bb.ones({ shape: this.points.shape }),
             sizes: bb.ones({ shape: this.points.shape }),
             mode: 'LINES'
-        }
+        }]
     }
 }
