@@ -14,9 +14,9 @@ export default class Tensor {
 
         const shape = []
 
-        while (data[0].constructor === Array)
+        while (data.constructor === Array)
             shape.push(data.length), data = data[0]
-        
+
         return shape
     }
 
@@ -30,39 +30,31 @@ export default class Tensor {
         return flat
     }
 
-    static isTyped(data) {
-        if (data === undefined)
-            throw "Attempting to check type of something undefined"
-
-        return data.constructor === Int8Array
-            || data.constructor === Int16Array
-            || data.constructor === Int32Array
-            || data.constructor === Uint8Array
-            || data.constructor === Uint16Array
-            || data.constructor === Uint32Array
-            || data.constructor === Float32Array
-            || data.constructor === Float64Array
-            || data.constructor === Uint8ClampedArray
-    }
-
-    static tensor(data, type = Tensor.Float32) {
+    static tensor(data) {
         if (data === undefined)
             throw "Attempting to create tensor from undefined"
 
         if (data.constructor === Tensor)
             return data
 
-        if (Tensor.isTyped(data))
-            return new Tensor(data, new Header({ shape: [data.length], type }))
+        if (Type.isArray(data))
+            return new Tensor(data, new Header({
+                shape: [data.length],
+                type: Type.resolveArray(data)
+            }))
+
+        if (data.constructor === Number)
+            data = [data]
 
         /** Tensor dimensions */
         const shape = Tensor.shape(data)
+        const type = Type.resolveSize(shape[shape.length - 1])
         const size = shape.reduce(__Math__.multiply, 1)
 
         /** Flatten data */
-        const array = Tensor.flatten(data, new type.array(size * type.size))
-
-        return new Tensor(array, new Header({ type, shape, size }))
+        return new Tensor(
+            Tensor.flatten(data, new type.array(size)),
+            new Header({ type, shape, size: size / type.size }))
     }
 
     static zerosLike(tensor) {
