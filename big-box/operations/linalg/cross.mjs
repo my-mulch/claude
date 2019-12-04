@@ -23,7 +23,7 @@ export default class CrossProduct extends LinearAlgebraOperation {
     }
 
     /** Resultant Tensor */
-    resultant() { return Tensor.zeros({ shape: [3, 1], type: this.of.header.type }) }
+    resultant() { return Tensor.zeros([3, 1], this.of.header.type) }
 
     /** Pointwise Implementation */
     pointwiseSourceTemplate() {

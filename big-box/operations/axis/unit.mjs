@@ -25,7 +25,7 @@ export default class Unit extends AxisOperation {
         })
     }
 
-    resultant() { return Tensor.zerosLike({ tensor: this.of }) }
+    resultant() { return Tensor.zerosLike(this.of) }
 
     invoke() {
         this.norm.invoke()

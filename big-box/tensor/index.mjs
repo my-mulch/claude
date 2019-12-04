@@ -1,7 +1,6 @@
-import Types from '../types/index.mjs'
 import Header from '../header/index.mjs'
 
-import { __Math__ } from '../resources/index.mjs'
+import { __Math__, PRECISION, SYMBOL_FROM_ID } from '../resources/index.mjs'
 
 export default class Tensor {
     constructor(data, header) {
@@ -15,18 +14,18 @@ export default class Tensor {
 
         const shape = []
 
-        while (data.constructor === Array)
+        while (data[0].constructor === Array)
             shape.push(data.length), data = data[0]
-
+        
         return shape
     }
 
-    static flat(data, flat, fi = [0]) {
+    static flatten(data, flat = [], fi = [0]) {
         if (data.constructor !== Array)
             return flat[fi[0]++] = data
 
         for (let i = 0; i < data.length; i++)
-            Tensor.flat(data[i], flat, fi)
+            Tensor.flatten(data[i], flat, fi)
 
         return flat
     }
@@ -61,7 +60,7 @@ export default class Tensor {
         const size = shape.reduce(__Math__.multiply, 1)
 
         /** Flatten data */
-        const array = Tensor.flat(data, new type.array(size * type.size))
+        const array = Tensor.flatten(data, new type.array(size * type.size))
 
         return new Tensor(array, new Header({ type, shape, size }))
     }
@@ -213,12 +212,12 @@ export default class Tensor {
         if (this.header.size === 1)
             return this
 
-        const raw = this.toRaw().flat(Number.POSITIVE_INFINITY)
-        const data = type.array(this.header.size)
+        const raw = this.toRawFlat()
+        const data = new type.array(this.header.size * type.size)
 
-        for (let i = 0, j = 0; i < raw.length; i++ , j += type.size)
-            for (let o = 0, parsed = Types.parse(raw[i]); o < __Math__.min(type.size, this.header.type.size); o++)
-                data[j + o] = parsed[o]
+        for (let i = 0, j = 0; i < raw.length; i += this.header.type.size, j += type.size)
+            for (let offset = 0; offset < __Math__.min(type.size, this.header.type.size); offset++)
+                data[j + offset] = raw[i + offset]
 
         return new Tensor(data, new Header({ type, shape: this.header.shape }))
     }
@@ -252,6 +251,9 @@ export default class Tensor {
     }
 
     slice(region) {
+        if (region === undefined)
+            throw 'You must specify a region to slice'
+
         return new Tensor(this.data, this.header.slice(region))
     }
 
@@ -260,13 +262,16 @@ export default class Tensor {
     }
 
     reshape(shape) {
+        if (shape === undefined)
+            throw 'You must specify reshape dimensions'
+
         if (!this.header.isContig)
             return Tensor.tensor(this.toRaw(), this.header.type).reshape(shape)
 
         return new Tensor(this.data, this.header.reshape(shape))
     }
 
-    visit(operation = this.noop, index = this.header.offset, depth = 0) {
+    visit(operation, index = this.header.offset, depth = 0) {
         if (!this.header.shape.length || depth === this.header.shape.length)
             return operation(index)
 
@@ -275,16 +280,42 @@ export default class Tensor {
         }, this)
     }
 
-    noop(value) {
-        return value
+    toStringAtIndex(index, string = '') {
+        for (let i = 0; i < this.header.type.size; i++) {
+            const sign = __Math__.sign(this.data[index + i]) < 0 ? '-' : '+'
+            const number = __Math__.abs(this.data[index + i])
+
+            string += `${sign}${number.toPrecision(PRECISION)}${SYMBOL_FROM_ID[i]}`
+        }
+
+        if (!string)
+            return '0'
+
+        if (string.startsWith('+'))
+            return string.slice(1)
+
+        return string
+    }
+
+    toString() {
+        return this.visit(this.toStringAtIndex.bind(this))
+    }
+
+    toRawAtIndex(index) {
+        const result = []
+
+        for (let i = 0; i < this.header.type.size; i++)
+            result.push(this.data[index + i])
+
+        return result
     }
 
     toRaw() {
-        return this.visit()
+        return this.visit(this.toRawAtIndex.bind(this))
     }
 
     toRawFlat() {
-        return this.visit().flat(Number.POSITIVE_INFINITY)
+        return this.toRaw().flat(Number.POSITIVE_INFINITY)
     }
 
     toIndices() {
@@ -295,7 +326,7 @@ export default class Tensor {
         return indices
     }
 
-    toString() {
+    valueOf() {
         return this.toRaw()
     }
 }

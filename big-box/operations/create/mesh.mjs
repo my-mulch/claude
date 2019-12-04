@@ -40,12 +40,10 @@ export default class Mesh {
     }
 
     resultant() {
-        return Tensor.zeros({
-            shape: [
-                this.of.reduce(this.size, 1),
-                this.of.length
-            ]
-        })
+        return Tensor.zeros([
+            this.of.reduce(this.size, 1),
+            this.of.length
+        ])
     }
 
     /** (TODO) Pointwise Implementation */

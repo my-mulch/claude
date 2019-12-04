@@ -28,12 +28,10 @@ export default class Norm extends AxisOperation {
 
     /** Resultant Tensor */
     resultant() {
-        return Tensor.zeros({
-            type: Tensor.Float32,
-            shape: this.of.header.shape.filter(function (_, axis) {
-                return !this.axes.inner.includes(axis)
-            }, this)
-        })
+        return Tensor.zeros(
+            this.of.header.shape.filter(this.unselectedAxes, this),
+            Tensor.Float32,
+        )
     }
 
     /** 

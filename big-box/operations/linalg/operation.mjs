@@ -13,7 +13,7 @@ export default class LinearAlgebraOperation extends TensorOperation {
     }
 
     /** Resultant Tensor */
-    resultant() { return Tensor.zerosLike({ tensor: this.of }) }
+    resultant() { return Tensor.zerosLike(this.of) }
 
     /** Pointwise Source Implementation */
     pointwiseSourceBoilerplate() { }

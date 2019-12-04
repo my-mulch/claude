@@ -6,13 +6,13 @@ import Algebra from '../template/algebra.mjs'
 export default class TensorOperation {
     constructor(args) {
         /** Sanitize */
-        this.of = Tensor.tensor({ data: args.of })
-        this.with = Tensor.tensor({ data: args.with })
+        this.of = Tensor.tensor(args.of)
+        this.with = Tensor.tensor(args.with)
 
         /** Promote */
         this.type = Types.promote(this.of, this.with)
-        this.of = this.of.astype({ type: this.type })
-        this.with = this.with.astype({ type: this.type })
+        this.of = this.of.astype(this.type)
+        this.with = this.with.astype(this.type)
     }
 
     shape(axis) {

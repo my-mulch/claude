@@ -10,7 +10,7 @@ export default class AxisOperation extends TensorOperation {
         this.axes = {}
         this.axes.inner = args.axes
         this.axes.total = [...this.of.header.shape.keys()]
-        this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
+        this.axes.outer = AxisOperation.difference(this.axes.total, this.axes.inner)
         this.axes.order = this.axes.outer.concat(this.axes.inner)
         this.axes.last = this.axes.order[this.axes.order.length - 1]
 
@@ -25,15 +25,23 @@ export default class AxisOperation extends TensorOperation {
         this.sizes.inner = this.axes.inner.reduce(this.size.bind(this.of), 1)
     }
 
+    static intersection(a1, a2) {
+        return a1.filter(function (value) { return a2.includes(value) })
+    }
+
+    static difference(a1, a2) {
+        return a1.filter(function (value) { return !a2.includes(value) })
+    }
+
     unselectedAxes(_, axis) {
         return !this.axes.inner.includes(axis)
     }
 
     resultant() {
-        return Tensor.zeros({
-            type: this.of.header.type,
-            shape: this.of.header.shape.filter(this.unselectedAxes, this),
-        })
+        return Tensor.zeros(
+            this.of.header.shape.filter(this.unselectedAxes, this),
+            this.of.header.type,
+        )
     }
 
     symbolicSourceBoilerplate() {

@@ -23,11 +23,20 @@ window.bb = bb
 
     ; (async function () {
 
-        for (let i = -75; i < 75; i++)
-            for (let j = -75; j < 75; j++)
-                for (let k = -75; k < 75; k++)
-                    bb.flat([[1, 4, 3]])
-
+        // console.time('lop')
+        // for (let i = -75; i < 75; i++)
+        //     for (let j = -75; j < 75; j++)
+        //         for (let k = -75; k < 75; k++)
+        //             bb.shape([1, 2, 3])
+        // console.timeEnd('lop')
+        // console.log(bb.shape([1, 2, 2, 3]))
+        // console.log(bb.tensor([
+        //     [[2, 0], [6, 0]],
+        //     [[1, 0], [6, 0]],
+        //     [[5, 0], [2, 0]],
+        //     [[1, 0], [2, 0]],
+        //     [[1, 0], [5, 0]]
+        // ]))
 
         // app.plot(new Circle({ radius: 0.1, center: [[i, j, k]] }).render())
         // app.plot(new Cylinder({ height: 2, radius: 0.1 }).render())

@@ -30,12 +30,10 @@ export default class Repeat extends AxisOperation {
     }
 
     resultant() {
-        return Tensor.zeros({
-            type: this.of.header.type,
-            shape: this.of.header.shape.map(function (value, axis) {
-                return axis === this.axes.inner[0] ? this.count * value : value
-            }, this)
-        })
+        const shape = this.of.header.shape.slice()
+        shape[this.axes.inner[0]] *= this.count
+        
+        return Tensor.zeros(shape, this.of.header.type)
     }
 
     /** 

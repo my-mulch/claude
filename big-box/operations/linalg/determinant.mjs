@@ -24,7 +24,7 @@ export default class Determinant extends LinearAlgebraOperation {
     }
 
     /** Resultant Tensor */
-    resultant() { return Tensor.zeros({ shape: [], type: this.of.header.type }) }
+    resultant() { return Tensor.zeros([], this.of.header.type) }
 
     static subMatrix(indices, r, c) {
         const size = Math.sqrt(indices.length)

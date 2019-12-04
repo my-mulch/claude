@@ -40,7 +40,7 @@ export default class PairOperation extends TensorOperation {
                 shape.push(this.of.header.shape[ai])
         }
 
-        return Tensor.zeros({ shape: shape.reverse(), type: this.of.header.type })
+        return Tensor.zeros(shape.reverse(), this.of.header.type)
     }
 
     symbolicSourceBoilerplate() {

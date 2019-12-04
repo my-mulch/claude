@@ -31,10 +31,9 @@ export default class MatrixMultiplication extends LinearAlgebraOperation {
 
     /** Resultant Tensor */
     resultant() {
-        return Tensor.zeros({
-            type: this.of.header.type,
-            shape: [this.of.header.shape[0], this.with.header.shape[1]]
-        })
+        return Tensor.zeros([
+            this.of.header.shape[0],
+            this.with.header.shape[1]], this.of.header.type)
     }
 
     /** Pointwise Implementation */
