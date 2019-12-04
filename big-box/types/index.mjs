@@ -1,5 +1,3 @@
-import { PARSE_NUMBER, ID_FROM_SYMBOL, SPACE } from '../resources/index.mjs'
-
 export default class Type {
     constructor({ size, typed }) {
         this.size = size
@@ -8,86 +6,6 @@ export default class Type {
 
     static promote(A, B) {
         return A.header.type.size > B.header.type.size ? A.header.type : B.header.type
-    }
-
-    static isTypedArray(array) {
-        if (array === undefined) return false
-
-        return array.constructor === Int8Array
-            || array.constructor === Int16Array
-            || array.constructor === Int32Array
-            || array.constructor === Uint8Array
-            || array.constructor === Uint16Array
-            || array.constructor === Uint32Array
-            || array.constructor === Float32Array
-            || array.constructor === Float64Array
-            || array.constructor === Uint8ClampedArray
-    }
-
-    static resolve(data) {
-        const number = Type.parse(data)
-
-        if (number.length === 1) return Type.Float32
-        if (number.length === 2) return Type.ComplexFloat32
-        if (number.length > 2) return Type.QuatFloat32
-    }
-
-
-    static parse(number) {
-        let token
-        let sign = 1
-
-        const result = []
-        const tokens = String(number)
-            .match(PARSE_NUMBER)
-            .filter(function (token) { return !SPACE.test(token) })
-
-        for (let i = 0; i < tokens.length; i++) {
-            token = tokens[i]
-
-            if (token in ID_FROM_SYMBOL) {
-                if (isNaN(tokens[i - 1])) {
-                    result[ID_FROM_SYMBOL[token]] = result[ID_FROM_SYMBOL[token]] || 0
-                    result[ID_FROM_SYMBOL[token]] += sign
-                }
-            }
-
-            else if (token === '+') sign = 1
-            else if (token === '-') sign = -1
-
-            else if (!isNaN(token)) {
-                let symbol = tokens[i + 1]
-
-                if (symbol in ID_FROM_SYMBOL) {
-                    result[ID_FROM_SYMBOL[symbol]] = result[ID_FROM_SYMBOL[symbol]] || 0
-                    result[ID_FROM_SYMBOL[symbol]] += sign * Number(token)
-                } else {
-                    result[0] = result[0] || 0
-                    result[0] += sign * Number(token)
-                }
-            }
-        }
-
-        return result
-    }
-
-    array(data) {
-        if (Type.isTypedArray(data))
-            return data
-
-        if (data.constructor === Array)
-            return new this.typed(data.flatMap(function (number) {
-                return this.align(Type.parse(number))
-            }, this))
-
-        if (data.constructor === Number)
-            return new this.typed(data * this.size)
-    }
-
-    align(number) {
-        number.length = this.size
-
-        return Array.from(number, function (value) { return value || 0 })
     }
 }
 

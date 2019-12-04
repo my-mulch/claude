@@ -6,9 +6,9 @@ export default class Header {
         this.type = opts.type !== undefined ? opts.type : Types.Float32
         this.shape = opts.shape !== undefined ? opts.shape : []
         this.offset = opts.offset !== undefined ? opts.offset : 0
-        this.contig = opts.contig !== undefined ? opts.contig : true
+        this.isContig = opts.isContig !== undefined ? opts.isContig : true
+        this.size = opts.size !== undefined ? opts.size : this.shape.reduce(__Math__.multiply, 1)
         this.strides = opts.strides !== undefined ? opts.strides : this.resolveStrides(this.shape)
-        this.size = this.shape.reduce(__Math__.multiply, 1)
     }
 
     static isContigous(index) {
@@ -88,7 +88,7 @@ export default class Header {
     slice(index) {
         const shape = new Array()
         const strides = new Array()
-        const contig = Header.isContigous(index)
+        const isContig = Header.isContigous(index)
 
         let offset = this.offset
 
@@ -129,13 +129,13 @@ export default class Header {
 
         }
 
-        return new Header({ ...this, shape, strides, offset, contig })
+        return new Header({ ...this, shape, strides, offset, isContig })
     }
 
     transpose() {
         return new Header({
             ...this,
-            contig: false,
+            isContig: false,
             shape: this.shape.slice().reverse(),
             strides: this.strides.slice().reverse(),
         })
