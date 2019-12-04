@@ -20,7 +20,7 @@ export default class ImageCube extends Primitive {
         return [{
             vertices: this.points,
             colors: this.points,
-            sizes: bb.ones({ shape: [this.points.shape[0], 1] }),
+            sizes: bb.ones({ shape: [this.points.header.shape[0], 1] }),
             mode: 'POINTS'
         }]
     }

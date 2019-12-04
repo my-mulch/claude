@@ -25,23 +25,24 @@ window.config = config
 window.Cylinder = Cylinder
 
     ; (async function () {
-        // app.plot(await new Sound({ path: 'http://localhost:3000/Users/trumanpurnell/Music/PinkPanther60.wav' }).render())
+        app.plot(await new Sound({ path: 'http://localhost:3000/Users/trumanpurnell/Music/PinkPanther60.wav' }).render())
 
         // app.plot(new Cylinder({ height: 2, radius: 0.1 }).render())
-        // app.plot(new Cylinder({ height: 2, radius: 1 }).render())
+        app.plot(new Cylinder({ height: 2, radius: 1 }).render())
 
         // for (let i = -75; i < 75; i++)
         //     for (let j = -75; j < 75; j++)
         //         for (let k = -75; k < 75; k++)
-        //             new Header({ shape: [3, 1] })
-        // [[1], [1], [1]]
+        //             bb.tensor({ data: [[1], [1], [1]] })
+        // new Header({ shape: [3, 1] })
+
 
         // app.plot(new Circle({ radius: 0.1, center: [[i, j, k]] }).render())
 
         app.plot(new Axes({ length: 5 }).render())
-        // app.plot(new Cube({}).render())
-        // app.plot(await new ImageCube({ path: 'http://localhost:3000/Users/trumanpurnell/Pictures/IMG_6721.jpg' }).render())
-        // app.plot(new RGBCube({}).render())
+        app.plot(new Cube({}).render())
+        app.plot(await new ImageCube({ path: 'http://localhost:3000/Users/trumanpurnell/Pictures/IMG_6721.jpg' }).render())
+        app.plot(new RGBCube({}).render())
         app.plot(new Circle({}).render())
 
         app.render()

@@ -13,7 +13,7 @@ export default class PairOperation extends TensorOperation {
 
         /** Axes */
         this.axes = {}
-        this.axes.total = [...new Array(__Math__.max(this.of.shape.length, this.with.shape.length)).keys()]
+        this.axes.total = [...new Array(__Math__.max(this.of.header.shape.length, this.with.header.shape.length)).keys()]
 
         /** Shapes */
         this.shapes = {}
@@ -24,23 +24,23 @@ export default class PairOperation extends TensorOperation {
 
     resultant() {
         const shape = []
-        const maxLen = __Math__.max(this.of.shape.length, this.with.shape.length)
+        const maxLen = __Math__.max(this.of.header.shape.length, this.with.header.shape.length)
 
         for (let i = 0; i < maxLen; i++) {
-            const bi = this.with.shape.length - 1 - i
-            const ai = this.of.shape.length - 1 - i
+            const bi = this.with.header.shape.length - 1 - i
+            const ai = this.of.header.shape.length - 1 - i
 
-            if (this.with.shape[bi] === 1 || this.with.shape[bi] === undefined)
-                shape.push(this.of.shape[ai])
+            if (this.with.header.shape[bi] === 1 || this.with.header.shape[bi] === undefined)
+                shape.push(this.of.header.shape[ai])
 
-            else if (this.of.shape[ai] === 1 || this.of.shape[ai] === undefined)
-                shape.push(this.with.shape[bi])
+            else if (this.of.header.shape[ai] === 1 || this.of.header.shape[ai] === undefined)
+                shape.push(this.with.header.shape[bi])
 
-            else if (this.with.shape[bi] === this.of.shape[ai])
-                shape.push(this.of.shape[ai])
+            else if (this.with.header.shape[bi] === this.of.header.shape[ai])
+                shape.push(this.of.header.shape[ai])
         }
 
-        return Tensor.zeros({ shape: shape.reverse(), type: this.of.type })
+        return Tensor.zeros({ shape: shape.reverse(), type: this.of.header.type })
     }
 
     symbolicSourceBoilerplate() {

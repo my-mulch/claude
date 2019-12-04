@@ -23,16 +23,16 @@ export default class CrossProduct extends LinearAlgebraOperation {
     }
 
     /** Resultant Tensor */
-    resultant() { return Tensor.zeros({ shape: [3, 1], type: this.of.type }) }
+    resultant() { return Tensor.zeros({ shape: [3, 1], type: this.of.header.type }) }
 
     /** Pointwise Implementation */
     pointwiseSourceTemplate() {
         const A = [], B = [], R = []
 
         for (let i = 0; i < 3; i++) {
-            A.push(Algebra.variable({ symbol: 'A.data', index: this.of.header.literalIndex([i, 0]), size: this.of.type.size }))
-            B.push(Algebra.variable({ symbol: 'B.data', index: this.with.header.literalIndex([i, 0]), size: this.with.type.size }))
-            R.push(Algebra.variable({ symbol: 'R.data', index: this.result.header.literalIndex([i, 0]), size: this.result.type.size }))
+            A.push(Algebra.variable({ symbol: 'A.data', index: this.of.header.literalIndex([i, 0]), size: this.of.header.type.size }))
+            B.push(Algebra.variable({ symbol: 'B.data', index: this.with.header.literalIndex([i, 0]), size: this.with.header.type.size }))
+            R.push(Algebra.variable({ symbol: 'R.data', index: this.result.header.literalIndex([i, 0]), size: this.result.header.type.size }))
         }
 
         this.source = [

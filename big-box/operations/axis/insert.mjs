@@ -7,7 +7,7 @@ import { __Math__ } from '../../resources/index.mjs'
 export default class Insert extends AxisOperation {
     constructor(args) {
         /** Defaults */
-        args.axes = args.axes || [args.of.shape.length - 1]
+        args.axes = args.axes || [args.of.header.shape.length - 1]
 
         /** Superclass */
         super(args)
@@ -32,8 +32,8 @@ export default class Insert extends AxisOperation {
 
     resultant() {
         return Tensor.zeros({
-            type: this.of.type,
-            shape: this.of.shape.map(function (dimension, axis) {
+            type: this.of.header.type,
+            shape: this.of.header.shape.map(function (dimension, axis) {
                 if (axis === this.axes.inner[0])
                     return dimension + this.entries.length
 
@@ -55,7 +55,7 @@ export default class Insert extends AxisOperation {
         this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
 
         if (!this.axes.of[this.axes.last])
-            this.axes.of[this.axes.last] = [`i${this.axes.last}`, this.of.strides[this.axes.last]]
+            this.axes.of[this.axes.last] = [`i${this.axes.last}`, this.of.header.strides[this.axes.last]]
 
         this.axes.of[this.axes.last][0] = `(i${this.axes.last} - seen)`
         this.axes.with = this.with.header.nonZeroAxes(this.axes.total)

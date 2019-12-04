@@ -24,7 +24,7 @@ export default class Determinant extends LinearAlgebraOperation {
     }
 
     /** Resultant Tensor */
-    resultant() { return Tensor.zeros({ shape: [], type: this.of.type }) }
+    resultant() { return Tensor.zeros({ shape: [], type: this.of.header.type }) }
 
     static subMatrix(indices, r, c) {
         const size = Math.sqrt(indices.length)
@@ -39,7 +39,7 @@ export default class Determinant extends LinearAlgebraOperation {
 
     static determinant(tensor, indices = indexTemplate(tensor.shape[0])) {
         if (indices.length === 1)
-            return Algebra.variable({ symbol: 'A.data', size: tensor.type.size, index: tensor.header.literalIndex(indices[0]) })
+            return Algebra.variable({ symbol: 'A.data', size: tensor.header.type.size, index: tensor.header.literalIndex(indices[0]) })
 
         const subDeterminants = []
         const size = Math.sqrt(indices.length)
@@ -48,7 +48,7 @@ export default class Determinant extends LinearAlgebraOperation {
             const subMatrix = Determinant.subMatrix(indices, 0, i)
             const subDeterminant = Determinant.determinant(tensor, subMatrix)
 
-            const factor = Algebra.variable({ symbol: 'A.data', size: tensor.type.size, index: tensor.header.literalIndex(indices[i]) })
+            const factor = Algebra.variable({ symbol: 'A.data', size: tensor.header.type.size, index: tensor.header.literalIndex(indices[i]) })
             const cofactor = Algebra.multiply(factor, subDeterminant)
 
             subDeterminants.push(Math.pow(-1, i % 2) > 0 ? cofactor : Algebra.negate(cofactor))
@@ -63,8 +63,8 @@ export default class Determinant extends LinearAlgebraOperation {
         this.variables = {}
         this.variables.result = Algebra.variable({
             symbol: 'R.data',
-            index: this.result.offset,
-            size: this.result.type.size
+            index: this.result.header.offset,
+            size: this.result.header.type.size
         })
     }
 

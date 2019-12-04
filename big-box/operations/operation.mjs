@@ -16,11 +16,11 @@ export default class TensorOperation {
     }
 
     shape(axis) {
-        return this.shape[axis]
+        return this.header.shape[axis]
     }
 
     size(size, axis) {
-        return size * this.shape[axis]
+        return size * this.header.shape[axis]
     }
 
     symbolicSourceBoilerplate() {
@@ -32,9 +32,9 @@ export default class TensorOperation {
 
         /** Variables */
         this.variables = {}
-        this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.type.size })
-        this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
-        this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
-        this.variables.temp = Algebra.variable({ symbol: 'temp', index: 0, size: this.result.type.size })
+        this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.header.type.size })
+        this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.header.type.size })
+        this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.header.type.size })
+        this.variables.temp = Algebra.variable({ symbol: 'temp', index: 0, size: this.result.header.type.size })
     }
 }

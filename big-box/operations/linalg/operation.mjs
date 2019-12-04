@@ -6,14 +6,14 @@ export default class LinearAlgebraOperation extends TensorOperation {
         super(args)
 
         /** Dimensions */
-        this.rows = this.of.shape[0]
-        this.cols = this.with.shape[1] || this.of.shape[1]
-        this.like = this.of.shape[1]
+        this.rows = this.of.header.shape[0]
+        this.cols = this.with.header.shape[1] || this.of.header.shape[1]
+        this.like = this.of.header.shape[1]
         this.size = this.rows
     }
 
     /** Resultant Tensor */
-    resultant() { return Tensor.zeros(this.of) }
+    resultant() { return Tensor.zerosLike({ tensor: this.of }) }
 
     /** Pointwise Source Implementation */
     pointwiseSourceBoilerplate() { }

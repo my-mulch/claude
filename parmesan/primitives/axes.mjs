@@ -22,8 +22,8 @@ export default class Axes extends Primitive {
     render() {
         return [{
             vertices: this.points,
-            colors: bb.ones({ shape: this.points.shape }),
-            sizes: bb.ones({ shape: this.points.shape }),
+            colors: bb.ones({ shape: this.points.header.shape }),
+            sizes: bb.ones({ shape: this.points.header.shape }),
             mode: 'LINES'
         }]
     }

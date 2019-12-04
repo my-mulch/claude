@@ -38,21 +38,21 @@ export default class Adjugate extends LinearAlgebraOperation {
         this.source.push(Algebra.assign(Algebra.variable({
             index: this.result.header.literalIndex([this.r, this.c]),
             symbol: 'R.data',
-            size: this.result.type.size
+            size: this.result.header.type.size
         }), cofactor))
     }
 
     finish() { this.source = this.source.join('\n') }
 
     determinant() {
-        const source = [`const D = new Array(${this.of.type.size})`]
+        const source = [`const D = new Array(${this.of.header.type.size})`]
 
-        const variable = Algebra.variable({ symbol: 'D', size: this.of.type.size, index: 0 })
+        const variable = Algebra.variable({ symbol: 'D', size: this.of.header.type.size, index: 0 })
 
         const value = new Array(this.size).fill(null).map(function (_, i) {
             return Algebra.multiply(
-                Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.literalIndex([0, i]) }),
-                Algebra.variable({ symbol: 'R.data', size: this.of.type.size, index: this.result.header.literalIndex([i, 0]) }))
+                Algebra.variable({ symbol: 'A.data', size: this.of.header.type.size, index: this.of.header.literalIndex([0, i]) }),
+                Algebra.variable({ symbol: 'R.data', size: this.of.header.type.size, index: this.result.header.literalIndex([i, 0]) }))
         }, this).reduce(Algebra.add)
 
         source.push(Algebra.assign(variable, value))

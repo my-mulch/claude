@@ -12,14 +12,14 @@ class ParmesanApplication {
         this.objects = []
 
         /** Displays */
-        this.HUD = document.createElement('canvas')
-        this.HUD.id = 'hud'
+        this.hud = document.createElement('canvas')
+        this.hud.id = 'hud'
 
-        this.CANVAS = document.createElement('canvas')
-        this.CANVAS.id = 'main'
+        this.canvas = document.createElement('canvas')
+        this.canvas.id = 'main'
 
-        // document.body.prepend(this.HUD)
-        document.body.prepend(this.CANVAS)
+        // document.body.prepend(this.hud)
+        document.body.prepend(this.canvas)
 
         this.resize()
 
@@ -71,13 +71,13 @@ class ParmesanApplication {
     }
 
     resize() {
-        this.CANVAS.width = window.innerWidth
-        this.CANVAS.height = window.innerHeight
+        this.canvas.width = window.innerWidth
+        this.canvas.height = window.innerHeight
 
-        this.HUD.width = window.innerWidth * 0.5
-        this.HUD.height = window.innerHeight * 0.2
+        this.hud.width = window.innerWidth * 0.5
+        this.hud.height = window.innerHeight * 0.2
 
-        config.ASPECT_RATIO = this.CANVAS.width / this.CANVAS.height
+        config.ASPECT_RATIO = this.canvas.width / this.canvas.height
     }
 
     plot(objects) {
@@ -87,14 +87,14 @@ class ParmesanApplication {
                 colorBuffer: this.webgl.createBuffer(colors),
                 vertexBuffer: this.webgl.createBuffer(vertices),
 
-                drawMode: this.webgl.CONTEXT[mode],
-                drawCount: vertices.shape[0]
+                drawMode: this.webgl.context[mode],
+                drawCount: vertices.header.shape[0]
             })
         }
     }
 
     render() {
-        this.webgl.CONTEXT.clear(this.webgl.CONTEXT.COLOR_BUFFER_BIT)
+        this.webgl.context.clear(this.webgl.context.COLOR_BUFFER_BIT)
 
         for (const object of this.objects) {
 
@@ -106,7 +106,7 @@ class ParmesanApplication {
             this.webgl.uniforms.u_ProjMatrix(this.camera.project())
 
 
-            this.webgl.CONTEXT.drawArrays(object.drawMode, 0, object.drawCount)
+            this.webgl.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
     }
 

@@ -7,7 +7,7 @@ export default class Type {
     }
 
     static promote(A, B) {
-        return A.type.size > B.type.size ? A.type : B.type
+        return A.header.type.size > B.header.type.size ? A.header.type : B.header.type
     }
 
     static isTypedArray(array) {

@@ -9,7 +9,7 @@ export default class AxisOperation extends TensorOperation {
         /** Axes */
         this.axes = {}
         this.axes.inner = args.axes
-        this.axes.total = [...this.of.shape.keys()]
+        this.axes.total = [...this.of.header.shape.keys()]
         this.axes.outer = Tensor.difference(this.axes.total, this.axes.inner)
         this.axes.order = this.axes.outer.concat(this.axes.inner)
         this.axes.last = this.axes.order[this.axes.order.length - 1]
@@ -31,8 +31,8 @@ export default class AxisOperation extends TensorOperation {
 
     resultant() {
         return Tensor.zeros({
-            type: this.of.type,
-            shape: this.of.shape.filter(this.unselectedAxes, this),
+            type: this.of.header.type,
+            shape: this.of.header.shape.filter(this.unselectedAxes, this),
         })
     }
 

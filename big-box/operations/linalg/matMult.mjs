@@ -32,8 +32,8 @@ export default class MatrixMultiplication extends LinearAlgebraOperation {
     /** Resultant Tensor */
     resultant() {
         return Tensor.zeros({
-            type: this.of.type,
-            shape: [this.of.shape[0], this.with.shape[1]]
+            type: this.of.header.type,
+            shape: [this.of.header.shape[0], this.with.header.shape[1]]
         })
     }
 
@@ -41,11 +41,11 @@ export default class MatrixMultiplication extends LinearAlgebraOperation {
     start() { this.source = [] }
 
     inLoop() {
-        const R = Algebra.variable({ symbol: 'R.data', size: this.result.type.size, index: this.result.header.literalIndex([this.r, this.c]) })
+        const R = Algebra.variable({ symbol: 'R.data', size: this.result.header.type.size, index: this.result.header.literalIndex([this.r, this.c]) })
 
         const dot = new Array(this.like).fill(null).map(function (_, s) {
-            const A = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: this.of.header.literalIndex([this.r, s]) })
-            const B = Algebra.variable({ symbol: 'B.data', size: this.with.type.size, index: this.with.header.literalIndex([s, this.c]) })
+            const A = Algebra.variable({ symbol: 'A.data', size: this.of.header.type.size, index: this.of.header.literalIndex([this.r, s]) })
+            const B = Algebra.variable({ symbol: 'B.data', size: this.with.header.type.size, index: this.with.header.literalIndex([s, this.c]) })
 
             return Algebra.multiply(A, B)
         }, this).reduce(Algebra.add)
@@ -58,25 +58,25 @@ export default class MatrixMultiplication extends LinearAlgebraOperation {
     /** Symbolic Implementation */
     symbolicSourceBoilerplate() {
         this.variables = {}
-        this.variables.of = Algebra.variable({ symbol: 'A.data', size: this.of.type.size, index: 'AIndex' })
-        this.variables.with = Algebra.variable({ symbol: 'B.data', size: this.with.type.size, index: 'BIndex' })
-        this.variables.result = Algebra.variable({ symbol: 'R.data', size: this.result.type.size, index: 'RIndex' })
+        this.variables.of = Algebra.variable({ symbol: 'A.data', size: this.of.header.type.size, index: 'AIndex' })
+        this.variables.with = Algebra.variable({ symbol: 'B.data', size: this.with.header.type.size, index: 'BIndex' })
+        this.variables.result = Algebra.variable({ symbol: 'R.data', size: this.result.header.type.size, index: 'RIndex' })
 
         this.indices = {}
-        this.indices.of = `const AIndex = r * A.strides[0] + s * A.strides[1] + A.offset`
-        this.indices.with = `const BIndex = r * B.strides[0] + s * B.strides[1] + B.offset`
-        this.indices.result = `const RIndex = r * R.strides[0] + c * R.strides[1] + R.offset`
+        this.indices.of = `const AIndex = r * A.header.strides[0] + s * A.header.strides[1] + A.header.offset`
+        this.indices.with = `const BIndex = r * B.header.strides[0] + s * B.header.strides[1] + B.header.offset`
+        this.indices.result = `const RIndex = r * R.header.strides[0] + c * R.header.strides[1] + R.header.offset`
     }
 
     symbolicSourceTemplate() {
         this.source = [
-            `for (let r = 0; r < A.shape[0]; r++){`,
-            `for (let c = 0; c < B.shape[1]; c++){`,
+            `for (let r = 0; r < A.header.shape[0]; r++){`,
+            `for (let c = 0; c < B.header.shape[1]; c++){`,
 
             this.indices.result,
             `R.data[RIndex] = 0`,
 
-            `for (let s = 0; s < A.shape[1]; s++) {`,
+            `for (let s = 0; s < A.header.shape[1]; s++) {`,
 
             this.indices.of,
             this.indices.with,
