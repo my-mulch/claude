@@ -13,6 +13,9 @@ import Circle from './parmesan/primitives/circle.mjs'
 import RGBCube from './parmesan/primitives/rgbCube.mjs'
 import Cylinder from './parmesan/primitives/cylinder.mjs'
 import ImageCube from './parmesan/primitives/imageCube.mjs'
+import Primitive from './parmesan/primitives/index.mjs'
+
+import Header from './big-box/header/index.mjs'
 
 window.bb = bb
 window.myio = myio
@@ -24,20 +27,25 @@ window.Cylinder = Cylinder
     ; (async function () {
         // app.plot(await new Sound({ path: 'http://localhost:3000/Users/trumanpurnell/Music/PinkPanther60.wav' }).render())
 
+        // app.plot(new Cylinder({ height: 2, radius: 0.1 }).render())
+        // app.plot(new Cylinder({ height: 2, radius: 1 }).render())
 
+        // for (let i = -75; i < 75; i++)
+        //     for (let j = -75; j < 75; j++)
+        //         for (let k = -75; k < 75; k++)
+        //             new Header({ shape: [3, 1] })
+        // [[1], [1], [1]]
+
+        // app.plot(new Circle({ radius: 0.1, center: [[i, j, k]] }).render())
 
         app.plot(new Axes({ length: 5 }).render())
         // app.plot(new Cube({}).render())
         // app.plot(await new ImageCube({ path: 'http://localhost:3000/Users/trumanpurnell/Pictures/IMG_6721.jpg' }).render())
         // app.plot(new RGBCube({}).render())
-        // app.plot(new Circle({}).render())
+        app.plot(new Circle({}).render())
+
+        app.render()
     })()
 
-// app.plot(new Cylinder({ height: 2, radius: 0.1 }).render())
-// app.plot(new Cylinder({ height: 2, radius: 1 }).render())
-for (let i = -5; i <= 5; i++)
-    for (let j = -5; j <= 5; j++)
-        for (let k = -5; k <= 5; k++)
-            app.plot(new Vector({ center: [[i, j, k]] }).render())
 
 

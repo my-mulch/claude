@@ -27,17 +27,21 @@ export default class Tensor {
         return a1.filter(function (value) { return !a2.includes(value) })
     }
 
-    static shape(array, shape = []) {
+    static shape(array) {
         if (array.constructor === Tensor)
             return array.shape
 
         if (Types.isTypedArray(array))
             return [array.length]
 
-        if (array.constructor !== Array)
-            return shape
+        const shape = []
+        
+        while (array.constructor === Array) {
+            shape.push(array.length)
+            array = array[0]
+        }
 
-        return Tensor.shape(array[0], shape.concat(array.length))
+        return shape
     }
 
     static tensor({ data, type }) {

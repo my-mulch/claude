@@ -91,8 +91,6 @@ class ParmesanApplication {
                 drawCount: vertices.shape[0]
             })
         }
-
-        this.render()
     }
 
     render() {

@@ -1,7 +1,7 @@
 import bb from '../../big-box/index.mjs'
 
 export default class Primitive {
-    static VERTEX_COUNT = 3
+    static VERTEX_COUNT = 10
 
     static offset = new bb.cached.add({ of: bb.zeros({ shape: [Primitive.VERTEX_COUNT, 3] }), with: [[0, 0, 0]] })
     static scale = new bb.cached.multiply({ of: bb.zeros({ shape: [Primitive.VERTEX_COUNT, 3] }), with: 0 })
