@@ -60,7 +60,7 @@ export default class Tensor {
             throw "Attempting to create tensor from undefined"
 
         return new Tensor(
-            new tensor.type.array(tensor.header.size * tensor.header.type.size),
+            new tensor.header.type.array(tensor.header.size * tensor.header.type.size),
             new Header({
                 size: tensor.header.size,
                 type: tensor.header.type,
@@ -84,7 +84,7 @@ export default class Tensor {
             throw "Attempting to create tensor from undefined"
 
         const ones = new Tensor(
-            new tensor.type.array(tensor.header.size * tensor.header.type.size),
+            new tensor.header.type.array(tensor.header.size * tensor.header.type.size),
             new Header({
                 size: tensor.header.size,
                 type: tensor.header.type,
