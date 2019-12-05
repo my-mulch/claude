@@ -1,7 +1,7 @@
 import Type from '../types/index.mjs'
 import Header from '../header/index.mjs'
 
-import { __Math__, PRECISION, SYMBOL_FROM_ID } from '../resources/index.mjs'
+import { __Math__, ARRAY_REPLACER, ARRAY_SPACER, PRECISION, SYMBOL_FROM_ID } from '../resources/index.mjs'
 
 export default class Tensor {
     constructor(data, header) {
@@ -209,7 +209,7 @@ export default class Tensor {
         if (type === undefined)
             throw "Attempting to convert tensor to undefined type"
 
-        if (type === this.header.type)
+        if (type.size === this.header.type.size)
             return this
 
         if (this.header.size === 1)
@@ -295,10 +295,6 @@ export default class Tensor {
         return string
     }
 
-    toString() {
-        return this.visit(this.toStringAtIndex.bind(this))
-    }
-
     toRawAtIndex(index) {
         const result = []
 
@@ -318,13 +314,17 @@ export default class Tensor {
 
     toIndices() {
         const indices = []
-
         this.visit(function (index) { indices.push(index) })
-
         return indices
     }
 
-    valueOf() {
-        return this.toRaw()
+    toPretty() {
+        return this.visit(this.toStringAtIndex.bind(this))
+    }
+
+    toString() {
+        return JSON
+            .stringify(this.toPretty())
+            .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
 }

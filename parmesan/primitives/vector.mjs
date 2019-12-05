@@ -9,7 +9,7 @@ export default class Vector extends Primitive {
 
         this.tip = new Cone({ radius: 0.3 / 10, height: 0.5 / 10, center })
         this.ring = new Circle({ radius: 0.3 / 10, center })
-        this.base = new Cylinder({ radius: 0.12 / 10, height: 0.5 / 10, center: this.center.subtract({ with: [[0, 0, 0.25 / 10]] }) })
+        this.base = new Cylinder({ radius: 0.12 / 10, height: 0.5 / 10, center: this.center.subtract({ with: [[[0], [0], [0.25 / 10]]] }) })
     }
 
     render() {

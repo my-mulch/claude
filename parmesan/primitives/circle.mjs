@@ -3,22 +3,18 @@ import Primitive from './index.mjs'
 
 export default class Circle extends Primitive {
     static template = bb
-        .linspace({
-            start: 0,
-            stop: 2 * Math.PI,
-            num: Primitive.VERTEX_COUNT
-        })
-        .multiply({ with: 'i' })
+        .linspace(0, 2 * Math.PI, Primitive.VERTEX_COUNT)
+        .multiply({ with: [0, 1] })
         .exp()
-        .reshape({ shape: [-1, 1] })
-        .view({ type: bb.Float32 })
+        .reshape([-1, 1])
+        .view(bb.Float32)
         .insert({ with: 0, axes: [1], entries: [2] })
 
     constructor({ radius = 1, center }) {
         super(center)
 
-        this.radius = bb.tensor({ data: radius })
-        this.points = bb.zerosLike({ tensor: Circle.template })
+        this.radius = bb.tensor(radius)
+        this.points = bb.zerosLike(Circle.template)
 
         Primitive.scale.invoke(Circle.template, this.radius, this.points)
         Primitive.offset.invoke(this.points, this.center, this.points)
@@ -27,7 +23,7 @@ export default class Circle extends Primitive {
     render() {
         return [{
             vertices: this.points,
-            colors: this.points,
+            colors: bb.onesLike(this.points),
             sizes: this.points,
             mode: 'LINE_STRIP'
         }]

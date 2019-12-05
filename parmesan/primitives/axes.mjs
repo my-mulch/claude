@@ -7,23 +7,21 @@ export default class Axes extends Primitive {
 
         this.length = length
 
-        this.points = bb.tensor({
-            data: [
-                [0, 0, -this.length],
-                [0, 0, this.length],
-                [0, -this.length, 0],
-                [0, this.length, 0],
-                [-this.length, 0, 0],
-                [this.length, 0, 0],
-            ]
-        })
+        this.points = bb.tensor([
+            [[0], [0], [-this.length]],
+            [[0], [0], [this.length]],
+            [[0], [-this.length], [0]],
+            [[0], [this.length], [0]],
+            [[-this.length], [0], [0]],
+            [[this.length], [0], [0]],
+        ])
     }
 
     render() {
         return [{
             vertices: this.points,
-            colors: bb.ones({ shape: this.points.header.shape }),
-            sizes: bb.ones({ shape: this.points.header.shape }),
+            colors: bb.ones(this.points.header.shape),
+            sizes: bb.ones(this.points.header.shape),
             mode: 'LINES'
         }]
     }

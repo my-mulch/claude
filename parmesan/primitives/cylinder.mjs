@@ -12,19 +12,19 @@ export default class Cylinder extends Primitive {
         this.top = new Circle({
             radius: this.radius,
             center: this.center
-                .slice({ region: [':', ':3'] })
-                .add({ with: [0, 0, this.height / 2] })
+                .slice([':', ':3'])
+                .add({ with: [[0], [0], [this.height / 2]] })
         })
 
         this.base = new Circle({
             radius: this.radius,
             center: this.center
-                .slice({ region: [':', ':3'] })
-                .subtract({ with: [0, 0, this.height / 2] })
+                .slice([':', ':3'])
+                .subtract({ with: [[0], [0], [this.height / 2]] })
         })
 
         this.points = bb
-            .zeros({ shape: [Primitive.VERTEX_COUNT * 2, 3] })
+            .zeros([Primitive.VERTEX_COUNT * 2, 3])
             .assign({ region: ['::2'], with: this.base.points })
             .assign({ region: ['1::2'], with: this.top.points })
     }
@@ -33,8 +33,8 @@ export default class Cylinder extends Primitive {
         return [
             {
                 vertices: this.points,
-                colors: bb.ones({ shape: this.points.header.shape }),
-                sizes: bb.ones({ shape: this.points.header.shape }),
+                colors: bb.ones(this.points.header.shape),
+                sizes: bb.ones(this.points.header.shape),
                 mode: 'TRIANGLE_STRIP',
             },
             ...this.top.render(),

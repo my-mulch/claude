@@ -40,7 +40,7 @@ export default class WebGLManager {
     createBuffer(tensor) {
         const buffer = this.context.createBuffer()
 
-        const numberType = this.mapType(tensor.header.type.typed)
+        const numberType = this.mapType(tensor.header.type.array)
         const renderType = this.context.STATIC_DRAW
         const bufferType = this.context.ARRAY_BUFFER
 

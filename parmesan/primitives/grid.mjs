@@ -9,9 +9,9 @@ export default class Grid extends Primitive {
 
         this.points = bb.mesh({
             of: [
-                bb.linspace({ start: -this.resolution, stop: this.resolution, num: Primitive.VERTEX_COUNT }).toRawFlat(),
-                bb.linspace({ start: -this.resolution, stop: this.resolution, num: Primitive.VERTEX_COUNT }).toRawFlat(),
-                bb.linspace({ start: -this.resolution, stop: this.resolution, num: Primitive.VERTEX_COUNT }).toRawFlat()
+                bb.linspace(-this.resolution, this.resolution, Primitive.VERTEX_COUNT).toRawFlat(),
+                bb.linspace(-this.resolution, this.resolution, Primitive.VERTEX_COUNT).toRawFlat(),
+                bb.linspace(-this.resolution, this.resolution, Primitive.VERTEX_COUNT).toRawFlat()
             ]
         })
     }

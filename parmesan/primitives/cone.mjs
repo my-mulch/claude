@@ -10,14 +10,14 @@ export default class Cone extends Primitive {
         this.radius = radius
 
         this.base = new Circle({ radius: this.radius, center: this.center })
-        this.points = this.base.points.insert({ with: this.center.add({ with: [[0, 0, this.height]] }), axes: [0], entries: [0] })
+        this.points = this.base.points.insert({ with: this.center.add({ with: [[[0], [0], this.height]] }), axes: [0], entries: [0] })
     }
 
     render() {
         return [{
             vertices: this.points,
-            colors: bb.ones({ shape: this.points.header.shape }),
-            sizes: bb.ones({ shape: this.points.header.shape }),
+            colors: bb.ones(this.points.header.shape),
+            sizes: bb.ones(this.points.header.shape),
             mode: 'TRIANGLE_FAN',
         }]
     }

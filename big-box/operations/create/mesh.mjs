@@ -29,7 +29,7 @@ export default class Mesh {
             `let i = 0`,
             new Source().nestedFor(this.axes, this.shapes, [
                 this.of.map(function (_, i) {
-                    return `R.data[i++] = A[${i}][i${i}][0]`
+                    return `R.data[i++] = A[${i}][i${i}]`
                 })
             ])
         ])
