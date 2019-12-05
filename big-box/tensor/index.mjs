@@ -9,7 +9,7 @@ export default class Tensor {
         this.header = header
     }
 
-    static shape(data) {
+    static parse(data) {
         if (data === undefined)
             throw "Attempting to get shape of something undefined"
 
@@ -33,13 +33,16 @@ export default class Tensor {
 
     static tensor(data) {
         if (data === undefined)
-            throw "Attempting to create tensor from undefined"
+            return Tensor.zeros([])
 
         if (data.constructor === Tensor)
             return data
 
+        if (data.constructor === Number)
+            data = [data]
+
         if (data.constructor === Array) {
-            const [shape, type] = Tensor.shape(data)
+            const [shape, type] = Tensor.parse(data)
             const size = shape.reduce(__Math__.multiply, 1)
 
             return new Tensor(
@@ -65,12 +68,11 @@ export default class Tensor {
             }))
     }
 
-    static zeros(...shape) {
+    static zeros(shape, type = Tensor.Float32) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
         const size = shape.reduce(__Math__.multiply, 1)
-        const type = Type.resolveSize(shape[shape.length - 1])
 
         return new Tensor(
             new type.array(size * type.size),
@@ -94,12 +96,11 @@ export default class Tensor {
         return ones
     }
 
-    static ones(...shape) {
+    static ones(shape, type = Tensor.Float32) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
         const size = shape.reduce(__Math__.multiply, 1)
-        const type = Type.resolveSize(shape[shape.length - 1])
 
         const ones = new Tensor(
             new type.array(size * type.size),
@@ -110,12 +111,12 @@ export default class Tensor {
         return ones
     }
 
-    static arange(start = 0, step = 1, stop) {
+    static arange(start = 0, stop, step = 1) {
         if (stop === undefined)
             throw "You must specify when to stop the range"
 
         const shape = [__Math__.round((stop - start) / step)]
-        const size = shape.length
+        const size = shape[0]
         const type = Tensor.Float32
 
         const tensor = new Tensor(
@@ -147,12 +148,12 @@ export default class Tensor {
         return tensor
     }
 
-    static rand(...shape) {
+    static rand(shape) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
+        const type = Tensor.Float32
         const size = shape.reduce(__Math__.multiply, 1)
-        const type = Type.resolveSize(shape[shape.length - 1])
 
         const tensor = new Tensor(
             new type.array(size * type.size),
@@ -171,8 +172,8 @@ export default class Tensor {
         if (shape === undefined)
             throw "Attempting to create randrange tensor with undefined shape"
 
+        const type = Tensor.Float32
         const size = shape.reduce(__Math__.multiply, 1)
-        const type = Type.resolveSize(shape[shape.length - 1])
 
         const tensor = new Tensor(
             new type.array(size * type.size),
@@ -184,12 +185,12 @@ export default class Tensor {
         return tensor
     }
 
-    static eye(...shape) {
+    static eye(shape) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
+        const type = Tensor.Float32
         const size = shape.reduce(__Math__.multiply, 1)
-        const type = Type.resolveSize(shape[shape.length - 1])
 
         const tensor = new Tensor(
             new type.array(size * type.size),
@@ -282,7 +283,7 @@ export default class Tensor {
             const sign = __Math__.sign(this.data[index + i]) < 0 ? '-' : '+'
             const number = __Math__.abs(this.data[index + i])
 
-            string += `${sign}${number.toPrecision(PRECISION)}${SYMBOL_FROM_ID[i]}`
+            string += `${sign}${number.toFixed(PRECISION)}${SYMBOL_FROM_ID[i]}`
         }
 
         if (!string)

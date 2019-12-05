@@ -87,8 +87,8 @@ export default class Header {
     }
 
     view(type) {
-        const ratio = this.header.type.size / type.size
-        const header = this.header.copy()
+        const ratio = this.type.size / type.size
+        const header = this.copy()
 
         header.type = type
         header.size *= ratio
@@ -156,7 +156,7 @@ export default class Header {
 
     reshape(shape) {
         const newShape = this.resolveShape(shape)
-        const newStrides = Header.resolveStrides(newShape)
+        const newStrides = this.resolveStrides(newShape)
 
         return new Header({
             ...this,

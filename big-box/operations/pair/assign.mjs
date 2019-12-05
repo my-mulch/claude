@@ -6,7 +6,7 @@ export default class Assignment extends PairOperation {
         /** Superclass */
         super({
             ...args,
-            of: args.of.slice({ region: args.region || [] }),
+            of: args.of.slice(args.region || []),
             result: args.of
         })
 
