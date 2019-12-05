@@ -40,20 +40,14 @@ export default {
         '}\n',
 
 
-    UP: bb.tensor({ data: [[0], [1], [0], [1]] }),
-    TO: bb.tensor({ data: [["0"], ["0"], ["0"], ["1"]] }),
-    FROM: bb.tensor({
-        data: [["4.008469581604004"],
-        ["2.170660972595215"],
-        ["7.1728620529174805"],
-        ["1"]]
-    }),
-    // FROM: bb.tensor({ data: [["0.02000032365322113"], ["0.010000161826610565"], ["0.010000161826610565"], ["1"]] }),
+    UP: bb.tensor([[[0]], [[1]], [[0]], [[1]]]),
+    TO: bb.tensor([[[0]], [[0]], [[0]], [[1]]]),
+    FROM: bb.tensor([[[3]], [[2.3]], [[3]], [[1]]]),
 
-    LOOK_MATRIX: bb.eye({ shape: [4, 4] }),
-    VIEW_MATRIX: bb.eye({ shape: [4, 4] }),
-    TRANSLATION_MATRIX: bb.eye({ shape: [4, 4] }),
-    PROJECTION_MATRIX: bb.zeros({ shape: [4, 4] }),
+    LOOK_MATRIX: bb.eye([4, 4]),
+    VIEW_MATRIX: bb.eye([4, 4]),
+    TRANSLATION_MATRIX: bb.eye([4, 4]),
+    PROJECTION_MATRIX: bb.zeros([4, 4]),
 
     VIEWING_ANGLE: 30,
     ASPECT_RATIO: 1,

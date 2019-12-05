@@ -1,24 +1,24 @@
 import config from '../../resources/index.mjs'
 
 export default class WebGLManager {
-    constructor({ CANVAS }) {
-        this.CONTEXT = CANVAS.getContext('webgl')
+    constructor({ canvas }) {
+        this.context = canvas.getContext('webgl')
 
         this.program = this.createProgram()
         this.uniforms = this.createUniforms()
         this.attributes = this.createAttributes()
 
-        this.CONTEXT.useProgram(this.program)
+        this.context.useProgram(this.program)
     }
 
     createUniforms() {
         const uniforms = {}
 
-        const uniformCount = this.CONTEXT.getProgramParameter(this.program, this.CONTEXT.ACTIVE_UNIFORMS)
+        const uniformCount = this.context.getProgramParameter(this.program, this.context.ACTIVE_UNIFORMS)
 
         for (let i = 0; i < uniformCount; i++) {
-            const uniformInfo = this.CONTEXT.getActiveUniform(this.program, i)
-            const uniformLocation = this.CONTEXT.getUniformLocation(this.program, uniformInfo.name)
+            const uniformInfo = this.context.getActiveUniform(this.program, i)
+            const uniformLocation = this.context.getUniformLocation(this.program, uniformInfo.name)
 
             uniforms[uniformInfo.name] = this.createUniform(uniformInfo.type, uniformLocation)
         }
@@ -27,46 +27,46 @@ export default class WebGLManager {
     }
 
     createUniform(type, location) {
-        if (type === this.CONTEXT.FLOAT_MAT2)
-            return (function (array) { this.CONTEXT.uniformMatrix2fv(location, false, array.data) }).bind(this)
+        if (type === this.context.FLOAT_MAT2)
+            return (function (array) { this.context.uniformMatrix2fv(location, false, array.data) }).bind(this)
 
-        if (type === this.CONTEXT.FLOAT_MAT3)
-            return (function (array) { this.CONTEXT.uniformMatrix3fv(location, false, array.data) }).bind(this)
+        if (type === this.context.FLOAT_MAT3)
+            return (function (array) { this.context.uniformMatrix3fv(location, false, array.data) }).bind(this)
 
-        if (type === this.CONTEXT.FLOAT_MAT4)
-            return (function (array) { this.CONTEXT.uniformMatrix4fv(location, false, array.data) }).bind(this)
+        if (type === this.context.FLOAT_MAT4)
+            return (function (array) { this.context.uniformMatrix4fv(location, false, array.data) }).bind(this)
     }
 
     createBuffer(tensor) {
-        const buffer = this.CONTEXT.createBuffer()
+        const buffer = this.context.createBuffer()
 
-        const numberType = this.mapType(tensor.type.typed)
-        const renderType = this.CONTEXT.STATIC_DRAW
-        const bufferType = this.CONTEXT.ARRAY_BUFFER
+        const numberType = this.mapType(tensor.header.type.array)
+        const renderType = this.context.STATIC_DRAW
+        const bufferType = this.context.ARRAY_BUFFER
 
-        this.CONTEXT.bindBuffer(bufferType, buffer)
-        this.CONTEXT.bufferData(bufferType, tensor.data, renderType)
+        this.context.bindBuffer(bufferType, buffer)
+        this.context.bufferData(bufferType, tensor.data, renderType)
 
         return {
             buffer,
-            size: tensor.shape[1],
-            count: tensor.shape[0],
+            size: tensor.header.shape[1],
+            count: tensor.header.shape[0],
             type: numberType,
             normalize: false,
-            offset: tensor.offset * tensor.data.BYTES_PER_ELEMENT,
-            stride: tensor.strides[0] * tensor.data.BYTES_PER_ELEMENT
+            offset: tensor.header.offset * tensor.data.BYTES_PER_ELEMENT,
+            stride: tensor.header.strides[0] * tensor.data.BYTES_PER_ELEMENT
         }
     }
 
     mapType(type) {
-        if (type === Int8Array) { return this.CONTEXT.BYTE }
-        if (type === Uint8Array) { return this.CONTEXT.UNSIGNED_BYTE }
-        if (type === Uint8ClampedArray) { return this.CONTEXT.UNSIGNED_BYTE }
-        if (type === Int16Array) { return this.CONTEXT.SHORT }
-        if (type === Uint16Array) { return this.CONTEXT.UNSIGNED_SHORT }
-        if (type === Int32Array) { return this.CONTEXT.INT }
-        if (type === Uint32Array) { return this.CONTEXT.UNSIGNED_INT }
-        if (type === Float32Array) { return this.CONTEXT.FLOAT }
+        if (type === Int8Array) { return this.context.BYTE }
+        if (type === Uint8Array) { return this.context.UNSIGNED_BYTE }
+        if (type === Uint8ClampedArray) { return this.context.UNSIGNED_BYTE }
+        if (type === Int16Array) { return this.context.SHORT }
+        if (type === Uint16Array) { return this.context.UNSIGNED_SHORT }
+        if (type === Int32Array) { return this.context.INT }
+        if (type === Uint32Array) { return this.context.UNSIGNED_INT }
+        if (type === Float32Array) { return this.context.FLOAT }
 
         return null
     }
@@ -74,11 +74,11 @@ export default class WebGLManager {
     createAttributes() {
         const attributes = {}
 
-        const attributeCount = this.CONTEXT.getProgramParameter(this.program, this.CONTEXT.ACTIVE_ATTRIBUTES)
+        const attributeCount = this.context.getProgramParameter(this.program, this.context.ACTIVE_ATTRIBUTES)
 
         for (var i = 0; i < attributeCount; i++) {
-            const attributeInfo = this.CONTEXT.getActiveAttrib(this.program, i)
-            const attributeLocation = this.CONTEXT.getAttribLocation(this.program, attributeInfo.name)
+            const attributeInfo = this.context.getActiveAttrib(this.program, i)
+            const attributeLocation = this.context.getAttribLocation(this.program, attributeInfo.name)
 
             attributes[attributeInfo.name] = this.createAttribute(attributeLocation)
         }
@@ -88,10 +88,10 @@ export default class WebGLManager {
 
     createAttribute(location) {
         return (function (data) {
-            this.CONTEXT.bindBuffer(this.CONTEXT.ARRAY_BUFFER, data.buffer)
-            this.CONTEXT.enableVertexAttribArray(location)
+            this.context.bindBuffer(this.context.ARRAY_BUFFER, data.buffer)
+            this.context.enableVertexAttribArray(location)
 
-            this.CONTEXT.vertexAttribPointer(
+            this.context.vertexAttribPointer(
                 location,
                 data.size,
                 data.type,
@@ -103,16 +103,16 @@ export default class WebGLManager {
     }
 
     createShader(type, source) {
-        const shader = this.CONTEXT.createShader(type)
+        const shader = this.context.createShader(type)
 
-        this.CONTEXT.shaderSource(shader, source)
-        this.CONTEXT.compileShader(shader)
+        this.context.shaderSource(shader, source)
+        this.context.compileShader(shader)
 
-        const didCompile = this.CONTEXT.getShaderParameter(shader, this.CONTEXT.COMPILE_STATUS)
+        const didCompile = this.context.getShaderParameter(shader, this.context.COMPILE_STATUS)
 
         if (!didCompile) {
-            console.error(`Error with compile: ${this.CONTEXT.getShaderInfoLog(shader)}`)
-            this.CONTEXT.deleteShader(shader)
+            console.error(`Error with compile: ${this.context.getShaderInfoLog(shader)}`)
+            this.context.deleteShader(shader)
 
             return null
         }
@@ -121,25 +121,25 @@ export default class WebGLManager {
     }
 
     createProgram() {
-        const program = this.CONTEXT.createProgram()
+        const program = this.context.createProgram()
 
-        this.CONTEXT.attachShader(program, this.createShader(
-            this.CONTEXT.VERTEX_SHADER,
+        this.context.attachShader(program, this.createShader(
+            this.context.VERTEX_SHADER,
             config.VERTEX_SOURCE
         ))
 
-        this.CONTEXT.attachShader(program, this.createShader(
-            this.CONTEXT.FRAGMENT_SHADER,
+        this.context.attachShader(program, this.createShader(
+            this.context.FRAGMENT_SHADER,
             config.FRAGMENT_SOURCE
         ))
 
-        this.CONTEXT.linkProgram(program)
+        this.context.linkProgram(program)
 
-        const didLink = this.CONTEXT.getProgramParameter(program, this.CONTEXT.LINK_STATUS)
+        const didLink = this.context.getProgramParameter(program, this.context.LINK_STATUS)
 
         if (!didLink) {
-            console.error(`Error with link: ${this.CONTEXT.getProgramInfoLog(program)}`)
-            this.CONTEXT.deleteProgram(program)
+            console.error(`Error with link: ${this.context.getProgramInfoLog(program)}`)
+            this.context.deleteProgram(program)
 
             return null
         }

@@ -6,9 +6,9 @@ export default class Header {
         this.type = opts.type !== undefined ? opts.type : Types.Float32
         this.shape = opts.shape !== undefined ? opts.shape : []
         this.offset = opts.offset !== undefined ? opts.offset : 0
-        this.contig = opts.contig !== undefined ? opts.contig : true
+        this.isContig = opts.isContig !== undefined ? opts.isContig : true
         this.strides = opts.strides !== undefined ? opts.strides : this.resolveStrides(this.shape)
-        this.size = this.shape.reduce(__Math__.multiply, 1)
+        this.size = opts.size !== undefined ? opts.size : this.shape.reduce(__Math__.multiply, 1)
     }
 
     static isContigous(index) {
@@ -30,7 +30,8 @@ export default class Header {
         return true
     }
 
-    resolveStrides(shape, stride = this.type.size) {
+    resolveStrides(shape) {
+        let stride = this.type.size
         const strides = new Array(shape.length)
         strides[strides.length - 1] = stride
 
@@ -85,10 +86,22 @@ export default class Header {
         return nonZeroAxes
     }
 
+    view(type) {
+        const ratio = this.type.size / type.size
+        const header = this.copy()
+
+        header.type = type
+        header.size *= ratio
+        header.shape[header.shape.length - 1] *= ratio
+        header.strides[header.strides.length - 1] /= ratio
+
+        return header
+    }
+
     slice(index) {
         const shape = new Array()
         const strides = new Array()
-        const contig = Header.isContigous(index)
+        const isContig = Header.isContigous(index)
 
         let offset = this.offset
 
@@ -129,13 +142,13 @@ export default class Header {
 
         }
 
-        return new Header({ ...this, shape, strides, offset, contig })
+        return new Header({ ...this, shape, strides, offset, isContig })
     }
 
     transpose() {
         return new Header({
             ...this,
-            contig: false,
+            isContig: false,
             shape: this.shape.slice().reverse(),
             strides: this.strides.slice().reverse(),
         })

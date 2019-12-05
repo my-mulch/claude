@@ -5,15 +5,15 @@ export default class RGBCube extends Primitive {
     constructor({ center }) {
         super(center)
 
-        this.points = bb.rand({ shape: [Primitive.VERTEX_COUNT ** 3, 3] })
+        this.points = bb.rand([Primitive.VERTEX_COUNT ** 3, 3])
     }
 
     render() {
-        return {
+        return [{
             vertices: this.points,
             colors: this.points,
-            sizes: bb.ones({ shape: [Primitive.VERTEX_COUNT ** 3, 1] }),
+            sizes: bb.ones([Primitive.VERTEX_COUNT ** 3, 1]),
             mode: 'POINTS'
-        }
+        }]
     }
 }

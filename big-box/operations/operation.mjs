@@ -6,21 +6,21 @@ import Algebra from '../template/algebra.mjs'
 export default class TensorOperation {
     constructor(args) {
         /** Sanitize */
-        this.of = Tensor.tensor({ data: args.of })
-        this.with = Tensor.tensor({ data: args.with })
+        this.of = Tensor.tensor(args.of)
+        this.with = Tensor.tensor(args.with)
 
         /** Promote */
         this.type = Types.promote(this.of, this.with)
-        this.of = this.of.astype({ type: this.type })
-        this.with = this.with.astype({ type: this.type })
+        this.of = this.of.astype(this.type)
+        this.with = this.with.astype(this.type)
     }
 
     shape(axis) {
-        return this.shape[axis]
+        return this.header.shape[axis]
     }
 
     size(size, axis) {
-        return size * this.shape[axis]
+        return size * this.header.shape[axis]
     }
 
     symbolicSourceBoilerplate() {
@@ -32,9 +32,9 @@ export default class TensorOperation {
 
         /** Variables */
         this.variables = {}
-        this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.type.size })
-        this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.type.size })
-        this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.type.size })
-        this.variables.temp = Algebra.variable({ symbol: 'temp', index: 0, size: this.result.type.size })
+        this.variables.of = Algebra.variable({ symbol: 'A.data', index: 'AIndex', size: this.of.header.type.size })
+        this.variables.with = Algebra.variable({ symbol: 'B.data', index: 'BIndex', size: this.with.header.type.size })
+        this.variables.result = Algebra.variable({ symbol: 'R.data', index: 'RIndex', size: this.result.header.type.size })
+        this.variables.temp = Algebra.variable({ symbol: 'temp', index: 0, size: this.result.header.type.size })
     }
 }

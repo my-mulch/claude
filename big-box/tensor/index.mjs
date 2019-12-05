@@ -1,88 +1,127 @@
-import Types from '../types/index.mjs'
+import Type from '../types/index.mjs'
 import Header from '../header/index.mjs'
 
-import { __Math__, SYMBOL_FROM_ID, ARRAY_SPACER, ARRAY_REPLACER, PRECISION } from '../resources/index.mjs'
+import { __Math__, ARRAY_REPLACER, ARRAY_SPACER, PRECISION, SYMBOL_FROM_ID } from '../resources/index.mjs'
 
 export default class Tensor {
-    constructor({ header, data }) {
-        Object.assign(this, this.header = header)
-        this.data = this.type.array(data || this.size)
+    constructor(data, header) {
+        this.data = data
+        this.header = header
     }
 
-    static intersection(a1, a2) {
-        if (a1.constructor === Tensor && a2.constructor === Tensor) {
-            a1 = a1.toRawFlat()
-            a2 = a2.toRawFlat()
-        }
-
-        return a1.filter(function (value) { return a2.includes(value) })
-    }
-
-    static difference(a1, a2) {
-        if (a1.constructor === Tensor && a2.constructor === Tensor) {
-            a1 = a1.toRawFlat()
-            a2 = a2.toRawFlat()
-        }
-
-        return a1.filter(function (value) { return !a2.includes(value) })
-    }
-
-    static shape(array, shape = []) {
-        if (array.constructor === Tensor)
-            return array.shape
-
-        if (Types.isTypedArray(array))
-            return [array.length]
-
-        if (array.constructor !== Array)
-            return shape
-
-        return Tensor.shape(array[0], shape.concat(array.length))
-    }
-
-    static tensor({ data, type }) {
+    static parse(data) {
         if (data === undefined)
-            return Tensor.zeros()
+            throw "Attempting to get shape of something undefined"
+
+        const shape = []
+
+        while (data[0].constructor === Array)
+            shape.push(data.length), data = data[0]
+
+        return [shape, Type.resolveSize(data.length)]
+    }
+
+    static flatten(data, flat = [], fi = [0]) {
+        if (data.constructor !== Array)
+            return flat[fi[0]++] = data
+
+        for (let i = 0; i < data.length; i++)
+            Tensor.flatten(data[i], flat, fi)
+
+        return flat
+    }
+
+    static tensor(data) {
+        if (data === undefined)
+            return Tensor.zeros([])
 
         if (data.constructor === Tensor)
             return data
 
-        const shape = Tensor.shape(data)
+        if (data.constructor === Number)
+            data = [data]
 
-        if (data.constructor === String || data.constructor === Number || data.constructor === Array)
-            data = [data].flat(Number.POSITIVE_INFINITY)
+        if (data.constructor === Array) {
+            const [shape, type] = Tensor.parse(data)
+            const size = shape.reduce(__Math__.multiply, 1)
 
-        type = type || Types.resolve(data[0])
+            return new Tensor(
+                Tensor.flatten(data, new type.array(size * type.size)),
+                new Header({ type, shape, size }))
+        }
 
-        return new Tensor({ data, header: new Header({ type, shape }) })
+        if (Type.isArray(data))
+            return new Tensor(data,
+                new Header({ shape: [data.length], type: Type.resolveArray(data) }))
     }
 
-    static zerosLike({ tensor }) {
-        return new Tensor({ header: new Header({ ...tensor }) })
+    static zerosLike(tensor) {
+        if (tensor === undefined)
+            throw "Attempting to create tensor from undefined"
+
+        return new Tensor(
+            new tensor.header.type.array(tensor.header.size * tensor.header.type.size),
+            new Header({
+                size: tensor.header.size,
+                type: tensor.header.type,
+                shape: tensor.header.shape,
+            }))
     }
 
-    static zeros({ shape, type } = {}) {
-        return new Tensor({ header: new Header({ shape, type }) })
+    static zeros(shape, type = Tensor.Float32) {
+        if (shape === undefined)
+            throw "Attempting to create tensor with undefined shape"
+
+        const size = shape.reduce(__Math__.multiply, 1)
+
+        return new Tensor(
+            new type.array(size * type.size),
+            new Header({ shape, size, type }))
     }
 
-    static onesLike({ tensor }) {
-        tensor = new Tensor({ header: new Header({ ...tensor }) })
-        tensor.data.fill(1)
+    static onesLike(tensor) {
+        if (tensor === undefined)
+            throw "Attempting to create tensor from undefined"
 
-        return tensor
+        const ones = new Tensor(
+            new tensor.header.type.array(tensor.header.size * tensor.header.type.size),
+            new Header({
+                size: tensor.header.size,
+                type: tensor.header.type,
+                shape: tensor.header.shape,
+            }))
+
+        ones.data.fill(1)
+
+        return ones
     }
 
-    static ones({ shape, type }) {
-        const tensor = new Tensor({ header: new Header({ shape, type }) })
-        tensor.data.fill(1)
+    static ones(shape, type = Tensor.Float32) {
+        if (shape === undefined)
+            throw "Attempting to create tensor with undefined shape"
 
-        return tensor
+        const size = shape.reduce(__Math__.multiply, 1)
+
+        const ones = new Tensor(
+            new type.array(size * type.size),
+            new Header({ shape, size, type }))
+
+        ones.data.fill(1)
+
+        return ones
     }
 
-    static arange({ start = 0, step = 1, stop, type }) {
-        const tensor = new Tensor({
-            header: new Header({ type, shape: [__Math__.round((stop - start) / step)] })
-        })
+    static arange(start = 0, stop, step = 1) {
+        if (stop === undefined)
+            throw "You must specify when to stop the range"
+
+        const shape = [__Math__.round((stop - start) / step)]
+        const size = shape[0]
+        const type = Tensor.Float32
+
+        const tensor = new Tensor(
+            new type.array(size * type.size),
+            new Header({ type, shape, size }))
 
         for (let i = start, j = 0; i < stop; i += step, j++)
             tensor.data[j] = i
@@ -90,18 +129,35 @@ export default class Tensor {
         return tensor
     }
 
-    static linspace({ start, stop, num = 50, type }) {
-        const step = (stop - start) / (num - 1)
-        const tensor = new Tensor({ header: new Header({ type, shape: [num] }) })
+    static linspace(start, stop, num = 50) {
+        if (start === undefined || stop === undefined)
+            throw "You must specify start and stop"
 
-        for (let i = start, j = 0; i <= stop; i += step, j += tensor.type.size)
+        const size = num
+        const shape = [num]
+        const type = Tensor.Float32
+        const step = (stop - start) / (num - 1)
+
+        const tensor = new Tensor(
+            new type.array(size * type.size),
+            new Header({ type, shape, size }))
+
+        for (let i = start, j = 0; i <= stop; i += step, j += type.size)
             tensor.data[j] = i
 
         return tensor
     }
 
-    static rand({ shape, type }) {
-        const tensor = new Tensor({ header: new Header({ shape, type }) })
+    static rand(shape) {
+        if (shape === undefined)
+            throw "Attempting to create tensor with undefined shape"
+
+        const type = Tensor.Float32
+        const size = shape.reduce(__Math__.multiply, 1)
+
+        const tensor = new Tensor(
+            new type.array(size * type.size),
+            new Header({ shape, type, size }))
 
         for (let i = 0; i < tensor.data.length; i++)
             tensor.data[i] = __Math__.random()
@@ -109,8 +165,19 @@ export default class Tensor {
         return tensor
     }
 
-    static randrange({ low, high, shape, type }) {
-        const tensor = new Tensor({ header: new Header({ shape, type }) })
+    static randrange(low, high, shape) {
+        if (low === undefined || high === undefined)
+            throw "You must specify start and stop"
+
+        if (shape === undefined)
+            throw "Attempting to create randrange tensor with undefined shape"
+
+        const type = Tensor.Float32
+        const size = shape.reduce(__Math__.multiply, 1)
+
+        const tensor = new Tensor(
+            new type.array(size * type.size),
+            new Header({ shape, type, size }))
 
         for (let i = 0; i < tensor.data.length; i++)
             tensor.data[i] = low + __Math__.floor(__Math__.random() * (high - low))
@@ -118,10 +185,19 @@ export default class Tensor {
         return tensor
     }
 
-    static eye({ shape, type }) {
-        const tensor = new Tensor({ header: new Header({ shape, type }) })
-        const diagonal = tensor.strides.reduce(__Math__.add)
-        const numDiags = __Math__.min(...tensor.shape)
+    static eye(shape) {
+        if (shape === undefined)
+            throw "Attempting to create tensor with undefined shape"
+
+        const type = Tensor.Float32
+        const size = shape.reduce(__Math__.multiply, 1)
+
+        const tensor = new Tensor(
+            new type.array(size * type.size),
+            new Header({ shape, size, type }))
+
+        const diagonal = tensor.header.strides.reduce(__Math__.add)
+        const numDiags = __Math__.min(...tensor.header.shape)
 
         for (let i = 0; i < numDiags * diagonal; i += diagonal)
             tensor.data[i] = 1
@@ -129,95 +205,126 @@ export default class Tensor {
         return tensor
     }
 
-    astype({ type }) {
-        if (type === this.type)
+    astype(type) {
+        if (type === undefined)
+            throw "Attempting to convert tensor to undefined type"
+
+        if (type.size === this.header.type.size)
             return this
 
-        if (this.size === 1)
+        if (this.header.size === 1)
             return this
 
-        const raw = this.toRaw().flat(Number.POSITIVE_INFINITY)
-        const data = type.array(this.size)
+        const raw = this.toRawFlat()
+        const data = new type.array(this.header.size * type.size)
 
-        for (let i = 0, j = 0; i < raw.length; i++ , j += type.size)
-            for (let o = 0, parsed = Types.parse(raw[i]); o < __Math__.min(type.size, this.type.size); o++)
-                data[j + o] = parsed[o]
+        const minSize = __Math__.min(type.size, this.header.type.size)
 
-        return new Tensor({ header: new Header({ type, shape: this.shape }), data })
+        for (let i = 0, j = 0; i < raw.length; i += this.header.type.size, j += type.size)
+            for (let offset = 0; offset < minSize; offset++)
+                data[j + offset] = raw[i + offset]
+
+        return new Tensor(data, new Header({ type, shape: this.header.shape }))
     }
 
-    view({ type }) {
-        if (type === this.type)
+    view(type) {
+        if (type === undefined)
+            throw "Attempting to view tensor as undefined type"
+
+        if (type === this.header.type)
             return this
 
-        if (!this.contig)
+        if (!this.header.isContig)
             return this
 
-        const ratio = this.type.size / type.size
-
-        this.size *= ratio
-        this.header.type = this.type = type
-        this.shape[this.shape.length - 1] *= ratio
-        this.strides[this.strides.length - 1] /= ratio
-
-        return this
+        return new Tensor(this.data, this.header.view(type))
     }
 
-    copy() { return new Tensor({ header: this.header, data: this.data.slice() }) }
-    ravel() { return Tensor.tensor({ data: this.toRaw(), type: this.type }).reshape({ shape: [-1] }) }
-    slice({ region }) { return new Tensor({ header: this.header.slice(region), data: this.data }) }
-    T() { return new Tensor({ header: this.header.transpose(), data: this.data }) }
-
-    reshape({ shape }) {
-        if (!this.contig)
-            return Tensor.tensor({ data: this.toRaw(), type: this.type }).reshape({ shape })
-
-        return new Tensor({ header: this.header.reshape(shape), data: this.data })
+    copy() {
+        return new Tensor(this.data.slice(), this.header)
     }
 
-    visit(operation = this.toStringAtIndex.bind(this), index = this.offset, depth = 0) {
-        if (!this.shape.length || depth === this.shape.length)
+    ravel() {
+        return Tensor.tensor(this.toRaw(), this.header.type).reshape([-1])
+    }
+
+    slice(region) {
+        if (region === undefined)
+            throw 'You must specify a region to slice'
+
+        return new Tensor(this.data, this.header.slice(region))
+    }
+
+    T() {
+        return new Tensor(this.data, this.header.transpose())
+    }
+
+    reshape(shape) {
+        if (shape === undefined)
+            throw 'You must specify reshape dimensions'
+
+        if (!this.header.isContig)
+            return Tensor.tensor(this.toRaw(), this.header.type).reshape(shape)
+
+        return new Tensor(this.data, this.header.reshape(shape))
+    }
+
+    visit(operation, index = this.header.offset, depth = 0) {
+        if (!this.header.shape.length || depth === this.header.shape.length)
             return operation(index)
 
-        return [...new Array(this.shape[depth]).keys()].map(function (i) {
-            return this.visit(operation, i * this.strides[depth] + index, depth + 1)
+        return [...new Array(this.header.shape[depth]).keys()].map(function (i) {
+            return this.visit(operation, i * this.header.strides[depth] + index, depth + 1)
         }, this)
     }
 
-    toRaw() {
-        return this.visit()
-    }
-
-    toRawFlat() {
-        return this.visit().flat(Number.POSITIVE_INFINITY)
-    }
-
-    toIndices() {
-        const indices = []
-
-        this.visit(function (index) { indices.push(index) })
-
-        return indices
-    }
-
     toStringAtIndex(index, string = '') {
-        for (let i = 0; i < this.type.size; i++) {
+        for (let i = 0; i < this.header.type.size; i++) {
             const sign = __Math__.sign(this.data[index + i]) < 0 ? '-' : '+'
             const number = __Math__.abs(this.data[index + i])
 
-            if (number)
-                string += `${sign}${number.toPrecision()}${SYMBOL_FROM_ID[i]}`
+            string += `${sign}${number.toFixed(PRECISION)}${SYMBOL_FROM_ID[i]}`
         }
 
-        if (!string) return "0"
-        if (string.startsWith('+')) return string.slice(1)
+        if (!string)
+            return '0'
+
+        if (string.startsWith('+'))
+            return string.slice(1)
 
         return string
     }
 
+    toRawAtIndex(index) {
+        const result = []
+
+        for (let i = 0; i < this.header.type.size; i++)
+            result.push(this.data[index + i])
+
+        return result
+    }
+
+    toRaw() {
+        return this.visit(this.toRawAtIndex.bind(this))
+    }
+
+    toRawFlat() {
+        return this.toRaw().flat(Number.POSITIVE_INFINITY)
+    }
+
+    toIndices() {
+        const indices = []
+        this.visit(function (index) { indices.push(index) })
+        return indices
+    }
+
+    toPretty() {
+        return this.visit(this.toStringAtIndex.bind(this))
+    }
+
     toString() {
         return JSON
-            .stringify(this.toRaw())
+            .stringify(this.toPretty())
             .replace(ARRAY_SPACER, ARRAY_REPLACER)
     }
 }

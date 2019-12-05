@@ -30,12 +30,12 @@ export default class MyIO {
         canvas.remove()
 
         let dataWithAlpha = context.getImageData(...region).data
-        const dataWithoutAlpha = new Uint8ClampedArray(bitmap.width * bitmap.height * 3)
+        const dataWithoutAlpha = new Float32Array(bitmap.width * bitmap.height * 3)
 
         for (let i = 0, j = 0; i < dataWithAlpha.length; i += 4, j += 3) {
-            dataWithoutAlpha[j] = dataWithAlpha[i]
-            dataWithoutAlpha[j + 1] = dataWithAlpha[i + 1]
-            dataWithoutAlpha[j + 2] = dataWithAlpha[i + 2]
+            dataWithoutAlpha[j] = dataWithAlpha[i] / 255
+            dataWithoutAlpha[j + 1] = dataWithAlpha[i + 1] / 255
+            dataWithoutAlpha[j + 2] = dataWithAlpha[i + 2] / 255
         }
 
         dataWithAlpha = null

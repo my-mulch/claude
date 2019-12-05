@@ -5,7 +5,7 @@ import AxisOperation from './operation.mjs'
 export default class Minimization extends AxisOperation {
     constructor(args) {
         /** Defaults */
-        args.axes = args.axes || [...args.of.shape.keys()]
+        args.axes = args.axes || [...args.of.header.shape.keys()]
 
         /** Superclass */
         super(args)
@@ -34,7 +34,7 @@ export default class Minimization extends AxisOperation {
      * */
 
     start() {
-        return new Source([`const temp = new Array(${this.of.type.size})`])
+        return new Source([`const temp = new Array(${this.of.header.type.size})`])
     }
 
     preLoop() {
