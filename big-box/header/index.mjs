@@ -7,8 +7,8 @@ export default class Header {
         this.shape = opts.shape !== undefined ? opts.shape : []
         this.offset = opts.offset !== undefined ? opts.offset : 0
         this.isContig = opts.isContig !== undefined ? opts.isContig : true
-        this.size = opts.size !== undefined ? opts.size : this.shape.reduce(__Math__.multiply, 1)
         this.strides = opts.strides !== undefined ? opts.strides : this.resolveStrides(this.shape)
+        this.size = opts.size !== undefined ? opts.size : this.shape.reduce(__Math__.multiply, 1)
     }
 
     static isContigous(index) {
@@ -30,7 +30,8 @@ export default class Header {
         return true
     }
 
-    resolveStrides(shape, stride = this.type.size) {
+    resolveStrides(shape) {
+        let stride = this.type.size
         const strides = new Array(shape.length)
         strides[strides.length - 1] = stride
 
@@ -83,6 +84,18 @@ export default class Header {
                 nonZeroAxes[axes[j]] = [`i${axes[j]}`, this.strides[i]]
 
         return nonZeroAxes
+    }
+
+    view(type) {
+        const ratio = this.header.type.size / type.size
+        const header = this.header.copy()
+
+        header.type = type
+        header.size *= ratio
+        header.shape[header.shape.length - 1] *= ratio
+        header.strides[header.strides.length - 1] /= ratio
+
+        return header
     }
 
     slice(index) {
@@ -143,7 +156,7 @@ export default class Header {
 
     reshape(shape) {
         const newShape = this.resolveShape(shape)
-        const newStrides = this.resolveStrides(newShape)
+        const newStrides = Header.resolveStrides(newShape)
 
         return new Header({
             ...this,

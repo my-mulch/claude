@@ -5,15 +5,26 @@ export default jest.suite(function () {
 
     console.log('\n\n-------- Assignment Suite --------\n\n')
 
-    const A = bb.tensor([[10, 2], [40, 3], [50, 1]], bb.ComplexFloat32)
-    const K = bb.tensor([[[5, 3], [4, 2], [4, 8], [9, 7]], [[4, 7], [9, 2], [4, 4], [4, 8]], [[3, 1], [4, 3], [5, 1], [7, 7]], [[4, 5], [7, 3], [3, 5], [7, 3]]], bb.ComplexFloat32)
-    const D = bb.tensor([[0, 1, 2, 3]])
+    const A = bb.tensor([
+        [[10, 2]],
+        [[40, 3]],
+        [[50, 1]],
+    ])
+
+    const K = bb.tensor([
+        [[5, 3], [4, 2], [4, 8], [9, 7]],
+        [[4, 7], [9, 2], [4, 4], [4, 8]],
+        [[3, 1], [4, 3], [5, 1], [7, 7]],
+        [[4, 5], [7, 3], [3, 5], [7, 3]]
+    ])
+
+    const D = bb.tensor([[0], [1], [2], [3]])
+
     const J = bb.tensor([[1, 2], [3, 4]])
     const L = bb.tensor([[[4, 7], [9, 8]], [[0, 3], [7, 4]]])
     const M = bb.linspace(0, 2 * Math.PI, 4)
     const N = bb.linspace(0, 2 * Math.PI, 10)
     const Q = bb.tensor([[0, 1]])
-    const O = N.insert({ with: [1], entries: [2], axes: [1] })
     const T = bb.tensor([
         [[2], [6]],
         [[1], [6]],
@@ -21,9 +32,10 @@ export default jest.suite(function () {
         [[1], [2]],
         [[1], [5]]
     ])
+    let O
+    
 
-
-
+    this.expect(O = N.insert({ with: [1], entries: [2], axes: [1] })).toEqual([])
     this.expect(T.astype(bb.ComplexFloat32)).toEqual([["2.0+0.0i", "6.0+0.0i"], ["1.0+0.0i", "6.0+0.0i"], ["5.0+0.0i", "2.0+0.0i"], ["1.0+0.0i", "2.0+0.0i"], ["1.0+0.0i", "5.0+0.0i"]])
     this.expect(T.astype(bb.ComplexFloat32).astype(bb.Float32)).toEqual([["2.0+0.0i", "6.0+0.0i"], ["1.0+0.0i", "6.0+0.0i"], ["5.0+0.0i", "2.0+0.0i"], ["1.0+0.0i", "2.0+0.0i"], ["1.0+0.0i", "5.0+0.0i"]])
     this.expect(M.multiply({ with: bb.tensor([0, 1], bb.ComplexFloat32) }).exp().reshape([4, 1]).view(bb.Float32)).toEqual([["1", "0"], ["-0.5000000596046448", "0.8660253882408142"], ["-0.49999991059303284", "-0.866025447845459"], ["1", "1.7484555314695172e-7"]])

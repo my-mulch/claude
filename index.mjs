@@ -23,13 +23,14 @@ window.bb = bb
 
     ; (async function () {
 
-        // console.time('lop')
-        // for (let i = -75; i < 75; i++)
-        //     for (let j = -75; j < 75; j++)
-        //         for (let k = -75; k < 75; k++)
-        //             bb.shape([1, 2, 3])
-        // console.timeEnd('lop')
-        // console.log(bb.shape([1, 2, 2, 3]))
+        console.time('lop')
+        for (let i = -75; i < 75; i++)
+            for (let j = -75; j < 75; j++)
+                for (let k = -75; k < 75; k++)
+                    bb.shape([1, 2, 3])
+        console.timeEnd('lop')
+
+        console.log(bb.shape([1, 2, 3]))
         // console.log(bb.tensor([
         //     [[2, 0], [6, 0]],
         //     [[1, 0], [6, 0]],

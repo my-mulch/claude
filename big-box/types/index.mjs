@@ -48,6 +48,8 @@ export default class Type {
         if (size === 1) return Type.Float32
         if (size === 2) return Type.ComplexFloat32
         if (size === 4) return Type.QuatFloat32
+
+        throw "Your type is not Float, Complex, or Quat"
     }
 
     static Int8 = new (class Int8 extends Type { })({ size: 1, array: Int8Array })
