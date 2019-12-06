@@ -24,10 +24,16 @@
 
         window.bb = bb
         window.io = io
-        window.app = parmesan
+        window.app = app
         window.config = config
 
-        console.log(io.txtread('./index.mjs'))
+        io.txtread('./index.mjs')
+            .then(function (source) {
+                return new (async function () { })
+                    .constructor(source)
+                    .call(window)
+            })
+
     </script>
 </body>
 

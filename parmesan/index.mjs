@@ -1,6 +1,6 @@
 import Mouse from './peripherals/mouse.mjs'
 import Keyboard from './peripherals/keyboard.mjs'
-import Config from './resources.mjs'
+import Config from '../resources.mjs'
 
 class Parmesan {
     constructor() {
@@ -24,9 +24,6 @@ class Parmesan {
     resize() {
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight
-
-        this.hud.width = window.innerWidth * 0.5
-        this.hud.height = window.innerHeight * 0.2
 
         Config.ASPECT_RATIO = this.canvas.width / this.canvas.height
     }
