@@ -8,7 +8,7 @@ export default class Tensor {
         this.data = data
         this.header = header
     }
-
+    
     static parse(data) {
         if (data === undefined)
             throw "Attempting to get shape of something undefined"

@@ -1,8 +1,8 @@
 
 export default class WebGLManager {
-    constructor({ canvas, vertexSource, fragmentSource }) {
+    constructor({ context, vertexSource, fragmentSource }) {
         /** Context */
-        this.context = canvas.getContext('webgl')
+        this.context = context
 
         /** Shaders */
         this.vertexShader = this.createShader(this.context.VERTEX_SHADER, vertexSource)

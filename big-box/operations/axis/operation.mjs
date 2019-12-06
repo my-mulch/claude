@@ -24,15 +24,7 @@ export default class AxisOperation extends TensorOperation {
         this.sizes.outer = this.axes.outer.reduce(this.size.bind(this.of), 1)
         this.sizes.inner = this.axes.inner.reduce(this.size.bind(this.of), 1)
     }
-
-    static intersection(a1, a2) {
-        return a1.filter(function (value) { return a2.includes(value) })
-    }
-
-    static difference(a1, a2) {
-        return a1.filter(function (value) { return !a2.includes(value) })
-    }
-
+    
     unselectedAxes(_, axis) {
         return !this.axes.inner.includes(axis)
     }

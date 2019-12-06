@@ -1,4 +1,4 @@
-import WebGLManager from '../../managers/webgl/index.mjs'
+import WebGLManager from '../../managers/webgl.mjs'
 import myio from '../../../myio/index.mjs'
 
 
@@ -12,11 +12,13 @@ export default async function () {
     /** Global */
     window.program = gl
 
-    /** Variable */
-    const location = gl.attributes.a_Position.attributeLocation
+    /** Variables */
+    const aPosIndex = gl.attributes.a_Position.attributeLocation
+    const aSizeIndex = gl.attributes.a_PointSize.attributeLocation
 
     /** GPU Data */
-    gl.context.vertexAttrib3f(location, 1., -0.1, .3);
+    gl.context.vertexAttrib3f(aPosIndex, 0., -0.1, .3);
+    gl.context.vertexAttrib1f(aSizeIndex, 80);
 
     /** Clear color */
     gl.context.clearColor(0., 0.0, 0.0, 1.0)
@@ -25,5 +27,5 @@ export default async function () {
     gl.context.clear(gl.context.COLOR_BUFFER_BIT)
 
     /** Draw */
-    gl.context.drawArrays(gl.context.POINTS, 0, 1)
+    gl.context.drawArrays(gl.context.POINTS, 0, 2)
 }

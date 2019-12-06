@@ -16,7 +16,19 @@
 </head>
 
 <body>
-    <script type="module" src='index.mjs'></script>
+    <script type="module">
+        import io from './myio/index.mjs'
+        import bb from './big-box/index.mjs'
+        import app from './parmesan/index.mjs'
+        import config from './parmesan/resources/index.mjs'
+
+        window.bb = bb
+        window.io = io
+        window.app = parmesan
+        window.config = config
+
+        console.log(io.txtread('./index.mjs'))
+    </script>
 </body>
 
 </html>
