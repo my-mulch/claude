@@ -1,4 +1,3 @@
-import config from '../../resources/index.mjs'
 
 export default class WebGLManager {
     constructor({ canvas, vertexSource, fragmentSource }) {

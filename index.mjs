@@ -8,7 +8,7 @@ window.myio = myio
 window.app = parmesan
 window.config = config
 
-import program from './parmesan/managers/webgl/programs/first/index.mjs'
+import program from './parmesan/programs/first/index.mjs'
 
     ; (async function () {
 
