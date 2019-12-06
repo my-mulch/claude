@@ -2,20 +2,23 @@ import config from '../../resources/index.mjs'
 
 export default class WebGLManager {
     constructor({ canvas, vertexSource, fragmentSource }) {
-        this.canvas = canvas
+        /** Context */
         this.context = canvas.getContext('webgl')
 
-        debugger
-        
+        /** Shaders */
         this.vertexShader = this.createShader(this.context.VERTEX_SHADER, vertexSource)
-        this.fragmentShader = this.createShader(this.context.VERTEX_SHADER, fragmentSource)
+        this.fragmentShader = this.createShader(this.context.FRAGMENT_SHADER, fragmentSource)
 
-        // this.program = this.createProgram()
-
+        /** Program */
+        this.program = this.createProgram()
+        
+        /** Uniforms */
         // this.uniforms = this.createUniforms()
-        // this.attributes = this.createAttributes()
 
-        // this.context.useProgram(this.program)
+        /** Attributes */
+        // this.attributes = this.createAttributes()
+        
+        this.context.useProgram(this.program)
     }
 
     createUniforms() {
@@ -130,12 +133,8 @@ export default class WebGLManager {
     createProgram() {
         const program = this.context.createProgram()
 
-        this.context.attachShader(program)
-
-        this.context.attachShader(program, this.createShader(
-            this.context.FRAGMENT_SHADER,
-            this.fragmentSource,
-        ))
+        this.context.attachShader(program, this.vertexShader)
+        this.context.attachShader(program, this.fragmentShader)
 
         this.context.linkProgram(program)
 
