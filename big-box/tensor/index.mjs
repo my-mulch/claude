@@ -1,14 +1,14 @@
 import Type from '../types/index.mjs'
 import Header from '../header/index.mjs'
-
-import { __Math__, ARRAY_REPLACER, ARRAY_SPACER, PRECISION, SYMBOL_FROM_ID } from '../resources/index.mjs'
+import Config from '../../resources.mjs'
+import __Math__ from '../operations/arithmetic/index.mjs'
 
 export default class Tensor {
     constructor(data, header) {
         this.data = data
         this.header = header
     }
-    
+
     static parse(data) {
         if (data === undefined)
             throw "Attempting to get shape of something undefined"
@@ -283,7 +283,7 @@ export default class Tensor {
             const sign = __Math__.sign(this.data[index + i]) < 0 ? '-' : '+'
             const number = __Math__.abs(this.data[index + i])
 
-            string += `${sign}${number.toFixed(PRECISION)}${SYMBOL_FROM_ID[i]}`
+            string += `${sign}${number.toFixed(Config.PRECISION)}${Config.SYMBOL_FROM_ID[i]}`
         }
 
         if (!string)
@@ -325,6 +325,6 @@ export default class Tensor {
     toString() {
         return JSON
             .stringify(this.toPretty())
-            .replace(ARRAY_SPACER, ARRAY_REPLACER)
+            .replace(Config.ARRAY_SPACER, Config.ARRAY_REPLACER)
     }
 }

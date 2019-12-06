@@ -1,5 +1,6 @@
 import Types from '../types/index.mjs'
-import { __Math__, PARTIAL_SLICE, NUMBER, SLICE_CHARACTER } from '../resources/index.mjs'
+import Config from '../../resources.mjs'
+import __Math__ from '../operations/arithmetic/index.mjs'
 
 export default class Header {
     constructor(opts) {
@@ -16,7 +17,7 @@ export default class Header {
 
         for (let i = index.length - 1; i >= 0; i--) {
             if (index[i].constructor === String &&
-                index[i].includes(SLICE_CHARACTER)) {
+                index[i].includes(Config.SLICE_CHARACTER)) {
 
                 if (i + 1 !== last)
                     return false
@@ -111,15 +112,15 @@ export default class Header {
              *  If the index is a ':', the user wants that entire dimension 
              */
 
-            if (index[i] === SLICE_CHARACTER || index[i] === undefined)
+            if (index[i] === Config.SLICE_CHARACTER || index[i] === undefined)
                 shape.push(this.shape[i]), strides.push(this.strides[i])
 
             /** 
              * If the index is a slice of the form 'a:b', the user wants a slice from a to b 
             */
 
-            else if (PARTIAL_SLICE.test(index[i])) {
-                let [low, high, step] = index[i].split(SLICE_CHARACTER).map(Number)
+            else if (Config.PARTIAL_SLICE.test(index[i])) {
+                let [low, high, step] = index[i].split(Config.SLICE_CHARACTER).map(Number)
 
                 if (high === 0)
                     high = this.shape[i]
@@ -134,10 +135,10 @@ export default class Header {
             }
 
             /** 
-             * If the index is a number, the user wants that index
+             * If the index is a Config.number, the user wants that index
              */
 
-            else if (NUMBER.test(index[i]))
+            else if (Config.NUMBER.test(index[i]))
                 offset += this.strides[i] * index[i]
 
         }

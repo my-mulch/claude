@@ -1,5 +1,6 @@
 import bb from '../../big-box'
 import jest from '..'
+import Config from '../../resources.mjs'
 
 export default jest.suite(function () {
 
@@ -19,7 +20,6 @@ export default jest.suite(function () {
     ])
 
     const D = bb.tensor([[0], [1], [2], [3]])
-
     const J = bb.tensor([[[1], [2]], [[3], [4]]])
     const L = bb.tensor([[[[4], [7]], [[9], [8]]], [[[0], [3]], [[7], [4]]]])
     const M = bb.linspace(0, 2 * Math.PI, 4).multiply({ with: [0, 1] }).exp().reshape([4, 1]).view(bb.Float32)
@@ -27,7 +27,7 @@ export default jest.suite(function () {
     const O = N.insert({ with: 1, entries: [2], axes: [1] })
     const Q = bb.tensor([[[0], [1]]])
     const T = bb.tensor([[[2], [6]], [[1], [6]], [[5], [2]], [[1], [2]], [[1], [5]]])
-
+    
     this.expect(T.astype(bb.ComplexFloat32)).toEqual([["2.00+0.00i", "6.00+0.00i"], ["1.00+0.00i", "6.00+0.00i"], ["5.00+0.00i", "2.00+0.00i"], ["1.00+0.00i", "2.00+0.00i"], ["1.00+0.00i", "5.00+0.00i"]])
     this.expect(T.astype(bb.ComplexFloat32).astype(bb.Float32)).toEqual([["2.00", "6.00"], ["1.00", "6.00"], ["5.00", "2.00"], ["1.00", "2.00"], ["1.00", "5.00"]])
     this.expect(M).toEqual([["1.00", "0.00"], ["-0.50", "0.87"], ["-0.50", "-0.87"], ["1.00", "0.00"]])

@@ -1,6 +1,6 @@
 import Tensor from '../../tensor/index.mjs'
 import Source from '../../template/source.mjs'
-import { __Math__ } from '../../resources/index.mjs'
+import __Math__ from '../arithmetic/index.mjs'
 
 export default class Mesh {
     constructor(args) {

@@ -1,5 +1,6 @@
 import Tensor from '../../tensor/index.mjs'
 import Source from '../../template/source.mjs'
+import __Math__ from '../arithmetic/index.mjs'
 import TensorOperation from '../operation.mjs'
 
 export default class AxisOperation extends TensorOperation {
@@ -10,7 +11,7 @@ export default class AxisOperation extends TensorOperation {
         this.axes = {}
         this.axes.inner = args.axes
         this.axes.total = [...this.of.header.shape.keys()]
-        this.axes.outer = AxisOperation.difference(this.axes.total, this.axes.inner)
+        this.axes.outer = __Math__.difference(this.axes.total, this.axes.inner)
         this.axes.order = this.axes.outer.concat(this.axes.inner)
         this.axes.last = this.axes.order[this.axes.order.length - 1]
 

@@ -1,7 +1,7 @@
 import Tensor from '../../tensor/index.mjs'
 import Source from '../../template/source.mjs'
+import __Math__ from '../arithmetic/index.mjs'
 import TensorOperation from '../operation.mjs'
-import { __Math__ } from '../../resources/index.mjs'
 
 export default class PairOperation extends TensorOperation {
     constructor(args) {
