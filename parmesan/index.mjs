@@ -24,8 +24,8 @@ class ParmesanApplication {
         this.resize()
 
         /** Managers */
-        this.webgl = new WebGLManager(this)
-        this.camera = new CameraManager(this)
+        // this.webgl = new WebGLManager(this)
+        // this.camera = new CameraManager(this)
 
         /** Graphics Operations */
         this.pan = this.pan.bind(this)

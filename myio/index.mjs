@@ -1,12 +1,18 @@
 
 export default class MyIO {
+    static async txtread(path) {
+        const response = await fetch(path)
+
+        return response.text()
+    }
+
     static async audioread(path) {
         const context = new AudioContext()
-        
+
         const response = await fetch(path)
         const arrayBuffer = await response.arrayBuffer()
         const audioBuffer = await context.decodeAudioData(arrayBuffer)
-        
+
         return audioBuffer.getChannelData(0)
     }
 
