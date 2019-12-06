@@ -1,8 +1,8 @@
 
 export default class WebGLManager {
-    constructor({ context, vertexSource, fragmentSource }) {
+    constructor({ canvas, vertexSource, fragmentSource }) {
         /** Context */
-        this.context = context
+        this.context = canvas.getContext('webgl')
 
         /** Shaders */
         this.vertexShader = this.createShader(this.context.VERTEX_SHADER, vertexSource)
@@ -19,6 +19,16 @@ export default class WebGLManager {
 
         /** Usage */
         this.context.useProgram(this.program)
+    }
+
+    static program(args) {
+        return new WebGLManager(args)
+    }
+
+    do(statements) {
+        statements.call(this)
+
+        return this
     }
 
     createUniforms() {

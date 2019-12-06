@@ -16,18 +16,22 @@
 </head>
 
 <body>
+    <canvas id="main"></canvas>
     <script type="module">
         import io from './myio/index.mjs'
         import bb from './big-box/index.mjs'
         import app from './parmesan/index.mjs'
+        import webgl from './webgl/index.mjs'
         import config from './resources.mjs'
 
         window.bb = bb
         window.io = io
         window.app = app
+        window.webgl = webgl
         window.config = config
 
-        io.txtread('./index.mjs')
+        io
+            .txtread('./index.mjs')
             .then(function (source) {
                 return new (async function () { })
                     .constructor(source)

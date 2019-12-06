@@ -1,13 +1,13 @@
+import Config from '../resources.mjs'
 import Mouse from './peripherals/mouse.mjs'
 import Keyboard from './peripherals/keyboard.mjs'
-import Config from '../resources.mjs'
 
 class Parmesan {
     constructor() {
-        /** Displays */
+        /** Display */
         this.canvas = document.createElement('canvas')
         this.canvas.id = 'main'
-        
+
         document.body.prepend(this.canvas)
 
         /** Peripherals */
