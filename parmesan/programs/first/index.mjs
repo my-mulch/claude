@@ -5,15 +5,25 @@ import myio from '../../../myio/index.mjs'
 export default async function () {
     const gl = new WebGLManager({
         canvas: document.getElementById('main'),
-        vertexSource: await myio.txtread(`${location}/parmesan/programs/first/shader.vert`),
-        fragmentSource: await myio.txtread(`${location}/parmesan/programs/first/shader.frag`),
+        vertexSource: await myio.txtread(`./parmesan/programs/first/shader.vert`),
+        fragmentSource: await myio.txtread(`./parmesan/programs/first/shader.frag`),
     })
 
-    gl.context.clearColor(0.0, 0.0, 0.0, 1.0)
+    /** Global */
+    window.program = gl
 
-    // Clear <canvas>
+    /** Variable */
+    const location = gl.attributes.a_Position.attributeLocation
+
+    /** GPU Data */
+    gl.context.vertexAttrib3f(location, 1., -0.1, .3);
+
+    /** Clear color */
+    gl.context.clearColor(0., 0.0, 0.0, 1.0)
+
+    /** Clear <canvas> to set color */
     gl.context.clear(gl.context.COLOR_BUFFER_BIT)
 
-    // Draw a point
+    /** Draw */
     gl.context.drawArrays(gl.context.POINTS, 0, 1)
 }

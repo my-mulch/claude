@@ -10,13 +10,14 @@ export default class WebGLManager {
 
         /** Program */
         this.program = this.createProgram()
-        
+
         /** Uniforms */
-        // this.uniforms = this.createUniforms()
+        this.uniforms = this.createUniforms()
 
         /** Attributes */
-        // this.attributes = this.createAttributes()
-        
+        this.attributes = this.createAttributes()
+
+        /** Usage */
         this.context.useProgram(this.program)
     }
 
@@ -89,7 +90,8 @@ export default class WebGLManager {
             const attributeInfo = this.context.getActiveAttrib(this.program, i)
             const attributeLocation = this.context.getAttribLocation(this.program, attributeInfo.name)
 
-            attributes[attributeInfo.name] = this.createAttribute(attributeLocation)
+            attributes[attributeInfo.name] = Object.assign(attributeInfo, { attributeLocation })
+            attributes[attributeInfo.name].set = this.createAttribute(attributeLocation)
         }
 
         return attributes
