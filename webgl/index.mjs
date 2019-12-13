@@ -1,6 +1,6 @@
 
 export default class WebGLManager {
-    constructor({ canvas, vertexSource, fragmentSource }) {
+    constructor(canvas, vertexSource, fragmentSource) {
         /** Context */
         this.context = canvas.getContext('webgl')
 
@@ -9,7 +9,7 @@ export default class WebGLManager {
         this.fragmentShader = this.createShader(this.context.FRAGMENT_SHADER, fragmentSource)
 
         /** Program */
-        this.program = this.createProgram()
+        this.context.program = this.createProgram()
 
         /** Uniforms */
         this.uniforms = this.createUniforms()
@@ -18,11 +18,7 @@ export default class WebGLManager {
         this.attributes = this.createAttributes()
 
         /** Usage */
-        this.context.useProgram(this.program)
-    }
-
-    static program(args) {
-        return new WebGLManager(args)
+        this.context.useProgram(this.context.program)
     }
 
     do(statements) {
@@ -34,13 +30,14 @@ export default class WebGLManager {
     createUniforms() {
         const uniforms = {}
 
-        const uniformCount = this.context.getProgramParameter(this.program, this.context.ACTIVE_UNIFORMS)
+        const uniformCount = this.context.getProgramParameter(this.context.program, this.context.ACTIVE_UNIFORMS)
 
         for (let i = 0; i < uniformCount; i++) {
-            const uniformInfo = this.context.getActiveUniform(this.program, i)
-            const uniformLocation = this.context.getUniformLocation(this.program, uniformInfo.name)
+            const uniformInfo = this.context.getActiveUniform(this.context.program, i)
+            const uniformLocation = this.context.getUniformLocation(this.context.program, uniformInfo.name)
 
-            uniforms[uniformInfo.name] = this.createUniform(uniformInfo.type, uniformLocation)
+            uniforms[uniformInfo.name] = Object.assign(uniformInfo, { uniformLocation })
+            uniforms[uniformInfo.name].set = this.createUniform(uniformInfo.type, uniformLocation)
         }
 
         return uniforms
@@ -55,6 +52,38 @@ export default class WebGLManager {
 
         if (type === this.context.FLOAT_MAT4)
             return (function (array) { this.context.uniformMatrix4fv(location, false, array.data) }).bind(this)
+    }
+
+    createAttributes() {
+        const attributes = {}
+
+        const attributeCount = this.context.getProgramParameter(this.context.program, this.context.ACTIVE_ATTRIBUTES)
+
+        for (var i = 0; i < attributeCount; i++) {
+            const attributeInfo = this.context.getActiveAttrib(this.context.program, i)
+            const attributeLocation = this.context.getAttribLocation(this.context.program, attributeInfo.name)
+
+            attributes[attributeInfo.name] = Object.assign(attributeInfo, { attributeLocation })
+            attributes[attributeInfo.name].set = this.createAttribute(attributeLocation)
+        }
+
+        return attributes
+    }
+
+    createAttribute(location) {
+        return (function (data) {
+            this.context.bindBuffer(this.context.ARRAY_BUFFER, data.buffer)
+            this.context.enableVertexAttribArray(location)
+
+            this.context.vertexAttribPointer(
+                location,
+                data.size,
+                data.type,
+                data.normalize,
+                data.stride,
+                data.offset
+            )
+        }).bind(this)
     }
 
     createBuffer(tensor) {
@@ -89,38 +118,6 @@ export default class WebGLManager {
         if (type === Float32Array) { return this.context.FLOAT }
 
         return null
-    }
-
-    createAttributes() {
-        const attributes = {}
-
-        const attributeCount = this.context.getProgramParameter(this.program, this.context.ACTIVE_ATTRIBUTES)
-
-        for (var i = 0; i < attributeCount; i++) {
-            const attributeInfo = this.context.getActiveAttrib(this.program, i)
-            const attributeLocation = this.context.getAttribLocation(this.program, attributeInfo.name)
-
-            attributes[attributeInfo.name] = Object.assign(attributeInfo, { attributeLocation })
-            attributes[attributeInfo.name].set = this.createAttribute(attributeLocation)
-        }
-
-        return attributes
-    }
-
-    createAttribute(location) {
-        return (function (data) {
-            this.context.bindBuffer(this.context.ARRAY_BUFFER, data.buffer)
-            this.context.enableVertexAttribArray(location)
-
-            this.context.vertexAttribPointer(
-                location,
-                data.size,
-                data.type,
-                data.normalize,
-                data.stride,
-                data.offset
-            )
-        }).bind(this)
     }
 
     createShader(type, source) {
