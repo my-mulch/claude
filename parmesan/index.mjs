@@ -58,6 +58,8 @@ export default class Parmesan {
 
     render() {
         this.webgl.context.clear(this.webgl.context.COLOR_BUFFER_BIT)
+        
+        console.time('rendering')
 
         for (const object of this.objects) {
 
@@ -71,6 +73,8 @@ export default class Parmesan {
 
             this.webgl.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
+
+        console.timeEnd('rendering')
     }
 
     keyup() {
