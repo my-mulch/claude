@@ -1,6 +1,6 @@
 import Type from '../types/index.mjs'
 import Header from '../header/index.mjs'
-import Config from '../../resources.mjs'
+import config from '../../res/config.mjs'
 import __Math__ from '../operations/arithmetic/index.mjs'
 
 export default class Tensor {
@@ -18,7 +18,7 @@ export default class Tensor {
         while (data[0].constructor === Array)
             shape.push(data.length), data = data[0]
 
-        return [shape, Type.resolveSize(data.length)]
+        return [shape, Type.configolveSize(data.length)]
     }
 
     static flatten(data, flat = [], fi = [0]) {
@@ -52,7 +52,7 @@ export default class Tensor {
 
         if (Type.isArray(data))
             return new Tensor(data,
-                new Header({ shape: [data.length], type: Type.resolveArray(data) }))
+                new Header({ shape: [data.length], type: Type.configolveArray(data) }))
     }
 
     static zerosLike(tensor) {
@@ -245,7 +245,7 @@ export default class Tensor {
     }
 
     ravel() {
-        return Tensor.tensor(this.toRaw(), this.header.type).reshape([-1])
+        return Tensor.tensor(this.toRaw(), this.header.type).confighape([-1])
     }
 
     slice(region) {
@@ -259,14 +259,14 @@ export default class Tensor {
         return new Tensor(this.data, this.header.transpose())
     }
 
-    reshape(shape) {
+    confighape(shape) {
         if (shape === undefined)
-            throw 'You must specify reshape dimensions'
+            throw 'You must specify confighape dimensions'
 
         if (!this.header.isContig)
-            return Tensor.tensor(this.toRaw(), this.header.type).reshape(shape)
+            return Tensor.tensor(this.toRaw(), this.header.type).confighape(shape)
 
-        return new Tensor(this.data, this.header.reshape(shape))
+        return new Tensor(this.data, this.header.confighape(shape))
     }
 
     visit(operation, index = this.header.offset, depth = 0) {
@@ -283,7 +283,7 @@ export default class Tensor {
             const sign = __Math__.sign(this.data[index + i]) < 0 ? '-' : '+'
             const number = __Math__.abs(this.data[index + i])
 
-            string += `${sign}${number.toFixed(Config.PRECISION)}${Config.SYMBOL_FROM_ID[i]}`
+            string += `${sign}${number.toFixed(config.PRECISION)}${config.SYMBOL_FROM_ID[i]}`
         }
 
         if (!string)
@@ -325,6 +325,6 @@ export default class Tensor {
     toString() {
         return JSON
             .stringify(this.toPretty())
-            .replace(Config.ARRAY_SPACER, Config.ARRAY_REPLACER)
+            .replace(config.ARRAY_SPACER, config.ARRAY_REPLACER)
     }
 }

@@ -18,16 +18,16 @@
 <body>
     <canvas id="main"></canvas>
     <script type="module">
-        import io from './myio/index.mjs'
-        import bb from './big-box/index.mjs'
-        import app from './parmesan/index.mjs'
-        import webgl from './webgl/index.mjs'
-        import config from './resources.mjs'
+        import io from './io/index.mjs'
+        import gl from './gl/index.mjs'
+        import bb from './bb/index.mjs'
+        import app from './app/index.mjs'
+        import config from './res/config.mjs'
 
-        window.bb = bb
         window.io = io
+        window.gl = gl
+        window.bb = bb
         window.app = app
-        window.webgl = webgl
         window.config = config
 
         io

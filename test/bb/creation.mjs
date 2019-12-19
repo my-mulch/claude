@@ -1,4 +1,4 @@
-import bb from '../../big-box'
+import bb from '../../bb'
 import jest from '..'
 
 export default jest.suite(function () {
@@ -13,7 +13,7 @@ export default jest.suite(function () {
 
     let B = bb.tensor([[[1]], [[2]], [[3]], [[4]],])
     let C = bb.tensor([[[10], [4]], [[42], [6]], [[1], [1]]])
-    let D = bb.arange(0, 8).reshape([4, 2]).slice(['0:2'])
+    let D = bb.arange(0, 8).confighape([4, 2]).slice(['0:2'])
 
 
 
@@ -27,7 +27,7 @@ export default jest.suite(function () {
     jest.expect(B.header.shape).toEqual([4, 1])
     jest.expect(A.header.strides).toEqual([4, 1])
     jest.expect(B.header.strides).toEqual([1, 1])
-    jest.expect(B.reshape([1, 4, 1])).toEqual([[["1.00"], ["2.00"], ["3.00"], ["4.00"]]])
+    jest.expect(B.confighape([1, 4, 1])).toEqual([[["1.00"], ["2.00"], ["3.00"], ["4.00"]]])
     jest.expect(bb.zeros([2, 3, 2])).toEqual([[["0.00", "0.00"], ["0.00", "0.00"], ["0.00", "0.00"]], [["0.00", "0.00"], ["0.00", "0.00"], ["0.00", "0.00"]]])
     jest.expect(bb.ones([2, 3, 2])).toEqual([[["1.00", "1.00"], ["1.00", "1.00"], ["1.00", "1.00"]], [["1.00", "1.00"], ["1.00", "1.00"], ["1.00", "1.00"]]])
     jest.expect(bb.eye([3, 3])).toEqual([["1.00", "0.00", "0.00"], ["0.00", "1.00", "0.00"], ["0.00", "0.00", "1.00"]])

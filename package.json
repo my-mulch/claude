@@ -4,7 +4,7 @@
   "description": "Got milk bitch? Got beef? (got beef?)\nGot steak ho? Got cheese? (got it)\nGrade A ho, not lean (not lean)\nGot me A1, sauce please\nThese heifers got nothin' on me\nSteaks high, need a side of collard greens\nCash rules everything around me (everything around me)\nIce C.R.E.A.M, ice C.R.E.A.M (ice cream)\nYou a calf bitch, you my daughter (you ma daughter)\nI ain't bothered (I ain't bothered)\nGet slaughtered (get slaughtered)\nGot the methane, I'm a farter (woo)\nWith my farmer (woo)\nMcDonald (woo)\nAnd they feed me real good, it's a honor (it's a honor)\nPhilly cheesesteak all in that order (get that order)\nChili cheese fries as a starter (as a starter)\nGot the steroids keeping me stronger (strong)",
   "main": "index.mjs",
   "scripts": {
-    "test": "node --experimental-modules --es-module-specifier-resolution=node test/big-box/index.mjs",
+    "test": "node --experimental-modules --es-module-specifier-resolution=node test/bb/index.mjs",
     "start": "npm run serve & npm run launch",
     "launch": "open http://localhost:3000$(pwd)",
     "serve": "http-server / -p 3000 --cors",

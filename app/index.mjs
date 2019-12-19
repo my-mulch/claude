@@ -1,12 +1,12 @@
-import bb from '../big-box/index.mjs'
-import WebGL from '../webgl/index.mjs'
-import config from '../resources.mjs'
+import bb from '../bb/index.mjs'
+import gl from '../gl/index.mjs'
+import config from '../res/config.mjs'
 
 import Mouse from './peripherals/mouse.mjs'
 import Camera from './peripherals/camera.mjs'
 import Keyboard from './peripherals/keyboard.mjs'
 
-export default class Parmesan {
+export default class Cow {
     constructor(vertex, fragment) {
         /** Objects */
         this.objects = []
@@ -25,53 +25,53 @@ export default class Parmesan {
         config.PROJ_MATRIX = bb.tensor(config.PROJ_MATRIX)
 
         /** Resize */
-        this.resize()
+        this.configize()
 
         /** Peripherals */
+        this.gl = new gl(this.canvas, vertex, fragment)
         this.mouse = new Mouse()
         this.camera = new Camera()
-        this.webgl = new WebGL(this.canvas, vertex, fragment)
         this.keyboard = new Keyboard(config.BINDINGS)
 
         /** Event Listeners */
         window.addEventListener('keyup', this.keyup.bind(this))
-        window.addEventListener('resize', this.resize.bind(this))
+        window.addEventListener('configize', this.configize.bind(this))
         window.addEventListener('keydown', this.keydown.bind(this))
     }
 
     plot(objects) {
         for (let { vertices, colors, sizes, mode } of objects) {
-            if (!mode) mode = this.webgl.context.POINTS
+            if (!mode) mode = this.gl.context.POINTS
             if (!sizes) sizes = bb.ones(vertices.header.shape)
             if (!colors) colors = vertices
 
             this.objects.push({
-                sizeBuffer: this.webgl.createBuffer(sizes),
-                colorBuffer: this.webgl.createBuffer(colors),
-                vertexBuffer: this.webgl.createBuffer(vertices),
+                sizeBuffer: this.gl.createBuffer(sizes),
+                colorBuffer: this.gl.createBuffer(colors),
+                vertexBuffer: this.gl.createBuffer(vertices),
 
-                drawMode: this.webgl.context[mode],
+                drawMode: this.gl.context[mode],
                 drawCount: vertices.header.shape[0]
             })
         }
     }
 
     render() {
-        this.webgl.context.clear(this.webgl.context.COLOR_BUFFER_BIT)
+        this.gl.context.clear(this.gl.context.COLOR_BUFFER_BIT)
         
         console.time('rendering')
 
         for (const object of this.objects) {
 
-            this.webgl.attributes.a_Color.set(object.colorBuffer)
-            this.webgl.attributes.a_PointSize.set(object.sizeBuffer)
-            this.webgl.attributes.a_Position.set(object.vertexBuffer)
+            this.gl.attributes.a_Color.set(object.colorBuffer)
+            this.gl.attributes.a_PointSize.set(object.sizeBuffer)
+            this.gl.attributes.a_Position.set(object.vertexBuffer)
 
-            this.webgl.uniforms.u_ViewMatrix.set(this.camera.look())
-            this.webgl.uniforms.u_ProjMatrix.set(this.camera.project())
+            this.gl.uniforms.u_ViewMatrix.set(this.camera.look())
+            this.gl.uniforms.u_ProjMatrix.set(this.camera.project())
 
 
-            this.webgl.context.drawArrays(object.drawMode, 0, object.drawCount)
+            this.gl.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
 
         console.timeEnd('rendering')
@@ -91,7 +91,7 @@ export default class Parmesan {
         }
     }
 
-    resize() {
+    configize() {
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight
 

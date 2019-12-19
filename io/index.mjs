@@ -1,16 +1,16 @@
 
-export default class MyIO {
+export default class IO {
     static async txtread(path) {
-        const response = await fetch(path)
+        const configponse = await fetch(path)
 
-        return response.text()
+        return configponse.text()
     }
 
     static async audioread(path) {
         const context = new AudioContext()
 
-        const response = await fetch(path)
-        const arrayBuffer = await response.arrayBuffer()
+        const configponse = await fetch(path)
+        const arrayBuffer = await configponse.arrayBuffer()
         const audioBuffer = await context.decodeAudioData(arrayBuffer)
 
         return audioBuffer.getChannelData(0)
@@ -22,8 +22,8 @@ export default class MyIO {
         const context = canvas.getContext('2d')
 
         // fetch
-        const response = await fetch(path)
-        const imageBlob = await response.blob()
+        const configponse = await fetch(path)
+        const imageBlob = await configponse.blob()
         const bitmap = await createImageBitmap(imageBlob)
 
         // paint

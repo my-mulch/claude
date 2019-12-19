@@ -1,4 +1,4 @@
-import bb from '../../big-box'
+import bb from '../../bb'
 import jest from '..'
 
 export default jest.suite(function () {

@@ -1,5 +1,5 @@
 
-export default class WebGLManager {
+export default class glManager {
     constructor(canvas, vertexSource, fragmentSource) {
         /** Context */
         this.context = canvas.getContext('webgl')

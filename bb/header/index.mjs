@@ -1,5 +1,5 @@
 import Types from '../types/index.mjs'
-import Config from '../../resources.mjs'
+import config from '../../res/config.mjs'
 import __Math__ from '../operations/arithmetic/index.mjs'
 
 export default class Header {
@@ -8,7 +8,7 @@ export default class Header {
         this.shape = opts.shape !== undefined ? opts.shape : []
         this.offset = opts.offset !== undefined ? opts.offset : 0
         this.isContig = opts.isContig !== undefined ? opts.isContig : true
-        this.strides = opts.strides !== undefined ? opts.strides : this.resolveStrides(this.shape)
+        this.strides = opts.strides !== undefined ? opts.strides : this.configolveStrides(this.shape)
         this.size = opts.size !== undefined ? opts.size : this.shape.reduce(__Math__.multiply, 1)
     }
 
@@ -17,7 +17,7 @@ export default class Header {
 
         for (let i = index.length - 1; i >= 0; i--) {
             if (index[i].constructor === String &&
-                index[i].includes(Config.SLICE_CHARACTER)) {
+                index[i].includes(config.SLICE_CHARACTER)) {
 
                 if (i + 1 !== last)
                     return false
@@ -31,7 +31,7 @@ export default class Header {
         return true
     }
 
-    resolveStrides(shape) {
+    configolveStrides(shape) {
         let stride = this.type.size
         const strides = new Array(shape.length)
         strides[strides.length - 1] = stride
@@ -42,7 +42,7 @@ export default class Header {
         return strides
     }
 
-    resolveShape(shape) {
+    configolveShape(shape) {
         const newShape = new Array(shape.length)
         const product = shape.reduce(__Math__.multiply, 1)
 
@@ -112,15 +112,15 @@ export default class Header {
              *  If the index is a ':', the user wants that entire dimension 
              */
 
-            if (index[i] === Config.SLICE_CHARACTER || index[i] === undefined)
+            if (index[i] === config.SLICE_CHARACTER || index[i] === undefined)
                 shape.push(this.shape[i]), strides.push(this.strides[i])
 
             /** 
              * If the index is a slice of the form 'a:b', the user wants a slice from a to b 
             */
 
-            else if (Config.PARTIAL_SLICE.test(index[i])) {
-                let [low, high, step] = index[i].split(Config.SLICE_CHARACTER).map(Number)
+            else if (config.PARTIAL_SLICE.test(index[i])) {
+                let [low, high, step] = index[i].split(config.SLICE_CHARACTER).map(Number)
 
                 if (high === 0)
                     high = this.shape[i]
@@ -135,10 +135,10 @@ export default class Header {
             }
 
             /** 
-             * If the index is a Config.number, the user wants that index
+             * If the index is a config.number, the user wants that index
              */
 
-            else if (Config.NUMBER.test(index[i]))
+            else if (config.NUMBER.test(index[i]))
                 offset += this.strides[i] * index[i]
 
         }
@@ -155,9 +155,9 @@ export default class Header {
         })
     }
 
-    reshape(shape) {
-        const newShape = this.resolveShape(shape)
-        const newStrides = this.resolveStrides(newShape)
+    confighape(shape) {
+        const newShape = this.configolveShape(shape)
+        const newStrides = this.configolveStrides(newShape)
 
         return new Header({
             ...this,
