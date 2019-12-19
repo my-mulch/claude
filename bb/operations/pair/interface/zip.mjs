@@ -1,6 +1,6 @@
 import PairOperation from './index.mjs'
 
-export default class ArithmeticPairOperation extends PairOperation {
+export default class ZipPairOperation extends PairOperation {
     constructor(args) {
         /** Superclass */
         super(args)
