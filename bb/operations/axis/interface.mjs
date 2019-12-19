@@ -1,15 +1,35 @@
-import Tensor from '../../../tensor/index.mjs'
-import Source from '../../../template/source.mjs'
-import __Math__ from '../../arithmetic/index.mjs'
-import TensorOperation from '../../interface.mjs'
+import Tensor from '../../tensor/index.mjs'
+import Source from '../../template/source.mjs'
+import __Math__ from '../arithmetic/index.mjs'
+import TensorOperation from '../interface.mjs'
 
 export default class AxisOperation extends TensorOperation {
+    static ALL = 'all'
+    static NONE = 'none'
+    static LAST = 'last'
+
     constructor(args) {
         super(args)
 
+        /** Norm */
+        this.norm = args.norm
+
+        /** Count */
+        this.count = args.count
+
+        /** Entries */
+        this.entries = args.entries
+
         /** Axes */
         this.axes = {}
-        this.axes.inner = args.axes
+
+        switch (args.axes) {
+            case AxisOperation.NONE: this.axes.inner = []; break
+            case AxisOperation.ALL: this.axes.inner = [...this.of.header.shape.keys()]; break
+            case AxisOperation.LAST: this.axes.inner = [this.of.header.shape.length - 1]; break
+            default: this.axes.inner = args.axes; break
+        }
+
         this.axes.total = [...this.of.header.shape.keys()]
         this.axes.outer = __Math__.difference(this.axes.total, this.axes.inner)
         this.axes.order = this.axes.outer.concat(this.axes.inner)
@@ -24,6 +44,20 @@ export default class AxisOperation extends TensorOperation {
         this.sizes = {}
         this.sizes.outer = this.axes.outer.reduce(this.size.bind(this.of), 1)
         this.sizes.inner = this.axes.inner.reduce(this.size.bind(this.of), 1)
+
+        /** Result */
+        this.result = args.result || this.resultant()
+
+        /** Initialize */
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
+
+        /** Create */
+        this.invoke = new Function(
+            'A = this.of',
+            'B = this.with',
+            'R = this.result',
+            [this.source, 'return R'].join('\n'))
     }
 
     unselectedAxes(_, axis) {

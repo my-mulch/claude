@@ -2,32 +2,15 @@ import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
 import Tensor from '../../tensor/index.mjs'
 import __Math__ from '../arithmetic/index.mjs'
-import AxisOperation from './interface/index.mjs'
+import AxisOperation from './interface.mjs'
 
 export default class Insert extends AxisOperation {
     constructor(args) {
-        /** Defaults */
-        args.axes = args.axes || [args.of.header.shape.length - 1]
-
-        /** Superclass */
-        super(args)
-
-        /** Properties */
-        this.entries = args.entries.sort(__Math__.subtract).map(Number)
-
-        /** Result */
-        this.result = args.result || this.resultant()
-
-        /** Initialize */
-        this.symbolicSourceBoilerplate()
-        this.symbolicSourceTemplate()
-
-        /** Create */
-        this.invoke = new Function(
-            'A = this.of',
-            'B = this.with',
-            'R = this.result',
-            [this.source, 'return R'].join('\n'))
+        super({
+            axes: args.axes || AxisOperation.LAST,
+            entries: args.entries.sort(__Math__.subtract).map(Number),
+            ...args,
+        })
     }
 
     resultant() {

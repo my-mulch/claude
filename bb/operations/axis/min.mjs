@@ -1,9 +1,9 @@
 import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
-import AxisReduceOperation from './interface/reduce.mjs'
+import AxisOperation from './interface.mjs'
 
-export default class Minimization extends AxisReduceOperation {
-    constructor(args) { super(args) }
+export default class Minimization extends AxisOperation {
+    constructor(args) { super({ axes: args.axes || AxisOperation.ALL, ...args }) }
 
     start() {
         return new Source([`const temp = new Array(${this.of.header.type.size})`])

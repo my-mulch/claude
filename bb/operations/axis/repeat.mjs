@@ -1,32 +1,15 @@
 import Tensor from '../../tensor/index.mjs'
 import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
-import AxisOperation from './interface/index.mjs'
+import AxisOperation from './interface.mjs'
 
 export default class Repeat extends AxisOperation {
     constructor(args) {
-        /** Defaults */
-        args.axes = args.axes || [args.of.header.shape.length - 1]
-
-        /** Superclass */
-        super(args)
-
-        /** Properties */
-        this.count = args.count || 1
-
-        /** Result */
-        this.result = args.result || this.resultant()
-
-        /** Initialize */
-        this.symbolicSourceBoilerplate()
-        this.symbolicSourceTemplate()
-
-        /** Create */
-        this.invoke = new Function(
-            'A = this.of',
-            'B = this.with',
-            'R = this.result',
-            [this.source, 'return R'].join('\n'))
+        super({
+            axes: args.axes || AxisOperation.LAST,
+            count: args.count || 1,
+            ...args,
+        })
     }
 
     resultant() {
@@ -46,9 +29,6 @@ export default class Repeat extends AxisOperation {
         super.symbolicSourceBoilerplate()
     }
 
-    start() { }
-    preLoop() { }
-
     inLoop() {
         return new Source([
             this.indices.of,
@@ -61,7 +41,4 @@ export default class Repeat extends AxisOperation {
                 ])
         ])
     }
-
-    postLoop() { }
-    finish() { }
 }

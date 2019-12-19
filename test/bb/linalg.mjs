@@ -78,6 +78,7 @@ export default jest.suite(function () {
     this.expect(new bb.cached.inverse({ of: [[[4], [1], [3], [3]], [[4], [0], [0], [1]], [[2], [3], [4], [2]], [[0], [0], [4], [4]]] }).invoke()).toEqual([["1.50", "-1.00", "-0.50", "-0.63"], ["-5.00", "4.00", "2.00", "1.75"], ["6.00", "-5.00", "-2.00", "-2.25"], ["-6.00", "5.00", "2.00", "2.50"]])
     this.expect(new bb.cached.cross({ of: E.slice(['1:2', 0, ':']).T(), with: C }).invoke()).toEqual([["19.00"], ["-170.00"], ["107.00"]])
     this.expect(new bb.cached.matMult({ of: E.slice([':', 0, ':']), with: C }).invoke()).toEqual([["26.00"], ["74.00"], ["109.00"]])
+    this.expect(bb.unit({ of: [[1], [2], [3]] })).toEqual(["0.27", "0.53", "0.80"])
 
     console.log('\n\n-------- End Linear Algebra Suite --------\n\n')
 })

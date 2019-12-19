@@ -1,10 +1,10 @@
 import Source from '../../template/source.mjs'
 import Tensor from '../../tensor/index.mjs'
 import Algebra from '../../template/algebra.mjs'
-import AxisReduceOperation from './interface/reduce.mjs'
+import AxisOperation from './interface.mjs'
 
-export default class Norm extends AxisReduceOperation {
-    constructor(args) { super(args) }
+export default class Norm extends AxisOperation {
+    constructor(args) { super({ axes: args.axes || AxisOperation.ALL, ...args }) }
 
     resultant() {
         return Tensor.zeros(

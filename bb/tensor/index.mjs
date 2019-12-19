@@ -245,7 +245,7 @@ export default class Tensor {
     }
 
     ravel() {
-        return Tensor.tensor(this.toRaw(), this.header.type).confighape([-1])
+        return Tensor.tensor(this.toRaw(), this.header.type).reshape([-1])
     }
 
     slice(region) {
@@ -259,14 +259,14 @@ export default class Tensor {
         return new Tensor(this.data, this.header.transpose())
     }
 
-    confighape(shape) {
+    reshape(shape) {
         if (shape === undefined)
-            throw 'You must specify confighape dimensions'
+            throw 'You must specify reshape dimensions'
 
         if (!this.header.isContig)
-            return Tensor.tensor(this.toRaw(), this.header.type).confighape(shape)
+            return Tensor.tensor(this.toRaw(), this.header.type).reshape(shape)
 
-        return new Tensor(this.data, this.header.confighape(shape))
+        return new Tensor(this.data, this.header.reshape(shape))
     }
 
     visit(operation, index = this.header.offset, depth = 0) {

@@ -1,10 +1,10 @@
 import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
-import AxisMapOperation from './interface/map.mjs'
+import AxisOperation from './interface.mjs'
 
-export default class Conjugation extends AxisMapOperation {
-    constructor(args) { super(args) }
-    
+export default class Conjugation extends AxisOperation {
+    constructor(args) { super({ axes: args.axes || AxisOperation.NONE, ...args }) }
+
     preLoop() {
         return new Source([this.indices.result])
     }

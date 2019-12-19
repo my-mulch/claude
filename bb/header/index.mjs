@@ -155,7 +155,7 @@ export default class Header {
         })
     }
 
-    confighape(shape) {
+    reshape(shape) {
         const newShape = this.configolveShape(shape)
         const newStrides = this.configolveStrides(newShape)
 

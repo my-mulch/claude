@@ -1,5 +1,4 @@
 
-
 window.cow = new app(
     await io.txtread('./gl/main/shader.vert'),
     await io.txtread('./gl/main/shader.frag'))
