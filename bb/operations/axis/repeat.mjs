@@ -1,7 +1,7 @@
 import Tensor from '../../tensor/index.mjs'
 import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
-import AxisOperation from './operation.mjs'
+import AxisOperation from './interface/index.mjs'
 
 export default class Repeat extends AxisOperation {
     constructor(args) {
@@ -32,17 +32,9 @@ export default class Repeat extends AxisOperation {
     resultant() {
         const shape = this.of.header.shape.slice()
         shape[this.axes.inner[0]] *= this.count
-        
+
         return Tensor.zeros(shape, this.of.header.type)
     }
-
-    /** 
-     * 
-     * 
-     * Symbolic Implementation 
-     * 
-     * 
-     * */
 
     symbolicSourceBoilerplate() {
         /** Axes */
@@ -72,12 +64,4 @@ export default class Repeat extends AxisOperation {
 
     postLoop() { }
     finish() { }
-
-    /** 
-     * 
-     * 
-     * (TODO) Literal Implementation 
-     * 
-     * 
-     * */
 }

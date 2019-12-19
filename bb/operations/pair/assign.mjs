@@ -1,25 +1,13 @@
 import Algebra from '../../template/algebra.mjs'
-import PairOperation from './operation.mjs'
+import ZipPairOperation from './interface/zip.mjs'
 
-export default class Assignment extends PairOperation {
+export default class Assignment extends ZipPairOperation {
     constructor(args) {
-        /** Superclass */
         super({
             ...args,
             of: args.of.slice(args.region || []),
             result: args.of
         })
-
-        /** Initialize */
-        this.symbolicSourceBoilerplate()
-        this.symbolicSourceTemplate()
-
-        /** Create */
-        this.invoke = new Function(
-            'A = this.of',
-            'B = this.with',
-            'R = this.result',
-            [this.source, 'return R'].join('\n'))
     }
 
     symbolicSourceBoilerplate() {
@@ -29,16 +17,7 @@ export default class Assignment extends PairOperation {
         super.symbolicSourceBoilerplate()
     }
 
-    /** Symbolic Implementation */
-    start() { }
-    preLoop() { }
-
     inLoop() {
         return Algebra.assign(this.variables.of, this.variables.with).join('\n')
     }
-
-    postLoop() { }
-    finish() { }
-
-    /** (TODO) Pointwise Implementation */
 }

@@ -1,7 +1,7 @@
-import Tensor from '../../tensor/index.mjs'
-import Source from '../../template/source.mjs'
-import __Math__ from '../arithmetic/index.mjs'
-import TensorOperation from '../operation.mjs'
+import Tensor from '../../../tensor/index.mjs'
+import Source from '../../../template/source.mjs'
+import __Math__ from '../../arithmetic/index.mjs'
+import TensorOperation from '../../interface.mjs'
 
 export default class AxisOperation extends TensorOperation {
     constructor(args) {
@@ -25,7 +25,7 @@ export default class AxisOperation extends TensorOperation {
         this.sizes.outer = this.axes.outer.reduce(this.size.bind(this.of), 1)
         this.sizes.inner = this.axes.inner.reduce(this.size.bind(this.of), 1)
     }
-    
+
     unselectedAxes(_, axis) {
         return !this.axes.inner.includes(axis)
     }
@@ -48,18 +48,29 @@ export default class AxisOperation extends TensorOperation {
 
     symbolicSourceTemplate() {
         this.source = new Source([
+            this.start &&
             this.start(),
 
-            new Source().nestedFor(this.axes.outer, this.shapes.outer, [
-                this.preLoop(),
+            new Source().nestedFor(
+                this.axes.outer,
+                this.shapes.outer,
+                [
+                    this.preLoop &&
+                    this.preLoop(),
 
-                new Source().nestedFor(this.axes.inner, this.shapes.inner, [
-                    this.inLoop(),
+                    new Source().nestedFor(
+                        this.axes.inner,
+                        this.shapes.inner,
+                        [
+                            this.inLoop &&
+                            this.inLoop(),
+                        ]),
+
+                    this.postLoop &&
+                    this.postLoop(),
                 ]),
 
-                this.postLoop(),
-            ]),
-
+            this.finish &&
             this.finish(),
         ])
     }

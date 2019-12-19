@@ -1,37 +1,9 @@
 import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
-import AxisOperation from './operation.mjs'
+import AxisReduceOperation from './interface/reduce.mjs'
 
-export default class Maximization extends AxisOperation {
-    constructor(args) {
-        /** Defaults */
-        args.axes = args.axes || [...args.of.header.shape.keys()]
-
-        /** Superclass */
-        super(args)
-
-        /** Result */
-        this.result = args.result || this.resultant()
-
-        /** Initialize */
-        this.symbolicSourceBoilerplate()
-        this.symbolicSourceTemplate()
-
-        /** Create */
-        this.invoke = new Function(
-            'A = this.of',
-            'B = this.with',
-            'R = this.result',
-            [this.source, 'return R'].join('\n'))
-    }
-
-    /** 
-     * 
-     * 
-     * Symbolic Implementation 
-     * 
-     * 
-     * */
+export default class Maximization extends AxisReduceOperation {
+    constructor(args) { super(args) }
 
     start() {
         return new Source([`const temp = new Array(${this.of.header.type.size})`])
@@ -57,14 +29,4 @@ export default class Maximization extends AxisOperation {
     postLoop() {
         return Algebra.assign(this.variables.result, this.variables.temp)
     }
-
-    finish() { }
-
-    /** 
-     * 
-     * 
-     * (TODO) Literal Implementation 
-     * 
-     * 
-     * */
 }

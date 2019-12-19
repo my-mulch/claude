@@ -1,34 +1,10 @@
 import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
-import AxisOperation from './operation.mjs'
+import AxisMapOperation from './interface/map.mjs'
 
-export default class Conjugation extends AxisOperation {
-    constructor(args) {
-        /** Defaults */
-        args.axes = args.axes || []
-
-        /** Superclass */
-        super(args)
-
-        /** Result */
-        this.result = args.result || this.resultant()
-
-        /** Initialize */
-        this.symbolicSourceBoilerplate()
-        this.symbolicSourceTemplate()
-
-        /** Create */
-        this.invoke = new Function(
-            'A = this.of',
-            'B = this.with',
-            'R = this.result',
-            [this.source, 'return R'].join('\n'))
-    }
-
-    /** Symbolic Implementation */
-
-    start() { }
-
+export default class Conjugation extends AxisMapOperation {
+    constructor(args) { super(args) }
+    
     preLoop() {
         return new Source([this.indices.result])
     }
@@ -36,19 +12,8 @@ export default class Conjugation extends AxisOperation {
     inLoop() {
         return new Source([
             this.indices.of,
-            Algebra.assign(this.variables.result, Algebra.conjugate(this.variables.of))
+            Algebra.assign(this.variables.result,
+                Algebra.conjugate(this.variables.of))
         ])
     }
-
-    postLoop() { }
-
-    finish() { }
-
-    /** 
-     * 
-     * 
-     * (TODO) Literal Implementation 
-     * 
-     * 
-     * */
 }

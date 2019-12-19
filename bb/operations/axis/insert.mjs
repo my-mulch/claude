@@ -2,7 +2,7 @@ import Source from '../../template/source.mjs'
 import Algebra from '../../template/algebra.mjs'
 import Tensor from '../../tensor/index.mjs'
 import __Math__ from '../arithmetic/index.mjs'
-import AxisOperation from './operation.mjs'
+import AxisOperation from './interface/index.mjs'
 
 export default class Insert extends AxisOperation {
     constructor(args) {
@@ -36,14 +36,6 @@ export default class Insert extends AxisOperation {
 
         return Tensor.zeros(shape, this.of.header.type)
     }
-
-    /** 
-     * 
-     * 
-     * Symbolic Implementation 
-     * 
-     * 
-     * */
 
     symbolicSourceBoilerplate() {
         /** Axes */
@@ -82,15 +74,4 @@ export default class Insert extends AxisOperation {
                 .else([...Algebra.assign(this.variables.result, this.variables.of)])
         ])
     }
-
-    postLoop() { }
-    finish() { }
-
-    /** 
-     * 
-     * 
-     * (TODO) Literal Implementation 
-     * 
-     * 
-     * */
 }
