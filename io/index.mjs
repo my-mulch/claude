@@ -1,16 +1,16 @@
 
 export default class IO {
     static async txtread(path) {
-        const configponse = await fetch(path)
+        const response = await fetch(path)
 
-        return configponse.text()
+        return response.text()
     }
 
     static async audioread(path) {
         const context = new AudioContext()
 
-        const configponse = await fetch(path)
-        const arrayBuffer = await configponse.arrayBuffer()
+        const response = await fetch(path)
+        const arrayBuffer = await response.arrayBuffer()
         const audioBuffer = await context.decodeAudioData(arrayBuffer)
 
         return audioBuffer.getChannelData(0)
@@ -22,8 +22,8 @@ export default class IO {
         const context = canvas.getContext('2d')
 
         // fetch
-        const configponse = await fetch(path)
-        const imageBlob = await configponse.blob()
+        const response = await fetch(path)
+        const imageBlob = await response.blob()
         const bitmap = await createImageBitmap(imageBlob)
 
         // paint

@@ -1,7 +1,7 @@
-import Tensor from '../../../tensor/index.mjs'
-import Source from '../../../template/source.mjs'
-import __Math__ from '../../arithmetic/index.mjs'
-import TensorOperation from '../../interface.mjs'
+import Tensor from '../../tensor/index.mjs'
+import Source from '../../template/source.mjs'
+import __Math__ from '../arithmetic/index.mjs'
+import TensorOperation from '../interface.mjs'
 
 export default class PairOperation extends TensorOperation {
     constructor(args) {
@@ -20,6 +20,17 @@ export default class PairOperation extends TensorOperation {
 
         /** Sizes */
         this.sizes = {}
+
+        /** Initialize */
+        this.symbolicSourceBoilerplate()
+        this.symbolicSourceTemplate()
+
+        /** Create */
+        this.invoke = new Function(
+            'A = this.of',
+            'B = this.with',
+            'R = this.result',
+            [this.source, 'return R'].join('\n'))
     }
 
     resultant() {

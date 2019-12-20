@@ -21,7 +21,6 @@ export default class Insert extends AxisOperation {
     }
 
     symbolicSourceBoilerplate() {
-        /** Axes */
         this.axes.of = this.of.header.nonZeroAxes(this.axes.total)
 
         if (!this.axes.of[this.axes.last])

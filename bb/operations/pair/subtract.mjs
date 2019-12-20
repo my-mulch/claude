@@ -1,7 +1,7 @@
 import Algebra from '../../template/algebra.mjs'
-import ZipPairOperation from './interface/zip.mjs'
+import PairOperation from './interface.mjs'
 
-export default class Subtraction extends ZipPairOperation {
+export default class Subtraction extends PairOperation {
     constructor(args) { super(args) }
 
     inLoop() {

@@ -25,7 +25,7 @@ export default class Cow {
         config.PROJ_MATRIX = bb.tensor(config.PROJ_MATRIX)
 
         /** Resize */
-        this.configize()
+        this.resize()
 
         /** Peripherals */
         this.gl = new gl(this.canvas, vertex, fragment)
@@ -35,7 +35,7 @@ export default class Cow {
 
         /** Event Listeners */
         window.addEventListener('keyup', this.keyup.bind(this))
-        window.addEventListener('configize', this.configize.bind(this))
+        window.addEventListener('resize', this.resize.bind(this))
         window.addEventListener('keydown', this.keydown.bind(this))
     }
 
@@ -91,7 +91,7 @@ export default class Cow {
         }
     }
 
-    configize() {
+    resize() {
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight
 
