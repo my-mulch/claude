@@ -14,7 +14,7 @@ export default class Cow {
         /** Display */
         this.canvas = document.getElementById('main')
 
-        /** configuration */
+        /** Configuration */
         config.UP = bb.tensor(config.UP)
         config.TO = bb.tensor(config.TO)
         config.FROM = bb.tensor(config.FROM)
@@ -24,7 +24,7 @@ export default class Cow {
         config.MOVE_MATRIX = bb.tensor(config.MOVE_MATRIX)
         config.PROJ_MATRIX = bb.tensor(config.PROJ_MATRIX)
 
-        /** Resize */
+        /** Size */
         this.resize()
 
         /** Peripherals */
@@ -34,9 +34,8 @@ export default class Cow {
         this.keyboard = new Keyboard(config.BINDINGS)
 
         /** Event Listeners */
-        window.addEventListener('keyup', this.keyup.bind(this))
         window.addEventListener('resize', this.resize.bind(this))
-        window.addEventListener('keydown', this.keydown.bind(this))
+        this.canvas.addEventListener('wheel', this.wheel.bind(this))
     }
 
     plot(objects) {
@@ -58,8 +57,6 @@ export default class Cow {
 
     render() {
         this.gl.context.clear(this.gl.context.COLOR_BUFFER_BIT)
-        
-        console.time('rendering')
 
         for (const object of this.objects) {
 
@@ -73,22 +70,14 @@ export default class Cow {
 
             this.gl.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
-
-        console.timeEnd('rendering')
     }
 
-    keyup() {
-        this.keyboard.keyup()
-    }
+    wheel(event) {
+        event.preventDefault()
+        
+        this.camera.zoom(event.deltaY > 0)
 
-    keydown(event) {
-        const binding = this.keyboard.keydown(event)
-
-        if (binding) {
-            event.preventDefault()
-            this.camera[binding.name](...binding.args)
-            this.render()
-        }
+        this.render()
     }
 
     resize() {

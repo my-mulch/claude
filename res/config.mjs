@@ -14,7 +14,7 @@ export default {
     NEAR: 1e-6,
     FAR: 1e6,
 
-    ZOOM_DELTA: 0.02,
+    ZOOM_DELTA: 0.01,
     PAN_DELTA: Math.PI / 128,
 
     SPACE: / +/g,
