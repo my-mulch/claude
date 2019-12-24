@@ -16,7 +16,26 @@
 </head>
 
 <body>
-    <script type="module" src='index.mjs'></script>
+    <canvas id="main"></canvas>
+    <script type="module">
+        import io from './io/index.mjs'
+        import bb from './bb/index.mjs'
+        import app from './app/index.mjs'
+        import config from './res/config.mjs'
+
+        window.io = io
+        window.bb = bb
+        window.app = app
+        window.config = config
+
+        io
+            .txtread('./index.mjs')
+            .then(function (source) {
+                return new (async function () { })
+                    .constructor(source)
+                    .call(window)
+            })
+    </script>
 </body>
 
 </html>
