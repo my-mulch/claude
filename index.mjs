@@ -2,10 +2,10 @@ window.cow = new app(
     await io.txtread('./res/shaders/rgb/shader.vert'),
     await io.txtread('./res/shaders/rgb/shader.frag'))
 
-const colors = bb.rand([1e6, 3])
-const sizes = bb.ones([1e6, 1]).multiply({ with: 1 })
+const colors = bb.tensor(await io.imread('./res/images/pen.jpg')).reshape([-1, 3])
+const vertices = colors.subtract({ with: 0.5 })
 
-cow.plot([{ vertices: colors.subtract({ with: 0.5 }), colors, sizes }])
+cow.plot([{ vertices, colors }])
 
 cow.render()
 
