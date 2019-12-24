@@ -133,21 +133,20 @@ export default class Cow {
         this.n = this.v1.norm().data[0] * this.v2.norm().data[0]
         this.a = Math.acos(this.d / this.n)
 
+        if (isNaN(this.a)) return
+
         this.pointer.data[0] = Math.cos(this.a / 2)
         this.pointer.data[1] = Math.sin(this.a / 2) * this.v.data[0]
         this.pointer.data[2] = Math.sin(this.a / 2) * this.v.data[1]
         this.pointer.data[3] = Math.sin(this.a / 2) * this.v.data[2]
 
-        this.rotate.invoke()
-        
-        // debugger
+
+        this.rotation = this.rotate.invoke()
 
         const qw = this.rotation.data[0]
         const qx = -this.rotation.data[1]
         const qy = -this.rotation.data[2]
         const qz = -this.rotation.data[3]
-
-        console.log(qw ** 2 + qx ** 2 + qy ** 2 + qz ** 2)
 
         this.matrix.data[0] = 1.0 - 2.0 * qy * qy - 2.0 * qz * qz
         this.matrix.data[1] = 2.0 * qx * qy - 2.0 * qz * qw
@@ -170,6 +169,8 @@ export default class Cow {
         this.matrix.data[15] = 1.0
 
         this.render()
+
+        this.v1 = this.v2
     }
 
     pointerup() {
