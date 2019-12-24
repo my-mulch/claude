@@ -1,5 +1,5 @@
-import bb from '../../bb/index.mjs'
-import config from '../../res/config.mjs'
+import bb from '../bb/index.mjs'
+import config from '../res/config.mjs'
 
 export default class Camera {
     constructor() {

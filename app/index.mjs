@@ -1,10 +1,7 @@
 import bb from '../bb/index.mjs'
-import gl from '../gl/index.mjs'
+import Engine from './engine.mjs'
+import Camera from './camera.mjs'
 import config from '../res/config.mjs'
-
-import Mouse from './peripherals/mouse.mjs'
-import Camera from './peripherals/camera.mjs'
-import Keyboard from './peripherals/keyboard.mjs'
 
 export default class Cow {
     constructor(vertex, fragment) {
@@ -28,56 +25,126 @@ export default class Cow {
         this.resize()
 
         /** Peripherals */
-        this.gl = new gl(this.canvas, vertex, fragment)
-        this.mouse = new Mouse()
+        this.webgl = new Engine(this.canvas, vertex, fragment)
         this.camera = new Camera()
-        this.keyboard = new Keyboard(config.BINDINGS)
+
+        /** State */
+        this.pointerIsDown = false
+
+        this.last = bb.tensor([0, 0, 0, 1])
+        this.pointer = bb.tensor([0, 0, 0, 0])
+        this.rotation = bb.tensor([0, 0, 0, 0])
+
+
+        this.matrix = bb.eye([4, 4])
+        this.webgl.uniforms.u_ModelMatrix.set(this.matrix)
+        
+        this.rotate = new bb.cached.multiply({
+            of: this.last,
+            with: this.pointer,
+            result: this.rotation
+        })
 
         /** Event Listeners */
-        window.addEventListener('resize', this.resize.bind(this))
         this.canvas.addEventListener('wheel', this.wheel.bind(this))
+        this.canvas.addEventListener('pointerup', this.pointerup.bind(this))
+        this.canvas.addEventListener('pointermove', this.pointermove.bind(this))
+        this.canvas.addEventListener('pointerdown', this.pointerdown.bind(this))
     }
 
     plot(objects) {
         for (let { vertices, colors, sizes, mode } of objects) {
-            if (!mode) mode = this.gl.context.POINTS
+            if (!mode) mode = this.webgl.context.POINTS
             if (!sizes) sizes = bb.ones(vertices.header.shape)
             if (!colors) colors = vertices
 
             this.objects.push({
-                sizeBuffer: this.gl.createBuffer(sizes),
-                colorBuffer: this.gl.createBuffer(colors),
-                vertexBuffer: this.gl.createBuffer(vertices),
+                sizeBuffer: this.webgl.createBuffer(sizes),
+                colorBuffer: this.webgl.createBuffer(colors),
+                vertexBuffer: this.webgl.createBuffer(vertices),
 
-                drawMode: this.gl.context[mode],
+                drawMode: this.webgl.context[mode],
                 drawCount: vertices.header.shape[0]
             })
         }
     }
 
     render() {
-        this.gl.context.clear(this.gl.context.COLOR_BUFFER_BIT)
+        this.webgl.context.clear(this.webgl.context.COLOR_BUFFER_BIT)
 
         for (const object of this.objects) {
+            this.webgl.attributes.a_Color.set(object.colorBuffer)
+            this.webgl.attributes.a_PointSize.set(object.sizeBuffer)
+            this.webgl.attributes.a_Position.set(object.vertexBuffer)
 
-            this.gl.attributes.a_Color.set(object.colorBuffer)
-            this.gl.attributes.a_PointSize.set(object.sizeBuffer)
-            this.gl.attributes.a_Position.set(object.vertexBuffer)
+            this.webgl.uniforms.u_ModelMatrix.set(this.matrix)
+            this.webgl.uniforms.u_ViewMatrix.set(this.camera.look())
+            this.webgl.uniforms.u_ProjMatrix.set(this.camera.project())
 
-            this.gl.uniforms.u_ViewMatrix.set(this.camera.look())
-            this.gl.uniforms.u_ProjMatrix.set(this.camera.project())
-
-
-            this.gl.context.drawArrays(object.drawMode, 0, object.drawCount)
+            this.webgl.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
     }
 
     wheel(event) {
         event.preventDefault()
-        
+
         this.camera.zoom(event.deltaY > 0)
 
         this.render()
+    }
+
+    pointerdown() {
+        /** Clicked */
+        this.pointerIsDown = true
+    }
+
+    pointermove(event) {
+        if (!this.pointerIsDown) return
+
+        /** Position */
+        this.pointer.data[0] = 0
+        this.pointer.data[1] = (event.x - this.canvas.width / 2) / this.canvas.width
+        this.pointer.data[2] = (this.canvas.height / 2 - event.y) / this.canvas.height
+        this.pointer.data[3] = Math.sqrt(1 - this.pointer.data[0] ** 2 - this.pointer.data[1] ** 2)
+
+        /** Last */
+        this.rotate.invoke()
+
+        const qw = this.rotation.data[0]
+        const qx = this.rotation.data[1]
+        const qy = this.rotation.data[2]
+        const qz = this.rotation.data[3]
+
+        this.matrix.data[0] = 1.0 - 2.0 * qy * qy - 2.0 * qz * qz
+        this.matrix.data[1] = 2.0 * qx * qy - 2.0 * qz * qw
+        this.matrix.data[2] = 2.0 * qx * qz + 2.0 * qy * qw
+        this.matrix.data[3] = 0.0
+
+        this.matrix.data[4] = 2.0 * qx * qy + 2.0 * qz * qw
+        this.matrix.data[5] = 1.0 - 2.0 * qx * qx - 2.0 * qz * qz
+        this.matrix.data[6] = 2.0 * qy * qz - 2.0 * qx * qw
+        this.matrix.data[7] = 0.0
+
+        this.matrix.data[8] = 2.0 * qx * qz - 2.0 * qy * qw
+        this.matrix.data[9] = 2.0 * qy * qz + 2.0 * qx * qw
+        this.matrix.data[10] = 1.0 - 2.0 * qx * qx - 2.0 * qy * qy
+        this.matrix.data[11] = 0.0
+
+        this.matrix.data[12] = 0
+        this.matrix.data[13] = 0
+        this.matrix.data[14] = 0
+        this.matrix.data[15] = 1.0
+
+        this.render()
+    }
+
+    pointerup() {
+        this.pointerIsDown = false
+        
+        // this.last.data[0] = this.pointer.data[0]
+        // this.last.data[1] = this.pointer.data[1]
+        // this.last.data[2] = this.pointer.data[2]
+        // this.last.data[3] = this.pointer.data[3]
     }
 
     resize() {

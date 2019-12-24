@@ -1,8 +1,10 @@
 window.cow = new app(
-    await io.txtread('./gl/rgb/shader.vert'),
-    await io.txtread('./gl/rgb/shader.frag'))
+    await io.txtread('./res/shaders/rgb/shader.vert'),
+    await io.txtread('./res/shaders/rgb/shader.frag'))
 
-cow.plot([{ vertices: bb.rand([1e6, 3]) }])
+const colors = bb.rand([1e6, 3])
+
+cow.plot([{ vertices: colors.subtract({ with: 0.5 }), colors }])
 cow.render()
 
 // cow.gl.do(function () {

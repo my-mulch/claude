@@ -2,7 +2,7 @@
 export default {
     UP: [[[0]], [[1]], [[0]], [[1]]],
     TO: [[[0]], [[0]], [[0]], [[1]]],
-    FROM: [[[10]], [[3]], [[12]], [[1]]],
+    FROM: [[[0]], [[0]], [[3]], [[1]]],
 
     LOOK_MATRIX: [[[1], [0], [0], [0]], [[0], [1], [0], [0]], [[0], [0], [1], [0]], [[0], [0], [0], [1]]],
     VIEW_MATRIX: [[[1], [0], [0], [0]], [[0], [1], [0], [0]], [[0], [0], [1], [0]], [[0], [0], [0], [1]]],
@@ -14,8 +14,7 @@ export default {
     NEAR: 1e-6,
     FAR: 1e6,
 
-    ZOOM_DELTA: 0.01,
-    PAN_DELTA: Math.PI / 128,
+    ZOOM_DELTA: 0.02,
 
     SPACE: / +/g,
     NUMBER: /\d+/,
@@ -26,27 +25,12 @@ export default {
     ARRAY_SPACER: /\]\,(\s*)\[/g,
     PARSE_NUMBER: /\d+\.?\d*e[+-]?\d+|\d+\.?\d*|\.\d+|./g,
 
-    BINDINGS: {
-        'o': { name: 'zoom', args: [true] },
-        'i': { name: 'zoom', args: [false] },
+    BINDINGS: {},
 
-        'ArrowUp': { name: 'pan', args: [0] },
-        'ArrowDown': { name: 'pan', args: [1] },
-        'ArrowLeft': { name: 'pan', args: [2] },
-        'ArrowRight': { name: 'pan', args: [3] },
-    },
-    
     SYMBOL_FROM_ID: {
         0: '',
         1: 'i',
         2: 'j',
         3: 'k'
-    },
-
-    DIRECTIONS: {
-        UP: 0,
-        DOWN: 1,
-        LEFT: 2,
-        RIGHT: 3,
     },
 }
