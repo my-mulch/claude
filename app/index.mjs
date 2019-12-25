@@ -31,7 +31,6 @@ export default class Cow {
         /** State */
         this.pointerIsDown = false
 
-        // this.last = bb.tensor([1, 0, 0, 0])
         this.pointer = bb.tensor([0, 0, 0, 0])
         this.rotation = bb.tensor([1, 0, 0, 0])
 
@@ -43,9 +42,6 @@ export default class Cow {
             with: this.rotation,
             result: this.rotation
         })
-
-        /** Intersection */
-
 
         /** Event Listeners */
         this.canvas.addEventListener('wheel', this.wheel.bind(this))
@@ -65,7 +61,7 @@ export default class Cow {
                 colorBuffer: this.webgl.createBuffer(colors),
                 vertexBuffer: this.webgl.createBuffer(vertices),
 
-                drawMode: this.webgl.context[mode],
+                drawMode: mode,
                 drawCount: vertices.header.shape[0]
             })
         }
@@ -89,31 +85,33 @@ export default class Cow {
 
     wheel(event) {
         event.preventDefault()
-
-        this.camera.zoom(event.deltaY > 0)
-
+        this.camera.zoom(event.deltaY)
         this.render()
     }
 
     intersect() {
-        const to = config.TO.subtract({
-            with: config.FROM
-        }).slice([':3'])
-
-        const ro = bb.tensor([
-            [[(event.x - this.canvas.width / 2) / this.canvas.width]],
-            [[(this.canvas.height / 2 - event.y) / this.canvas.height]],
-            [[-to.norm().data[0]]]
-        ]).unit()
-
         const r = 1
-        const t = to.T().matMult({ with: ro }).data[0]
-        const z = ro.multiply({ with: t }).subtract({ with: config.FROM.slice([':3']).negate() }).norm().data[0]
-        const x = Math.sqrt(r ** 2 - z ** 2)
-        const i = ro.multiply({ with: t - x })
-        i.data[2] *= -1
+        const ro = config.TO.subtract({ with: config.FROM }).slice([':3'])
+        const d = ro.norm().data[0]
 
-        return i
+        const x = (event.x - this.canvas.width / 2) / (this.canvas.width / 2)
+        const y = (this.canvas.height / 2 - event.y) / (this.canvas.height / 2)
+
+        const yh = Math.tan(Math.PI * 15 / 180) * d
+        const xh = yh * config.ASPECT_RATIO
+
+        const z = Math.sqrt((x * xh) ** 2 + (y * yh) ** 2)
+
+        const c = config.LOOK_MATRIX.matMult({ with: [[[x * xh]], [[y * yh]], [[0]], [[1]]] })
+
+        const rp = c.subtract({ with: config.FROM }).slice([':3']).unit()
+        const t = ro.T().matMult({ with: rp }).data[0]
+
+        const ip = Math.sqrt(r ** 2 - z ** 2)
+
+        const i = rp.multiply({ with: t - ip })
+
+        return i.subtract({ with: ro })
     }
 
     pointerdown(event) {
@@ -184,7 +182,3 @@ export default class Cow {
         config.ASPECT_RATIO = this.canvas.width / this.canvas.height
     }
 }
-        // this.pointer.data[0] = 0
-        // this.pointer.data[1] = (event.x - this.canvas.width / 2) / this.canvas.width
-        // this.pointer.data[2] = (this.canvas.height / 2 - event.y) / this.canvas.height
-        // this.pointer.data[3] = Math.sqrt(1 - this.pointer.data[0] ** 2 - this.pointer.data[1] ** 2)

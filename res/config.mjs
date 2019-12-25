@@ -14,8 +14,6 @@ export default {
     NEAR: 1e-6,
     FAR: 1e6,
 
-    ZOOM_DELTA: 0.05,
-
     SPACE: / +/g,
     NUMBER: /\d+/,
     PRECISION: 2,

@@ -29,28 +29,10 @@ export default class Camera {
         this.cotOfViewingAngle = this.cosOfViewingAngle / this.sinOfViewingAngle
 
         /** Pan Setup */
-        const s = Math.sin(config.PAN_DELTA)
-        const c = Math.cos(config.PAN_DELTA)
-
-        this.upRot = bb.tensor([[[1], [0], [0], [0]], [[0], [c], [-s], [0]], [[0], [s], [c], [0]], [[0], [0], [0], [1]]])
-        this.downRot = bb.tensor([[[1], [0], [0], [0]], [[0], [c], [s], [0]], [[0], [-s], [c], [0]], [[0], [0], [0], [1]]])
-        this.leftRot = bb.tensor([[[c], [0], [s], [0]], [[0], [1], [0], [0]], [[-s], [0], [c], [0]], [[0], [0], [0], [1]]])
-        this.rightRot = bb.tensor([[[c], [0], [-s], [0]], [[0], [1], [0], [0]], [[s], [0], [c], [0]], [[0], [0], [0], [1]]])
-
-        this.inverseView = new bb.cached.inverse({ of: config.LOOK_MATRIX })
-        this.setRotation = new bb.cached.matMult({ of: this.inverseView.result.T(), with: bb.zeros([4, 4]) })
-        this.setViewMatrix = new bb.cached.matMult({ of: this.setRotation.result, with: config.LOOK_MATRIX.T() })
-        this.setPosition = new bb.cached.matMult({ of: this.setViewMatrix.result, with: config.TO, result: config.TO })
+        
 
         /** Zoom Setup */
         this.gaze = new bb.cached.subtract({ of: config.FROM, with: config.TO })
-        this.delta = new bb.cached.multiply({ of: this.gaze.result, with: config.ZOOM_DELTA })
-
-        this.zoomInTo = new bb.cached.subtract({ of: config.TO, with: this.delta.result, result: config.TO })
-        this.zoomInFrom = new bb.cached.subtract({ of: config.FROM, with: this.delta.result, result: config.FROM })
-
-        this.zoomOutTo = new bb.cached.add({ of: config.TO, with: this.delta.result, result: config.TO })
-        this.zoomOutFrom = new bb.cached.add({ of: config.FROM, with: this.delta.result, result: config.FROM })
     }
 
     look() {
@@ -81,45 +63,15 @@ export default class Camera {
         return config.PROJ_MATRIX
     }
 
-    pan(direction) {
-        this.inverseView.invoke()
+    track() {
 
-        switch (direction) {
-            case config.DIRECTIONS.UP: return this.rotate(this.upRot)
-            case config.DIRECTIONS.DOWN: return this.rotate(this.downRot)
-            case config.DIRECTIONS.LEFT: return this.rotate(this.leftRot)
-            case config.DIRECTIONS.RIGHT: return this.rotate(this.rightRot)
-        }
     }
 
-    rotate(orientation) {
-        this.setRotation.invoke(this.setRotation.of, orientation, this.setRotation.result)
-        this.setViewMatrix.invoke()
-
-        return this.setPosition.invoke()
-    }
-
-    zoom(zoomOut) {
+    zoom(delta) {
         this.gaze.invoke()
-        this.delta.invoke()
-
-        if (zoomOut)
-            return this.zoomOut()
-
-        return this.zoomIn()
-    }
-
-    zoomIn() {
-        return [
-            this.zoomInTo.invoke(),
-            this.zoomInFrom.invoke()
-        ]
-    }
-
-    zoomOut() {
-        return [
-            this.zoomOutTo.invoke(),
-            this.zoomOutFrom.invoke()
-        ]
+        
+        config.FROM.data[0] += delta / 1000 * this.gaze.result.data[0]
+        config.FROM.data[1] += delta / 1000 * this.gaze.result.data[1]
+        config.FROM.data[2] += delta / 1000 * this.gaze.result.data[2]
     }
 }
