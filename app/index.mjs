@@ -33,6 +33,7 @@ export default class Cow {
 
         this.pointer = bb.tensor([0, 0, 0, 0])
         this.rotation = bb.tensor([1, 0, 0, 0])
+        this.intermediary = bb.tensor([0, 0, 0, 0])
 
         this.matrix = bb.eye([4, 4])
         this.webgl.uniforms.u_ModelMatrix.set(this.matrix)
@@ -40,7 +41,7 @@ export default class Cow {
         this.rotate = new bb.cached.multiply({
             of: this.pointer,
             with: this.rotation,
-            result: this.rotation
+            result: this.intermediary
         })
 
         /** Event Listeners */
@@ -143,41 +144,40 @@ export default class Cow {
         this.pointer.data[2] = Math.sin(this.a / 2) * this.v.data[1]
         this.pointer.data[3] = Math.sin(this.a / 2) * this.v.data[2]
 
+        this.rotate.invoke()
 
-        this.rotation = this.rotate.invoke()
-
-        const qw = this.rotation.data[0]
-        const qx = -this.rotation.data[1]
-        const qy = -this.rotation.data[2]
-        const qz = -this.rotation.data[3]
+        const qw = this.intermediary.data[0]
+        const qx = this.intermediary.data[1]
+        const qy = this.intermediary.data[2]
+        const qz = this.intermediary.data[3]
 
         this.matrix.data[0] = 1.0 - 2.0 * qy * qy - 2.0 * qz * qz
-        this.matrix.data[1] = 2.0 * qx * qy - 2.0 * qz * qw
-        this.matrix.data[2] = 2.0 * qx * qz + 2.0 * qy * qw
-        this.matrix.data[3] = 0.0
+        this.matrix.data[4] = 2.0 * qx * qy - 2.0 * qz * qw
+        this.matrix.data[8] = 2.0 * qx * qz + 2.0 * qy * qw
+        this.matrix.data[12] = 0.0
 
-        this.matrix.data[4] = 2.0 * qx * qy + 2.0 * qz * qw
+        this.matrix.data[1] = 2.0 * qx * qy + 2.0 * qz * qw
         this.matrix.data[5] = 1.0 - 2.0 * qx * qx - 2.0 * qz * qz
-        this.matrix.data[6] = 2.0 * qy * qz - 2.0 * qx * qw
-        this.matrix.data[7] = 0.0
+        this.matrix.data[9] = 2.0 * qy * qz - 2.0 * qx * qw
+        this.matrix.data[13] = 0.0
 
-        this.matrix.data[8] = 2.0 * qx * qz - 2.0 * qy * qw
-        this.matrix.data[9] = 2.0 * qy * qz + 2.0 * qx * qw
+        this.matrix.data[2] = 2.0 * qx * qz - 2.0 * qy * qw
+        this.matrix.data[6] = 2.0 * qy * qz + 2.0 * qx * qw
         this.matrix.data[10] = 1.0 - 2.0 * qx * qx - 2.0 * qy * qy
-        this.matrix.data[11] = 0.0
+        this.matrix.data[14] = 0.0
 
-        this.matrix.data[12] = 0
-        this.matrix.data[13] = 0
-        this.matrix.data[14] = 0
+        this.matrix.data[3] = 0
+        this.matrix.data[7] = 0
+        this.matrix.data[11] = 0
         this.matrix.data[15] = 1.0
 
         this.render()
-
-        this.v1 = this.v2
     }
 
     pointerup() {
         this.pointerIsDown = false
+
+        this.rotation.data = this.intermediary.data.slice()
     }
 
     resize() {
