@@ -100,16 +100,21 @@ export default class Cow {
         const yh = Math.tan(Math.PI * 15 / 180) * d
         const xh = yh * config.ASPECT_RATIO
 
-        const z = Math.sqrt((x * xh) ** 2 + (y * yh) ** 2)
+        // const z = Math.sqrt((x * xh) ** 2 + (y * yh) ** 2)
 
         const c = config.LOOK_MATRIX.matMult({ with: [[[x * xh]], [[y * yh]], [[0]], [[1]]] })
+        // const c = bb.tensor([[[-0.5]], [[0]], [[0]], [[1]]])
 
         const rp = c.subtract({ with: config.FROM }).slice([':3']).unit()
         const t = ro.T().matMult({ with: rp }).data[0]
 
+        const z = rp.multiply({ with: t }).subtract({ with: ro }).norm().data[0]
+
         const ip = Math.sqrt(r ** 2 - z ** 2)
 
         const i = rp.multiply({ with: t - ip })
+
+        // console.log(i.subtract({ with: ro }).norm().data[0])
 
         return i.subtract({ with: ro })
     }
