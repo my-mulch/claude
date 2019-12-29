@@ -1,12 +1,13 @@
 
-export default class glManager {
-    constructor(canvas, vertexSource, fragmentSource) {
-        /** Context */
+export default class WebGL {
+    constructor(canvas) {
         this.context = canvas.getContext('webgl')
+    }
 
+    session(vertex, fragment) {
         /** Shaders */
-        this.vertexShader = this.createShader(this.context.VERTEX_SHADER, vertexSource)
-        this.fragmentShader = this.createShader(this.context.FRAGMENT_SHADER, fragmentSource)
+        this.vertex = this.createShader(this.context.VERTEX_SHADER, vertex)
+        this.fragment = this.createShader(this.context.FRAGMENT_SHADER, fragment)
 
         /** Program */
         this.context.program = this.createProgram()
@@ -19,10 +20,6 @@ export default class glManager {
 
         /** Usage */
         this.context.useProgram(this.context.program)
-    }
-
-    do(statements) {
-        statements.call(this)
 
         return this
     }
@@ -45,13 +42,13 @@ export default class glManager {
 
     createUniform(type, location) {
         if (type === this.context.FLOAT_MAT2)
-            return (function (array) { this.context.uniformMatrix2fv(location, false, array.data) }).bind(this)
+            return (function (array) { this.context.uniformMatrix2fv(location, false, array) }).bind(this)
 
         if (type === this.context.FLOAT_MAT3)
-            return (function (array) { this.context.uniformMatrix3fv(location, false, array.data) }).bind(this)
+            return (function (array) { this.context.uniformMatrix3fv(location, false, array) }).bind(this)
 
         if (type === this.context.FLOAT_MAT4)
-            return (function (array) { this.context.uniformMatrix4fv(location, false, array.data) }).bind(this)
+            return (function (array) { this.context.uniformMatrix4fv(location, false, array) }).bind(this)
     }
 
     createAttributes() {
@@ -141,8 +138,8 @@ export default class glManager {
     createProgram() {
         const program = this.context.createProgram()
 
-        this.context.attachShader(program, this.vertexShader)
-        this.context.attachShader(program, this.fragmentShader)
+        this.context.attachShader(program, this.vertex)
+        this.context.attachShader(program, this.fragment)
 
         this.context.linkProgram(program)
 
