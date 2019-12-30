@@ -9,9 +9,9 @@ export default class Camera {
         delta = 0.01,
 
         /** Positioning */
-        to = [0, 0, 0],
         up = [0, 1, 0],
-        from = [3, 3, 3],
+        to = [0, 0, 0],
+        from = [0, 0, 3],
     ) {
 
         /** Controls */
@@ -41,7 +41,93 @@ export default class Camera {
         this.depth = 1 / (this.far - this.near)
         this.sinAngle = Math.sin(this.angle)
         this.cosAngle = Math.cos(this.angle)
+        this.tanAngle = Math.tan(this.angle)
         this.cotAngle = this.cosAngle / this.sinAngle
+
+        /** Trackball Setup */
+        this.radius = 2
+        this.pinned = new Float32Array(3)
+        this.pointer = new Float32Array(3)
+        this.rotation = new Float32Array([0, 0, 0, 1]) // Quaternion Representation
+
+        /** Ray-Tracer Setup */
+        this.rayOrigin = new Float32Array(3)
+        this.rayTarget = new Float32Array(3)
+    }
+
+    cast(x, y) {
+        this.rayOrigin[0] = this.to[0] - this.from[0]
+        this.rayOrigin[1] = this.to[1] - this.from[1]
+        this.rayOrigin[2] = this.to[2] - this.from[2]
+
+        const distance = Math.sqrt(
+            this.rayOrigin[0] ** 2 +
+            this.rayOrigin[1] ** 2 +
+            this.rayOrigin[2] ** 2)
+
+
+        const yHat = this.tanAngle * distance
+        const xHat = yHat * this.aspect
+
+        const vx = x * xHat
+        const vy = y * yHat
+
+        const nx = this.view[0] * vx + this.view[1] * vy
+        const ny = this.view[4] * vx + this.view[5] * vy
+        const nz = this.view[8] * vx + this.view[9] * vy
+
+        this.rayTarget[0] = nx - this.from[0]
+        this.rayTarget[1] = ny - this.from[1]
+        this.rayTarget[2] = nz - this.from[2]
+
+        const rn = 1 / Math.sqrt(
+            this.rayTarget[0] ** 2 +
+            this.rayTarget[1] ** 2 +
+            this.rayTarget[2] ** 2)
+
+        this.rayTarget[0] *= rn
+        this.rayTarget[1] *= rn
+        this.rayTarget[2] *= rn
+
+        const projectedLength = // Dot Product of Ray Origin and Ray Target
+            this.rayTarget[0] * this.rayOrigin[0] +
+            this.rayTarget[1] * this.rayOrigin[1] +
+            this.rayTarget[2] * this.rayOrigin[2]
+
+        this.rayTarget[0] * projectedLength
+        this.rayTarget[1] * projectedLength
+        this.rayTarget[2] * projectedLength
+    }
+
+    intersect() {
+
+        const ro = config.TO.subtract({ with: config.FROM }).slice([':3'])
+        const d = ro.norm().data[0]
+
+        const x = (event.x - this.canvas.width / 2) / (this.canvas.width / 2)
+        const y = (this.canvas.height / 2 - event.y) / (this.canvas.height / 2)
+
+        const yh = Math.tan(Math.PI * 15 / 180) * d
+        const xh = yh * config.ASPECT_RATIO
+
+        const c = config.LOOK_MATRIX.matMult({ with: [[[x * xh]], [[y * yh]], [[0]], [[1]]] })
+
+        const rp = c.subtract({ with: config.FROM }).slice([':3']).unit()
+        const t = ro.T().matMult({ with: rp }).data[0]
+
+        const z = rp.multiply({ with: t }).subtract({ with: ro }).norm().data[0]
+
+        const ip = Math.sqrt(r ** 2 - z ** 2)
+
+        const i = rp.multiply({ with: t - ip })
+
+        // console.log(i.subtract({ with: ro }).norm().data[0])
+
+        return i.subtract({ with: ro })
+    }
+
+    pin() {
+
     }
 
     look() {
@@ -107,20 +193,6 @@ export default class Camera {
 }
 
 
-// this.pointer = bb.tensor([0, 0, 0, 0])
-//         this.rotation = bb.tensor([1, 0, 0, 0])
-//         this.intermediary = bb.tensor([0, 0, 0, 0])
-
-//         this.matrix = bb.eye([4, 4])
-//         this.webgl.uniforms.u_ModelMatrix.set(this.matrix)
-
-//         this.rotate = new bb.cached.multiply({
-//             of: this.pointer,
-//             with: this.rotation,
-//             result: this.intermediary
-//         })
-
-
 // pointerdown(event) {
 //     /** Clicked */
 //     this.pointer = true
@@ -181,33 +253,3 @@ export default class Camera {
 //     this.rotation.data = this.intermediary.data.slice()
 // }
 
-
-// intersect() {
-//     const r = 2
-//     const ro = config.TO.subtract({ with: config.FROM }).slice([':3'])
-//     const d = ro.norm().data[0]
-
-//     const x = (event.x - this.canvas.width / 2) / (this.canvas.width / 2)
-//     const y = (this.canvas.height / 2 - event.y) / (this.canvas.height / 2)
-
-//     const yh = Math.tan(Math.PI * 15 / 180) * d
-//     const xh = yh * config.ASPECT_RATIO
-
-//     // const z = Math.sqrt((x * xh) ** 2 + (y * yh) ** 2)
-
-//     const c = config.LOOK_MATRIX.matMult({ with: [[[x * xh]], [[y * yh]], [[0]], [[1]]] })
-//     // const c = bb.tensor([[[-0.5]], [[0]], [[0]], [[1]]])
-
-//     const rp = c.subtract({ with: config.FROM }).slice([':3']).unit()
-//     const t = ro.T().matMult({ with: rp }).data[0]
-
-//     const z = rp.multiply({ with: t }).subtract({ with: ro }).norm().data[0]
-
-//     const ip = Math.sqrt(r ** 2 - z ** 2)
-
-//     const i = rp.multiply({ with: t - ip })
-
-//     // console.log(i.subtract({ with: ro }).norm().data[0])
-
-//     return i.subtract({ with: ro })
-// }
