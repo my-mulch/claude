@@ -69,9 +69,9 @@ export default class Cow {
         /** Pressed */
         this.pointer = true
 
-        /** View-Space Coordinates */
-        const x = (event.x - this.canvas.width / 2) / (this.canvas.width / 2)
-        const y = (this.canvas.height / 2 - event.y) / (this.canvas.height / 2)
+        /** Screen-Space Coordinates */
+        const x = 2 * event.x / this.canvas.width - 1
+        const y = 1 - 2 * event.y / this.canvas.height
 
         /** Cast a Ray */
         this.camera.cast(x, y)

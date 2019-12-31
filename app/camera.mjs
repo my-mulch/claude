@@ -51,52 +51,59 @@ export default class Camera {
         this.rotation = new Float32Array([0, 0, 0, 1]) // Quaternion Representation
 
         /** Ray-Tracer Setup */
-        this.rayOrigin = new Float32Array(3)
-        this.rayTarget = new Float32Array(3)
+        this.origin = new Float32Array(4)
+        this.target = new Float32Array(4)
     }
 
     cast(x, y) {
-        this.rayOrigin[0] = this.to[0] - this.from[0]
-        this.rayOrigin[1] = this.to[1] - this.from[1]
-        this.rayOrigin[2] = this.to[2] - this.from[2]
+        /** Origin Ray in Camera Space */
+        this.origin[0] = 0
+        this.origin[1] = 0
+        this.origin[2] = 0
+        this.origin[3] = 1
 
-        const distance = Math.sqrt(
-            this.rayOrigin[0] ** 2 +
-            this.rayOrigin[1] ** 2 +
-            this.rayOrigin[2] ** 2)
+        /** Target Ray in Camera Space */
+        this.target[0] = x * this.tanAngle * this.aspect
+        this.target[1] = y * this.tanAngle
+        this.target[2] = -1
+        this.target[3] = 1
+
+        /** Target Ray in World Space */
+        const xp = this.view[0] * this.target[0] + this.view[4] * this.target[1] + this.view[8] * this.target[2] + this.view[12] * this.target[3]
+        const yp = this.view[1] * this.target[0] + this.view[5] * this.target[1] + this.view[9] * this.target[2] + this.view[13] * this.target[3]
+        const zp = this.view[2] * this.target[0] + this.view[6] * this.target[1] + this.view[10] * this.target[2] + this.view[14] * this.target[3]
+        const wp = this.view[3] * this.target[0] + this.view[7] * this.target[1] + this.view[11] * this.target[2] + this.view[15] * this.target[3]
+
+        /** Origin Ray in World Space */
+        const xo = this.view[0] * this.origin[0] + this.view[4] * this.origin[1] + this.view[8] * this.origin[2] + this.view[12] * this.origin[3]
+        const yo = this.view[1] * this.origin[0] + this.view[5] * this.origin[1] + this.view[9] * this.origin[2] + this.view[13] * this.origin[3]
+        const zo = this.view[2] * this.origin[0] + this.view[6] * this.origin[1] + this.view[10] * this.origin[2] + this.view[14] * this.origin[3]
+        const wo = this.view[3] * this.origin[0] + this.view[7] * this.origin[1] + this.view[11] * this.origin[2] + this.view[15] * this.origin[3]
+
+        this.target[0] = xp - xo
+        this.target[1] = yp - yo
+        this.target[2] = zp - zo
+        this.target[3] = wp - wo
+
+        /** Normalize Target Ray */
+        const rayTargetInverseLength = 1 / Math.sqrt(
+            this.target[0] ** 2 +
+            this.target[1] ** 2 +
+            this.target[2] ** 2 +
+            this.target[3] ** 2)
+
+        this.target[0] *= rayTargetInverseLength
+        this.target[1] *= rayTargetInverseLength
+        this.target[2] *= rayTargetInverseLength
+        this.target[3] *= rayTargetInverseLength
 
 
-        const yHat = this.tanAngle * distance
-        const xHat = yHat * this.aspect
+        console.log(this.target[0], this.target[1], this.target[2], this.target[3])
 
-        const vx = x * xHat
-        const vy = y * yHat
-
-        const nx = this.view[0] * vx + this.view[1] * vy
-        const ny = this.view[4] * vx + this.view[5] * vy
-        const nz = this.view[8] * vx + this.view[9] * vy
-
-        this.rayTarget[0] = nx - this.from[0]
-        this.rayTarget[1] = ny - this.from[1]
-        this.rayTarget[2] = nz - this.from[2]
-
-        const rn = 1 / Math.sqrt(
-            this.rayTarget[0] ** 2 +
-            this.rayTarget[1] ** 2 +
-            this.rayTarget[2] ** 2)
-
-        this.rayTarget[0] *= rn
-        this.rayTarget[1] *= rn
-        this.rayTarget[2] *= rn
-
-        const projectedLength = // Dot Product of Ray Origin and Ray Target
-            this.rayTarget[0] * this.rayOrigin[0] +
-            this.rayTarget[1] * this.rayOrigin[1] +
-            this.rayTarget[2] * this.rayOrigin[2]
-
-        this.rayTarget[0] * projectedLength
-        this.rayTarget[1] * projectedLength
-        this.rayTarget[2] * projectedLength
+        // console.log(this.view[0], this.view[4], this.view[8], this.view[12])
+        // console.log(this.view[1], this.view[5], this.view[9], this.view[13])
+        // console.log(this.view[2], this.view[6], this.view[10], this.view[14])
+        // console.log(this.view[3], this.view[7], this.view[11], this.view[15])
     }
 
     intersect() {
