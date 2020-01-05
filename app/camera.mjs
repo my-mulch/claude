@@ -11,7 +11,7 @@ export default class Camera {
         /** Positioning */
         up = [0, 1, 0],
         to = [0, 0, 0],
-        from = [0, 0, 3],
+        from = [3, 3, 3],
     ) {
 
         /** Controls */
@@ -51,59 +51,50 @@ export default class Camera {
         this.rotation = new Float32Array([0, 0, 0, 1]) // Quaternion Representation
 
         /** Ray-Tracer Setup */
-        this.origin = new Float32Array(4)
-        this.target = new Float32Array(4)
+        this.ray = new Float32Array(4)
+    }
+
+    print(matrix) {
+        console.log(matrix[0].toFixed(2), matrix[4].toFixed(2), matrix[8].toFixed(2), matrix[12].toFixed(2))
+        console.log(matrix[1].toFixed(2), matrix[5].toFixed(2), matrix[9].toFixed(2), matrix[13].toFixed(2))
+        console.log(matrix[2].toFixed(2), matrix[6].toFixed(2), matrix[10].toFixed(2), matrix[14].toFixed(2))
+        console.log(matrix[3].toFixed(2), matrix[7].toFixed(2), matrix[11].toFixed(2), matrix[15].toFixed(2))
     }
 
     cast(x, y) {
-        /** Origin Ray in Camera Space */
-        this.origin[0] = 0
-        this.origin[1] = 0
-        this.origin[2] = 0
-        this.origin[3] = 1
+        /** Dummy Variables */
+        const t = this.ray
+        const v = this.view
 
         /** Target Ray in Camera Space */
-        this.target[0] = x * this.tanAngle * this.aspect
-        this.target[1] = y * this.tanAngle
-        this.target[2] = -1
-        this.target[3] = 1
+        t[0] = x * this.tanAngle * this.aspect
+        t[1] = y * this.tanAngle
+        t[2] = -1
+        t[3] = 1
+
+        console.log(t)
 
         /** Target Ray in World Space */
-        const xp = this.view[0] * this.target[0] + this.view[4] * this.target[1] + this.view[8] * this.target[2] + this.view[12] * this.target[3]
-        const yp = this.view[1] * this.target[0] + this.view[5] * this.target[1] + this.view[9] * this.target[2] + this.view[13] * this.target[3]
-        const zp = this.view[2] * this.target[0] + this.view[6] * this.target[1] + this.view[10] * this.target[2] + this.view[14] * this.target[3]
-        const wp = this.view[3] * this.target[0] + this.view[7] * this.target[1] + this.view[11] * this.target[2] + this.view[15] * this.target[3]
+        const xp = v[0] * t[0] + v[4] * t[1] + v[8] * t[2] + v[12] * t[3]
+        const yp = v[1] * t[0] + v[5] * t[1] + v[9] * t[2] + v[13] * t[3]
+        const zp = v[2] * t[0] + v[6] * t[1] + v[10] * t[2] + v[14] * t[3]
+        const wp = v[3] * t[0] + v[7] * t[1] + v[11] * t[2] + v[15] * t[3]
 
         /** Origin Ray in World Space */
-        const xo = this.view[0] * this.origin[0] + this.view[4] * this.origin[1] + this.view[8] * this.origin[2] + this.view[12] * this.origin[3]
-        const yo = this.view[1] * this.origin[0] + this.view[5] * this.origin[1] + this.view[9] * this.origin[2] + this.view[13] * this.origin[3]
-        const zo = this.view[2] * this.origin[0] + this.view[6] * this.origin[1] + this.view[10] * this.origin[2] + this.view[14] * this.origin[3]
-        const wo = this.view[3] * this.origin[0] + this.view[7] * this.origin[1] + this.view[11] * this.origin[2] + this.view[15] * this.origin[3]
-
-        this.target[0] = xp - xo
-        this.target[1] = yp - yo
-        this.target[2] = zp - zo
-        this.target[3] = wp - wo
+        t[0] = xp - v[12]
+        t[1] = yp - v[13]
+        t[2] = zp - v[14]
+        t[3] = wp - v[15]
 
         /** Normalize Target Ray */
-        const rayTargetInverseLength = 1 / Math.sqrt(
-            this.target[0] ** 2 +
-            this.target[1] ** 2 +
-            this.target[2] ** 2 +
-            this.target[3] ** 2)
+        const rayInverseLength = 1 / Math.sqrt(t[0] ** 2 + t[1] ** 2 + t[2] ** 2 + t[3] ** 2)
 
-        this.target[0] *= rayTargetInverseLength
-        this.target[1] *= rayTargetInverseLength
-        this.target[2] *= rayTargetInverseLength
-        this.target[3] *= rayTargetInverseLength
+        t[0] *= rayInverseLength
+        t[1] *= rayInverseLength
+        t[2] *= rayInverseLength
+        t[3] *= rayInverseLength
 
-
-        console.log(this.target[0], this.target[1], this.target[2], this.target[3])
-
-        // console.log(this.view[0], this.view[4], this.view[8], this.view[12])
-        // console.log(this.view[1], this.view[5], this.view[9], this.view[13])
-        // console.log(this.view[2], this.view[6], this.view[10], this.view[14])
-        // console.log(this.view[3], this.view[7], this.view[11], this.view[15])
+        return t
     }
 
     intersect() {
@@ -133,10 +124,6 @@ export default class Camera {
         return i.subtract({ with: ro })
     }
 
-    pin() {
-
-    }
-
     look() {
         /** Define Forward-Facing */
         let fx = this.from[0] - this.to[0]
@@ -163,23 +150,27 @@ export default class Camera {
         sz *= sn
 
         /** Calculate Cross Product of Side and Forward */
-        const ux = fy * sz - fz * sy;
-        const uy = fz * sx - fx * sz;
-        const uz = fx * sy - fy * sx;
+        const ux = fy * sz - fz * sy
+        const uy = fz * sx - fx * sz
+        const uz = fx * sy - fy * sx
+
+        /** Dummy Variables */
+        const v = this.view
+        const f = this.from
 
         /** Assign Rotation to Look Matrix */
-        this.view[0] = sx; this.view[4] = sy; this.view[8] = sz; this.view[12] = 0;
-        this.view[1] = ux; this.view[5] = uy; this.view[9] = uz; this.view[13] = 0;
-        this.view[2] = fx; this.view[6] = fy; this.view[10] = fz; this.view[14] = 0;
-        this.view[3] = 0; this.view[7] = 0; this.view[11] = 0; this.view[15] = 1;
+        v[0] = sx; v[4] = sy; v[8] = sz; v[12] = 0;
+        v[1] = ux; v[5] = uy; v[9] = uz; v[13] = 0;
+        v[2] = fx; v[6] = fy; v[10] = fz; v[14] = 0;
+        v[3] = 0; v[7] = 0; v[11] = 0; v[15] = 1;
 
         /** Assign Translation to Look Matrix */
-        this.view[12] += this.view[0] * -this.from[0] + this.view[4] * -this.from[1] + this.view[8] * -this.from[2]
-        this.view[13] += this.view[1] * -this.from[0] + this.view[5] * -this.from[1] + this.view[9] * -this.from[2]
-        this.view[14] += this.view[2] * -this.from[0] + this.view[6] * -this.from[1] + this.view[10] * -this.from[2]
-        this.view[15] += this.view[3] * -this.from[0] + this.view[7] * -this.from[1] + this.view[11] * -this.from[2]
+        v[12] += v[0] * -f[0] + v[4] * -f[1] + v[8] * -f[2]
+        v[13] += v[1] * -f[0] + v[5] * -f[1] + v[9] * -f[2]
+        v[14] += v[2] * -f[0] + v[6] * -f[1] + v[10] * -f[2]
+        v[15] += v[3] * -f[0] + v[7] * -f[1] + v[11] * -f[2]
 
-        return this.view
+        return v
     }
 
     project() {

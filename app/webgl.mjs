@@ -1,8 +1,6 @@
 
 export default class WebGL {
-    constructor(canvas) {
-        this.context = canvas.getContext('webgl')
-    }
+    constructor(context) { this.context = context }
 
     session(vertex, fragment) {
         /** Shaders */

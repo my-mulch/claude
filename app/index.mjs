@@ -14,7 +14,7 @@ export default class Cow {
         this.canvas.height = window.innerHeight
 
         /** Peripherals */
-        this.webgl = new WebGL(this.canvas)
+        this.webgl = new WebGL(this.canvas.getContext('webgl'))
         this.camera = new Camera(this.canvas.width / this.canvas.height)
 
         /** Event Listeners */
@@ -74,7 +74,9 @@ export default class Cow {
         const y = 1 - 2 * event.y / this.canvas.height
 
         /** Cast a Ray */
-        this.camera.cast(x, y)
+        const ray = this.camera.cast(x, y)
+        
+        // console.log(ray)
     }
 
     pointermove(event) {
