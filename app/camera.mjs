@@ -43,15 +43,6 @@ export default class Camera {
         this.cosAngle = Math.cos(this.angle)
         this.tanAngle = Math.tan(this.angle)
         this.cotAngle = this.cosAngle / this.sinAngle
-
-        /** Trackball Setup */
-        this.radius = 2
-        this.pinned = new Float32Array(3)
-        this.pointer = new Float32Array(3)
-        this.rotation = new Float32Array([0, 0, 0, 1]) // Quaternion Representation
-
-        /** Ray-Tracer Setup */
-        this.ray = new Float32Array(4)
     }
 
     print(matrix) {
@@ -61,40 +52,29 @@ export default class Camera {
         console.log(matrix[3].toFixed(2), matrix[7].toFixed(2), matrix[11].toFixed(2), matrix[15].toFixed(2))
     }
 
+    printT(matrix) {
+        console.log(matrix[0].toFixed(2), matrix[1].toFixed(2), matrix[2].toFixed(2), matrix[3].toFixed(2))
+        console.log(matrix[4].toFixed(2), matrix[5].toFixed(2), matrix[6].toFixed(2), matrix[7].toFixed(2))
+        console.log(matrix[8].toFixed(2), matrix[9].toFixed(2), matrix[10].toFixed(2), matrix[11].toFixed(2))
+        console.log(matrix[12].toFixed(2), matrix[13].toFixed(2), matrix[14].toFixed(2), matrix[15].toFixed(2))
+    }
+
     cast(x, y) {
         /** Dummy Variables */
-        const t = this.ray
         const v = this.view
+        
+        /** World-Space Ray from Clicked Point */
+        let xc = x * this.tanAngle * this.aspect
+        let yc = y * this.tanAngle
+        let zc = -1
 
-        /** Target Ray in Camera Space */
-        t[0] = x * this.tanAngle * this.aspect
-        t[1] = y * this.tanAngle
-        t[2] = -1
-        t[3] = 1
+        console.log(`[${xc}; ${yc}; ${zc}; 1]`)
 
-        console.log(t)
+        const xp = v[0] * xc + v[1] * yc + v[2] * zc
+        const yp = v[4] * xc + v[5] * yc + v[6] * zc
+        const zp = v[8] * xc + v[9] * yc + v[10] * zc
 
-        /** Target Ray in World Space */
-        const xp = v[0] * t[0] + v[4] * t[1] + v[8] * t[2] + v[12] * t[3]
-        const yp = v[1] * t[0] + v[5] * t[1] + v[9] * t[2] + v[13] * t[3]
-        const zp = v[2] * t[0] + v[6] * t[1] + v[10] * t[2] + v[14] * t[3]
-        const wp = v[3] * t[0] + v[7] * t[1] + v[11] * t[2] + v[15] * t[3]
-
-        /** Origin Ray in World Space */
-        t[0] = xp - v[12]
-        t[1] = yp - v[13]
-        t[2] = zp - v[14]
-        t[3] = wp - v[15]
-
-        /** Normalize Target Ray */
-        const rayInverseLength = 1 / Math.sqrt(t[0] ** 2 + t[1] ** 2 + t[2] ** 2 + t[3] ** 2)
-
-        t[0] *= rayInverseLength
-        t[1] *= rayInverseLength
-        t[2] *= rayInverseLength
-        t[3] *= rayInverseLength
-
-        return t
+        console.log(xp, yp, zp)
     }
 
     intersect() {
@@ -125,10 +105,16 @@ export default class Camera {
     }
 
     look() {
+        /** Dummy Variables */
+        const t = this.to
+        const u = this.up
+        const v = this.view
+        const f = this.from
+
         /** Define Forward-Facing */
-        let fx = this.from[0] - this.to[0]
-        let fy = this.from[1] - this.to[1]
-        let fz = this.from[2] - this.to[2]
+        let fx = f[0] - t[0]
+        let fy = f[1] - t[1]
+        let fz = f[2] - t[2]
 
         /** Normalize Forward-Facing */
         const fn = 1 / Math.sqrt(fx * fx + fy * fy + fz * fz)
@@ -138,9 +124,9 @@ export default class Camera {
         fz *= fn
 
         /** Calculate Cross Product of Up and Forward */
-        let sx = this.up[1] * fz - this.up[2] * fy
-        let sy = this.up[2] * fx - this.up[0] * fz
-        let sz = this.up[0] * fy - this.up[1] * fx
+        let sx = u[1] * fz - u[2] * fy
+        let sy = u[2] * fx - u[0] * fz
+        let sz = u[0] * fy - u[1] * fx
 
         /** Normalize Side-Facing */
         const sn = 1 / Math.sqrt(sx * sx + sy * sy + sz * sz)
@@ -153,10 +139,6 @@ export default class Camera {
         const ux = fy * sz - fz * sy
         const uy = fz * sx - fx * sz
         const uz = fx * sy - fy * sx
-
-        /** Dummy Variables */
-        const v = this.view
-        const f = this.from
 
         /** Assign Rotation to Look Matrix */
         v[0] = sx; v[4] = sy; v[8] = sz; v[12] = 0;
