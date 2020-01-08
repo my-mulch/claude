@@ -6,33 +6,22 @@ export default class Camera {
         angle = 30,
         near = 1e-6,
         far = 1e6,
-        delta = 0.01,
 
         /** Positioning */
         up = [0, 1, 0],
-        to = [-1, 0, 0],
-        from = [1, 2, 3],
+        to = [0, 0, 0],
+        from = [0, 0, 5],
     ) {
+        /** Matrices */
+        this.view = new Float32Array(16)
+        this.proj = new Float32Array(16)
 
-        /** Controls */
-        this.delta = delta
-
-        /** Look Setup */
+        /** Vectors */
         this.to = new Float32Array(to)
         this.up = new Float32Array(up)
         this.from = new Float32Array(from)
 
-        /** Matrices */
-        this.view = new Float32Array(16)
-        this.proj = new Float32Array(16)
-        this.model = new Float32Array(16)
-
-        this.model[0] = 1
-        this.model[5] = 1
-        this.model[10] = 1
-        this.model[15] = 1
-
-        /** Project Setup */
+        /** Projection */
         this.far = far
         this.near = near
         this.aspect = aspect
@@ -43,6 +32,12 @@ export default class Camera {
         this.cosAngle = Math.cos(this.angle)
         this.tanAngle = Math.tan(this.angle)
         this.cotAngle = this.cosAngle / this.sinAngle
+
+        this.proj[0] = this.cotAngle / this.aspect
+        this.proj[5] = this.cotAngle
+        this.proj[10] = -(this.far + this.near) * this.depth
+        this.proj[11] = -1
+        this.proj[14] = -2 * this.near * this.far * this.depth
     }
 
     cast(x, y) {
@@ -67,34 +62,7 @@ export default class Camera {
             v[8] * xn + v[9] * yn + v[10] * zn,
         ]
     }
-
-    intersect() {
-
-        const ro = config.TO.subtract({ with: config.FROM }).slice([':3'])
-        const d = ro.norm().data[0]
-
-        const x = (event.x - this.canvas.width / 2) / (this.canvas.width / 2)
-        const y = (this.canvas.height / 2 - event.y) / (this.canvas.height / 2)
-
-        const yh = Math.tan(Math.PI * 15 / 180) * d
-        const xh = yh * config.ASPECT_RATIO
-
-        const c = config.LOOK_MATRIX.matMult({ with: [[[x * xh]], [[y * yh]], [[0]], [[1]]] })
-
-        const rp = c.subtract({ with: config.FROM }).slice([':3']).unit()
-        const t = ro.T().matMult({ with: rp }).data[0]
-
-        const z = rp.multiply({ with: t }).subtract({ with: ro }).norm().data[0]
-
-        const ip = Math.sqrt(r ** 2 - z ** 2)
-
-        const i = rp.multiply({ with: t - ip })
-
-        // console.log(i.subtract({ with: ro }).norm().data[0])
-
-        return i.subtract({ with: ro })
-    }
-
+    
     look() {
         /** Dummy Variables */
         const t = this.to
@@ -146,20 +114,10 @@ export default class Camera {
         return v
     }
 
-    project() {
-        this.proj[0] = this.cotAngle / this.aspect
-        this.proj[5] = this.cotAngle
-        this.proj[10] = -(this.far + this.near) * this.depth
-        this.proj[11] = -1
-        this.proj[14] = -2 * this.near * this.far * this.depth
-
-        return this.proj
-    }
-
     zoom(direction) {
-        this.from[0] += direction * this.delta * (this.from[0] - this.to[0])
-        this.from[1] += direction * this.delta * (this.from[1] - this.to[1])
-        this.from[2] += direction * this.delta * (this.from[2] - this.to[2])
+        this.from[0] += direction * 0.01 * (this.from[0] - this.to[0])
+        this.from[1] += direction * 0.01 * (this.from[1] - this.to[1])
+        this.from[2] += direction * 0.01 * (this.from[2] - this.to[2])
     }
 }
 
