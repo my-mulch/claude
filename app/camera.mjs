@@ -10,8 +10,8 @@ export default class Camera {
 
         /** Positioning */
         up = [0, 1, 0],
-        to = [0, 0, 0],
-        from = [3, 3, 3],
+        to = [-1, 0, 0],
+        from = [1, 2, 3],
     ) {
 
         /** Controls */
@@ -25,12 +25,12 @@ export default class Camera {
         /** Matrices */
         this.view = new Float32Array(16)
         this.proj = new Float32Array(16)
-        this.model = new Float32Array([
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1,
-        ])
+        this.model = new Float32Array(16)
+
+        this.model[0] = 1
+        this.model[5] = 1
+        this.model[10] = 1
+        this.model[15] = 1
 
         /** Project Setup */
         this.far = far
@@ -45,36 +45,27 @@ export default class Camera {
         this.cotAngle = this.cosAngle / this.sinAngle
     }
 
-    print(matrix) {
-        console.log(matrix[0].toFixed(2), matrix[4].toFixed(2), matrix[8].toFixed(2), matrix[12].toFixed(2))
-        console.log(matrix[1].toFixed(2), matrix[5].toFixed(2), matrix[9].toFixed(2), matrix[13].toFixed(2))
-        console.log(matrix[2].toFixed(2), matrix[6].toFixed(2), matrix[10].toFixed(2), matrix[14].toFixed(2))
-        console.log(matrix[3].toFixed(2), matrix[7].toFixed(2), matrix[11].toFixed(2), matrix[15].toFixed(2))
-    }
-
-    printT(matrix) {
-        console.log(matrix[0].toFixed(2), matrix[1].toFixed(2), matrix[2].toFixed(2), matrix[3].toFixed(2))
-        console.log(matrix[4].toFixed(2), matrix[5].toFixed(2), matrix[6].toFixed(2), matrix[7].toFixed(2))
-        console.log(matrix[8].toFixed(2), matrix[9].toFixed(2), matrix[10].toFixed(2), matrix[11].toFixed(2))
-        console.log(matrix[12].toFixed(2), matrix[13].toFixed(2), matrix[14].toFixed(2), matrix[15].toFixed(2))
-    }
-
     cast(x, y) {
         /** Dummy Variables */
         const v = this.view
-        
-        /** World-Space Ray from Clicked Point */
-        let xc = x * this.tanAngle * this.aspect
-        let yc = y * this.tanAngle
-        let zc = -1
 
-        console.log(`[${xc}; ${yc}; ${zc}; 1]`)
+        /** Normalized Camera-Space Ray from Clicked Point */
+        let xn = x * this.tanAngle * this.aspect
+        let yn = y * this.tanAngle
+        let zn = -1
 
-        const xp = v[0] * xc + v[1] * yc + v[2] * zc
-        const yp = v[4] * xc + v[5] * yc + v[6] * zc
-        const zp = v[8] * xc + v[9] * yc + v[10] * zc
+        const inverseNorm = 1 / Math.sqrt(xn ** 2 + yn ** 2 + zn ** 2)
 
-        console.log(xp, yp, zp)
+        xn *= inverseNorm
+        yn *= inverseNorm
+        zn *= inverseNorm
+
+        /** Nomalized World-Space Ray after Inverse Camera Transform */
+        return [
+            v[0] * xn + v[1] * yn + v[2] * zn,
+            v[4] * xn + v[5] * yn + v[6] * zn,
+            v[8] * xn + v[9] * yn + v[10] * zn,
+        ]
     }
 
     intersect() {
