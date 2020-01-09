@@ -68,9 +68,9 @@ export default class Trackball {
         const pn = Math.sqrt(p[0] ** 2 + p[1] ** 2 + p[2] ** 2)
 
         /** Normalized Cross Product of Start and Pointer */
-        let cx = s[1] * p[2] - u[2] * p[1]
-        let cy = s[2] * p[0] - u[0] * p[2]
-        let cz = s[0] * p[1] - u[1] * p[0]
+        let cx = s[1] * p[2] - s[2] * p[1]
+        let cy = s[2] * p[0] - s[0] * p[2]
+        let cz = s[0] * p[1] - s[1] * p[0]
 
         const vectorInverseNorm = Math.sqrt(1 / cx ** 2 + cy ** 2 + cz ** 2)
 
@@ -82,15 +82,15 @@ export default class Trackball {
         const dp = s[0] * p[0] + s[1] * p[1] + s[2] * p[2]
 
         /** Angle Between Start and Pointer */
-        const angle = Math.acos(dp / norm)
+        const angle = Math.acos(dp / (sn * pn))
 
         if (isNaN(angle)) return
 
         /** Construct Quaternion to Represent Rotation */
-        qw = Math.cos(angle / 2)
-        qx = Math.sin(angle / 2) * cx
-        qy = Math.sin(angle / 2) * cy
-        qz = Math.sin(angle / 2) * cz
+        const qw = Math.cos(angle / 2)
+        const qx = Math.sin(angle / 2) * cx
+        const qy = Math.sin(angle / 2) * cy
+        const qz = Math.sin(angle / 2) * cz
 
         /** Apply Rotation via Quaternion Multiplication */
         r[0] = qw * o[0] - qx * o[1] - qy * o[2] - qz * o[3]

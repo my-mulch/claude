@@ -12,20 +12,17 @@ export default class Camera {
         to = [0, 0, 0],
         from = [0, 0, 5],
     ) {
-        /** Matrices */
-        this.view = new Float32Array([
-            1, 0, 0, 0,
-            0, 1, 0, 0,
-            0, 0, 1, 0,
-            0, 0, 0, 1,
-        ])
-
-        this.proj = new Float32Array(16)
-
         /** Vectors */
         this.to = new Float32Array(to)
         this.up = new Float32Array(up)
         this.from = new Float32Array(from)
+
+        /** Matrices */
+        this.view = new Float32Array(16)
+        this.proj = new Float32Array(16)
+
+        /** Compute Look-At */
+        this.look()
 
         /** Projection */
         this.far = far
