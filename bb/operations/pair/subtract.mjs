@@ -1,4 +1,4 @@
-import Algebra from '../../template/algebra.mjs'
+import Algebra from '../../../gen/algebra.mjs'
 import PairOperation from './interface.mjs'
 
 export default class Subtraction extends PairOperation {

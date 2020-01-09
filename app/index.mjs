@@ -49,15 +49,9 @@ export default class Cow {
             this.webgl.attributes.a_PointSize.set(object.sizeBuffer)
             this.webgl.attributes.a_Position.set(object.vertexBuffer)
 
-            this.webgl.uniforms.u_ModelMatrix.set(new Float32Array([
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1
-            ]))
-
-            this.webgl.uniforms.u_ViewMatrix.set(this.camera.look())
+            this.webgl.uniforms.u_ViewMatrix.set(this.camera.view)
             this.webgl.uniforms.u_ProjMatrix.set(this.camera.proj)
+            this.webgl.uniforms.u_ModelMatrix.set(this.trackball.model)
 
             this.webgl.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
@@ -77,12 +71,11 @@ export default class Cow {
         /** Pressed */
         this.pointer = true
 
-        /** Screen-Space Coordinates */
-        const x = 2 * event.x / this.canvas.width - 1
-        const y = 1 - 2 * event.y / this.canvas.height
-
-        /** Cast a Ray */
-        const ray = this.camera.cast(x, y)
+        /** Cast a Ray using Screen-Space Coordinates */
+        const ray = this.camera.cast(
+            2 * event.x / this.canvas.width - 1,
+            1 - 2 * event.y / this.canvas.height
+        )
 
         /** Intersection */
         const [p0, p1] = this.trackball.intersect(
@@ -90,15 +83,37 @@ export default class Cow {
             this.camera.from // Origin of casted ray
         )
 
-        this.trackball.start(p0)
+        this.trackball.start = p0
     }
 
     pointermove(event) {
+        /** Not Pressed? */
         if (!this.pointer) return
+
+        /** Cast a Ray using Screen-Space Coordinates */
+        const ray = this.camera.cast(
+            2 * event.x / this.canvas.width - 1,
+            1 - 2 * event.y / this.canvas.height
+        )
+
+        /** Intersection */
+        const [p0, p1] = this.trackball.intersect(
+            ray, // Direction of casted ray
+            this.camera.from // Origin of casted ray
+        )
+
+        /** Track the Mouse-Movement along the Trackball */
+        this.trackball.track(p0)
+
+        /** Render the Changes */
+        this.render()
     }
 
     pointerup(event) {
         /** Released */
         this.pointer = false
+
+        /** Keep the Trackball at the Released Position */
+        this.trackball.stop()
     }
 }

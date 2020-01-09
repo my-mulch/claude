@@ -13,7 +13,13 @@ export default class Camera {
         from = [0, 0, 5],
     ) {
         /** Matrices */
-        this.view = new Float32Array(16)
+        this.view = new Float32Array([
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1,
+        ])
+
         this.proj = new Float32Array(16)
 
         /** Vectors */
@@ -62,7 +68,7 @@ export default class Camera {
             v[8] * xn + v[9] * yn + v[10] * zn,
         ]
     }
-    
+
     look() {
         /** Dummy Variables */
         const t = this.to
@@ -115,70 +121,12 @@ export default class Camera {
     }
 
     zoom(direction) {
+        /** Zoom In or Out Depending on the Sign of Direction */
         this.from[0] += direction * 0.01 * (this.from[0] - this.to[0])
         this.from[1] += direction * 0.01 * (this.from[1] - this.to[1])
         this.from[2] += direction * 0.01 * (this.from[2] - this.to[2])
+
+        /** Construct Look-At Matrix from New Vantage Point */
+        this.look()
     }
 }
-
-
-// pointerdown(event) {
-//     /** Clicked */
-//     this.pointer = true
-
-//     this.v1 = this.intersect()
-// }
-
-// pointermove(event) {
-//     if (!this.pointer) return
-
-//     this.v2 = this.intersect()
-
-//     this.v = bb.cross({ of: this.v1, with: this.v2 }).unit()
-//     this.d = this.v1.T().matMult({ with: this.v2 }).data[0]
-//     this.n = this.v1.norm().data[0] * this.v2.norm().data[0]
-//     this.a = Math.acos(this.d / this.n)
-
-//     if (isNaN(this.a)) return
-
-//     this.pointer.data[0] = Math.cos(this.a / 2)
-//     this.pointer.data[1] = Math.sin(this.a / 2) * this.v.data[0]
-//     this.pointer.data[2] = Math.sin(this.a / 2) * this.v.data[1]
-//     this.pointer.data[3] = Math.sin(this.a / 2) * this.v.data[2]
-
-//     this.rotate.invoke()
-
-//     const qw = this.intermediary.data[0]
-//     const qx = this.intermediary.data[1]
-//     const qy = this.intermediary.data[2]
-//     const qz = this.intermediary.data[3]
-
-//     this.matrix.data[0] = 1.0 - 2.0 * qy * qy - 2.0 * qz * qz
-//     this.matrix.data[4] = 2.0 * qx * qy - 2.0 * qz * qw
-//     this.matrix.data[8] = 2.0 * qx * qz + 2.0 * qy * qw
-//     this.matrix.data[12] = 0.0
-
-//     this.matrix.data[1] = 2.0 * qx * qy + 2.0 * qz * qw
-//     this.matrix.data[5] = 1.0 - 2.0 * qx * qx - 2.0 * qz * qz
-//     this.matrix.data[9] = 2.0 * qy * qz - 2.0 * qx * qw
-//     this.matrix.data[13] = 0.0
-
-//     this.matrix.data[2] = 2.0 * qx * qz - 2.0 * qy * qw
-//     this.matrix.data[6] = 2.0 * qy * qz + 2.0 * qx * qw
-//     this.matrix.data[10] = 1.0 - 2.0 * qx * qx - 2.0 * qy * qy
-//     this.matrix.data[14] = 0.0
-
-//     this.matrix.data[3] = 0
-//     this.matrix.data[7] = 0
-//     this.matrix.data[11] = 0
-//     this.matrix.data[15] = 1.0
-
-//     this.render()
-// }
-
-// pointerup() {
-//     this.pointerIsDown = false
-
-//     this.rotation.data = this.intermediary.data.slice()
-// }
-

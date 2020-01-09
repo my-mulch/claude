@@ -1,5 +1,5 @@
 import Tensor from '../../tensor/index.mjs'
-import Source from '../../template/source.mjs'
+import Source from '../../../gen/source.mjs'
 import __Math__ from '../arithmetic/index.mjs'
 
 export default class Mesh {

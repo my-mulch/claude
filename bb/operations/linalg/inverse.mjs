@@ -1,4 +1,4 @@
-import Algebra from '../../template/algebra.mjs'
+import Algebra from '../../../gen/algebra.mjs'
 import Adjugate from './adjugate.mjs'
 import LinearAlgebraOperation from './operation.mjs'
 

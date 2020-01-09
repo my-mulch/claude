@@ -25,11 +25,6 @@ export default class Algebra {
         })
     }
 
-    static ONE(size) { return new Array(size).fill(1) }
-    static ZERO(size) { return new Array(size).fill(0) }
-    static POSITIVE_INFINITY(size) { return Array(size).fill(Number.POSITIVE_INFINITY) }
-    static NEGATIVE_INFINITY(size) { return Array(size).fill(Number.NEGATIVE_INFINITY) }
-
     static noop(o1, o2) {
         [o1, o2] = Algebra.match(o1, o2)
 
