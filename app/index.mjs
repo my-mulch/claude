@@ -67,15 +67,19 @@ export default class Cow {
         this.render()
     }
 
+    rasterToScreen(event) {
+        return [
+            2 * event.x / this.canvas.width - 1,
+            1 - 2 * event.y / this.canvas.height
+        ]
+    }
+
     pointerdown(event) {
         /** Pressed */
         this.pointer = true
 
         /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(
-            2 * event.x / this.canvas.width - 1,
-            1 - 2 * event.y / this.canvas.height
-        )
+        const ray = this.camera.cast(...this.rasterToScreen(event))
 
         /** Intersection */
         const [p0, p1] = this.trackball.intersect(
@@ -91,10 +95,7 @@ export default class Cow {
         if (!this.pointer) return
 
         /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(
-            2 * event.x / this.canvas.width - 1,
-            1 - 2 * event.y / this.canvas.height
-        )
+        const ray = this.camera.cast(...this.rasterToScreen(event))
 
         /** Intersection */
         const [p0, p1] = this.trackball.intersect(
