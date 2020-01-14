@@ -72,7 +72,7 @@ export default class Trackball {
         let cy = s[2] * p[0] - s[0] * p[2]
         let cz = s[0] * p[1] - s[1] * p[0]
 
-        const vectorInverseNorm = Math.sqrt(1 / cx ** 2 + cy ** 2 + cz ** 2)
+        const vectorInverseNorm = 1 / Math.sqrt(cx ** 2 + cy ** 2 + cz ** 2)
 
         cx *= vectorInverseNorm
         cy *= vectorInverseNorm
