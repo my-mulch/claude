@@ -1,125 +1,129 @@
-import bb from '../bb/index.mjs'
-import config from '../res/config.mjs'
 
 export default class Camera {
-    constructor() {
-        /** Look Setup */
-        this.negateFrom = new bb.cached.negate({ of: config.FROM })
+    constructor(
+        /** Viewing */
+        aspect = 1,
+        angle = 30,
+        near = 1e-6,
+        far = 1e6,
 
-        this.front = new bb.cached.subtract({ of: config.FROM, with: config.TO })
-        this.side = new bb.cached.cross({ of: config.UP, with: this.front.result })
+        /** Positioning */
+        up = [0, 1, 0],
+        to = [0, 0, 0],
+        from = [3, 1, 3],
+    ) {
+        /** Vectors */
+        this.to = new Float32Array(to)
+        this.up = new Float32Array(up)
+        this.from = new Float32Array(from)
 
-        this.unitSide = new bb.cached.unit({ of: this.side.result })
-        this.unitFront = new bb.cached.unit({ of: this.front.result })
-        this.unitUp = new bb.cached.cross({ of: this.unitFront.result, with: this.unitSide.result })
+        /** Matrices */
+        this.view = new Float32Array(16)
+        this.proj = new Float32Array(16)
 
-        this.assignUpFrame = new bb.cached.assign({ of: config.VIEW_MATRIX, region: [':3', '1:2'], with: this.unitUp.result })
-        this.assignSideFrame = new bb.cached.assign({ of: config.VIEW_MATRIX, region: [':3', '0:1'], with: this.unitSide.result })
-        this.assignFrontFrame = new bb.cached.assign({ of: config.VIEW_MATRIX, region: [':3', '2:3'], with: this.unitFront.result })
-        this.assignTranslation = new bb.cached.assign({ of: config.MOVE_MATRIX, region: ['3:4', ':3'], with: this.negateFrom.result.T() })
+        /** Compute Look-At */
+        this.look()
 
-        this.createView = new bb.cached.matMult({ of: config.MOVE_MATRIX, with: config.VIEW_MATRIX, result: config.LOOK_MATRIX })
+        /** Projection */
+        this.far = far
+        this.near = near
+        this.aspect = aspect
+        this.angle = Math.PI * angle / 180 / 2
 
-        /** Project Setup */
-        this.reciprocalDepth = 1 / (config.FAR - config.NEAR)
+        this.depth = 1 / (this.far - this.near)
+        this.sinAngle = Math.sin(this.angle)
+        this.cosAngle = Math.cos(this.angle)
+        this.tanAngle = Math.tan(this.angle)
+        this.cotAngle = this.cosAngle / this.sinAngle
 
-        this.viewingAngle = Math.PI * config.VIEWING_ANGLE / 180 / 2
-        this.sinOfViewingAngle = Math.sin(this.viewingAngle)
-        this.cosOfViewingAngle = Math.cos(this.viewingAngle)
-        this.cotOfViewingAngle = this.cosOfViewingAngle / this.sinOfViewingAngle
+        this.proj[0] = this.cotAngle / this.aspect
+        this.proj[5] = this.cotAngle
+        this.proj[10] = -(this.far + this.near) * this.depth
+        this.proj[11] = -1
+        this.proj[14] = -2 * this.near * this.far * this.depth
+    }
 
-        /** Pan Setup */
-        const s = Math.sin(config.PAN_DELTA)
-        const c = Math.cos(config.PAN_DELTA)
+    cast(x, y) {
+        /** Dummy Variables */
+        const v = this.view
 
-        this.upRot = bb.tensor([[[1], [0], [0], [0]], [[0], [c], [-s], [0]], [[0], [s], [c], [0]], [[0], [0], [0], [1]]])
-        this.downRot = bb.tensor([[[1], [0], [0], [0]], [[0], [c], [s], [0]], [[0], [-s], [c], [0]], [[0], [0], [0], [1]]])
-        this.leftRot = bb.tensor([[[c], [0], [s], [0]], [[0], [1], [0], [0]], [[-s], [0], [c], [0]], [[0], [0], [0], [1]]])
-        this.rightRot = bb.tensor([[[c], [0], [-s], [0]], [[0], [1], [0], [0]], [[s], [0], [c], [0]], [[0], [0], [0], [1]]])
+        /** Normalized Camera-Space Ray from Clicked Point */
+        let xn = x * this.tanAngle * this.aspect
+        let yn = y * this.tanAngle
+        let zn = -1
 
-        this.inverseView = new bb.cached.inverse({ of: config.LOOK_MATRIX })
-        this.setRotation = new bb.cached.matMult({ of: this.inverseView.result.T(), with: bb.zeros([4, 4]) })
-        this.setViewMatrix = new bb.cached.matMult({ of: this.setRotation.result, with: config.LOOK_MATRIX.T() })
-        this.setPosition = new bb.cached.matMult({ of: this.setViewMatrix.result, with: config.TO, result: config.TO })
+        const inverseNorm = 1 / Math.sqrt(xn ** 2 + yn ** 2 + zn ** 2)
 
-        /** Zoom Setup */
-        this.gaze = new bb.cached.subtract({ of: config.FROM, with: config.TO })
-        this.delta = new bb.cached.multiply({ of: this.gaze.result, with: config.ZOOM_DELTA })
+        xn *= inverseNorm
+        yn *= inverseNorm
+        zn *= inverseNorm
 
-        this.zoomInTo = new bb.cached.subtract({ of: config.TO, with: this.delta.result, result: config.TO })
-        this.zoomInFrom = new bb.cached.subtract({ of: config.FROM, with: this.delta.result, result: config.FROM })
-
-        this.zoomOutTo = new bb.cached.add({ of: config.TO, with: this.delta.result, result: config.TO })
-        this.zoomOutFrom = new bb.cached.add({ of: config.FROM, with: this.delta.result, result: config.FROM })
+        /** Nomalized World-Space Ray after Inverse Camera Transform */
+        return [
+            v[0] * xn + v[1] * yn + v[2] * zn,
+            v[4] * xn + v[5] * yn + v[6] * zn,
+            v[8] * xn + v[9] * yn + v[10] * zn,
+        ]
     }
 
     look() {
-        this.negateFrom.invoke()
+        /** Dummy Variables */
+        const t = this.to
+        const u = this.up
+        const v = this.view
+        const f = this.from
 
-        this.front.invoke()
-        this.side.invoke()
+        /** Define Forward-Facing */
+        let fx = f[0] - t[0]
+        let fy = f[1] - t[1]
+        let fz = f[2] - t[2]
 
-        this.unitSide.invoke()
-        this.unitFront.invoke()
-        this.unitUp.invoke()
+        /** Normalize Forward-Facing */
+        const fn = 1 / Math.sqrt(fx * fx + fy * fy + fz * fz)
 
-        this.assignUpFrame.invoke()
-        this.assignSideFrame.invoke()
-        this.assignFrontFrame.invoke()
-        this.assignTranslation.invoke()
+        fx *= fn
+        fy *= fn
+        fz *= fn
 
-        return this.createView.invoke()
+        /** Calculate Cross Product of Up and Forward */
+        let sx = u[1] * fz - u[2] * fy
+        let sy = u[2] * fx - u[0] * fz
+        let sz = u[0] * fy - u[1] * fx
+
+        /** Normalize Side-Facing */
+        const sn = 1 / Math.sqrt(sx * sx + sy * sy + sz * sz)
+
+        sx *= sn
+        sy *= sn
+        sz *= sn
+
+        /** Calculate Cross Product of Side and Forward */
+        const ux = fy * sz - fz * sy
+        const uy = fz * sx - fx * sz
+        const uz = fx * sy - fy * sx
+
+        /** Assign Rotation to Look Matrix */
+        v[0] = sx; v[4] = sy; v[8] = sz; v[12] = 0;
+        v[1] = ux; v[5] = uy; v[9] = uz; v[13] = 0;
+        v[2] = fx; v[6] = fy; v[10] = fz; v[14] = 0;
+        v[3] = 0; v[7] = 0; v[11] = 0; v[15] = 1;
+
+        /** Assign Translation to Look Matrix */
+        v[12] += v[0] * -f[0] + v[4] * -f[1] + v[8] * -f[2]
+        v[13] += v[1] * -f[0] + v[5] * -f[1] + v[9] * -f[2]
+        v[14] += v[2] * -f[0] + v[6] * -f[1] + v[10] * -f[2]
+        v[15] += v[3] * -f[0] + v[7] * -f[1] + v[11] * -f[2]
+
+        return v
     }
 
-    project() {
-        config.PROJ_MATRIX.data[0] = this.cotOfViewingAngle / config.ASPECT_RATIO
-        config.PROJ_MATRIX.data[5] = this.cotOfViewingAngle
-        config.PROJ_MATRIX.data[10] = -(config.FAR + config.NEAR) * this.reciprocalDepth
-        config.PROJ_MATRIX.data[11] = -1
-        config.PROJ_MATRIX.data[14] = -2 * config.NEAR * config.FAR * this.reciprocalDepth
+    zoom(direction) {
+        /** Zoom In or Out Depending on the Sign of Direction */
+        this.from[0] += direction * 0.01 * (this.from[0] - this.to[0])
+        this.from[1] += direction * 0.01 * (this.from[1] - this.to[1])
+        this.from[2] += direction * 0.01 * (this.from[2] - this.to[2])
 
-        return config.PROJ_MATRIX
-    }
-
-    pan(direction) {
-        this.inverseView.invoke()
-
-        switch (direction) {
-            case config.DIRECTIONS.UP: return this.rotate(this.upRot)
-            case config.DIRECTIONS.DOWN: return this.rotate(this.downRot)
-            case config.DIRECTIONS.LEFT: return this.rotate(this.leftRot)
-            case config.DIRECTIONS.RIGHT: return this.rotate(this.rightRot)
-        }
-    }
-
-    rotate(orientation) {
-        this.setRotation.invoke(this.setRotation.of, orientation, this.setRotation.result)
-        this.setViewMatrix.invoke()
-
-        return this.setPosition.invoke()
-    }
-
-    zoom(zoomOut) {
-        this.gaze.invoke()
-        this.delta.invoke()
-
-        if (zoomOut)
-            return this.zoomOut()
-
-        return this.zoomIn()
-    }
-
-    zoomIn() {
-        return [
-            this.zoomInTo.invoke(),
-            this.zoomInFrom.invoke()
-        ]
-    }
-
-    zoomOut() {
-        return [
-            this.zoomOutTo.invoke(),
-            this.zoomOutFrom.invoke()
-        ]
+        /** Construct Look-At Matrix from New Vantage Point */
+        this.look()
     }
 }

@@ -1,5 +1,5 @@
 import Tensor from '../../tensor/index.mjs'
-import Algebra from '../../template/algebra.mjs'
+import Algebra from '../../../gen/algebra.mjs'
 import LinearAlgebraOperation from './operation.mjs'
 import { indexTemplate } from './utils.mjs'
 
