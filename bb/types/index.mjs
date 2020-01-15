@@ -26,9 +26,9 @@ export default class Type {
             || array.constructor === Uint8ClampedArray
     }
 
-    static configolveArray(array) {
+    static resolveArray(array) {
         if (array === undefined)
-            throw "Attempting to configolve type of something undefined"
+            throw "Attempting to resolve type of something undefined"
 
         if (array.constructor === Int8Array) return Type.Int8
         if (array.constructor === Int16Array) return Type.Int16
@@ -41,9 +41,9 @@ export default class Type {
         if (array.constructor === Uint8ClampedArray) return Type.Uint8Clamped
     }
 
-    static configolveSize(size) {
+    static resolveSize(size) {
         if (size === undefined)
-            throw "Attempting to configolve type of something undefined"
+            throw "Attempting to resolve type of something undefined"
 
         if (size === 1) return Type.Float32
         if (size === 2) return Type.ComplexFloat32

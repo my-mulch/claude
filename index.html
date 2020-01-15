@@ -22,13 +22,13 @@
         import bb from './bb/index.mjs'
         import app from './app/index.mjs'
         import gen from './gen/algebra.mjs'
-        import config from './res/config.mjs'
+        import prim from './prim/index.mjs'
 
         window.io = io
         window.bb = bb
         window.gen = gen
         window.app = new app()
-        window.config = config
+        window.prim = prim
 
         io
             .txtread('./index.mjs')

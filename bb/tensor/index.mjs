@@ -18,7 +18,7 @@ export default class Tensor {
         while (data[0].constructor === Array)
             shape.push(data.length), data = data[0]
 
-        return [shape, Type.configolveSize(data.length)]
+        return [shape, Type.resolveSize(data.length)]
     }
 
     static flatten(data, flat = [], fi = [0]) {
@@ -52,7 +52,7 @@ export default class Tensor {
 
         if (Type.isArray(data))
             return new Tensor(data,
-                new Header({ shape: [data.length], type: Type.configolveArray(data) }))
+                new Header({ shape: [data.length], type: Type.resolveArray(data) }))
     }
 
     static zerosLike(tensor) {

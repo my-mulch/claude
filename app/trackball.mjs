@@ -59,6 +59,7 @@ export default class Trackball {
     track(pointer) {
         /** Dummy Variables */
         const p = pointer
+        const m = this.model
         const s = this.start
         const r = this.rotation
         const o = this.orientation
@@ -99,25 +100,25 @@ export default class Trackball {
         r[3] = qw * o[3] + qx * o[2] - qy * o[1] + qz * o[0]
 
         /** To Model Matrix */
-        this.model[0] = 1.0 - 2.0 * r[2] * r[2] - 2.0 * r[3] * r[3]
-        this.model[4] = 2.0 * r[1] * r[2] - 2.0 * r[3] * r[0]
-        this.model[8] = 2.0 * r[1] * r[3] + 2.0 * r[2] * r[0]
-        this.model[12] = 0.0
+        m[0] = 1 - 2 * r[2] * r[2] - 2 * r[3] * r[3]
+        m[4] = 2 * r[1] * r[2] - 2 * r[3] * r[0]
+        m[8] = 2 * r[1] * r[3] + 2 * r[2] * r[0]
+        m[12] = 0
 
-        this.model[1] = 2.0 * r[1] * r[2] + 2.0 * r[3] * r[0]
-        this.model[5] = 1.0 - 2.0 * r[1] * r[1] - 2.0 * r[3] * r[3]
-        this.model[9] = 2.0 * r[2] * r[3] - 2.0 * r[1] * r[0]
-        this.model[13] = 0.0
+        m[1] = 2 * r[1] * r[2] + 2 * r[3] * r[0]
+        m[5] = 1 - 2 * r[1] * r[1] - 2 * r[3] * r[3]
+        m[9] = 2 * r[2] * r[3] - 2 * r[1] * r[0]
+        m[13] = 0
 
-        this.model[2] = 2.0 * r[1] * r[3] - 2.0 * r[2] * r[0]
-        this.model[6] = 2.0 * r[2] * r[3] + 2.0 * r[1] * r[0]
-        this.model[10] = 1.0 - 2.0 * r[1] * r[1] - 2.0 * r[2] * r[2]
-        this.model[14] = 0.0
+        m[2] = 2 * r[1] * r[3] - 2 * r[2] * r[0]
+        m[6] = 2 * r[2] * r[3] + 2 * r[1] * r[0]
+        m[10] = 1 - 2 * r[1] * r[1] - 2 * r[2] * r[2]
+        m[14] = 0
 
-        this.model[3] = 0
-        this.model[7] = 0
-        this.model[11] = 0
-        this.model[15] = 1.0
+        m[3] = 0
+        m[7] = 0
+        m[11] = 0
+        m[15] = 1
     }
 
     stop() {

@@ -1,4 +1,3 @@
-import bb from '../bb/index.mjs'
 import WebGL from './webgl.mjs'
 import Camera from './camera.mjs'
 import Trackball from './trackball.mjs'
@@ -27,10 +26,6 @@ export default class Cow {
     }
 
     plot({ vertices, colors, sizes, mode }) {
-        if (!mode) mode = this.webgl.context.POINTS
-        if (!sizes) sizes = bb.ones(vertices.header.shape)
-        if (!colors) colors = vertices
-
         this.drawables.push({
             sizeBuffer: this.webgl.createBuffer(sizes),
             colorBuffer: this.webgl.createBuffer(colors),
@@ -68,6 +63,7 @@ export default class Cow {
     }
 
     rasterToScreen(event) {
+        /** Convert Raster-Space Coordinates to Screen-Space */
         return [
             2 * event.x / this.canvas.width - 1,
             1 - 2 * event.y / this.canvas.height
