@@ -8,9 +8,34 @@ const circle = bb.tensor(new prim.Circle().vertices).reshape([-1, 3])
 
 app.plot({
     vertices: circle,
-    colors: bb.ones(circle.header.shape),
+    colors: bb.rand(circle.header.shape),
     sizes: bb.ones(circle.header.shape),
     mode: app.webgl.context.TRIANGLES
+})
+
+app.plot({
+    vertices: bb.tensor([
+        [[0], [0], [-1]],
+        [[0], [0], [1]],
+
+        [[0], [1], [0]],
+        [[0], [-1], [0]],
+
+        [[-1], [0], [0]],
+        [[1], [0], [0]],
+    ]),
+    colors: bb.tensor([
+        [[1], [0], [0]],
+        [[1], [0], [0]],
+
+        [[1], [0], [0]],
+        [[1], [0], [0]],
+
+        [[1], [0], [0]],
+        [[1], [0], [0]],
+    ]),
+    sizes: bb.ones([6, 1]),
+    mode: app.webgl.context.LINES,
 })
 
 app.render()

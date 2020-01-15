@@ -113,8 +113,6 @@ export default class Camera {
         v[13] += v[1] * -f[0] + v[5] * -f[1] + v[9] * -f[2]
         v[14] += v[2] * -f[0] + v[6] * -f[1] + v[10] * -f[2]
         v[15] += v[3] * -f[0] + v[7] * -f[1] + v[11] * -f[2]
-
-        return v
     }
 
     zoom(direction) {
