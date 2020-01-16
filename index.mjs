@@ -4,12 +4,19 @@ app.webgl.session(
     await io.txtread('./res/shaders/rgb/shader.frag'),
 )
 
-const circle = bb.tensor(new prim.Circle().vertices).reshape([-1, 3])
+
+const vectors = new Float32Array(90 * 200000)
+
+for (let i = 0; i < 200000; i++)
+    vectors.set(new prim.Circle().vertices, i * 90)
+
+
+const field = bb.tensor(vectors).reshape([-1, 3])
 
 app.plot({
-    vertices: circle,
-    colors: bb.rand(circle.header.shape),
-    sizes: bb.ones(circle.header.shape),
+    vertices: field,
+    colors: bb.rand(field.header.shape),
+    sizes: bb.ones(field.header.shape),
     mode: app.webgl.context.TRIANGLES
 })
 
