@@ -5,10 +5,7 @@
   "main": "index.mjs",
   "scripts": {
     "test": "node --experimental-modules --es-module-specifier-resolution=node test/bb/index.mjs",
-    "start": "npm run serve & npm run launch",
-    "launch": "open http://localhost:3000$(pwd)",
-    "serve": "http-server / -p 3000 --cors",
-    "kill": "lsof -t -i tcp:3000 | xargs kill"
+    "start": "open http://localhost:3000$(pwd)"
   },
   "repository": {
     "type": "git",
