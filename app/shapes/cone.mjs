@@ -1,12 +1,13 @@
 
 export default class Cone {
     constructor(
-        count = 7,
-        radius = 0.001,
+        from = [Math.random(), Math.random(), Math.random()],
+        to = [Math.random(), Math.random(), Math.random()],
+
+        count = 10,
+        radius = 0.01,
 
         up = [0, 1, 0],
-        to = [Math.random(), Math.random(), Math.random()],
-        from = [Math.random(), Math.random(), Math.random()],
     ) {
         /** Properties */
         this.count = count
@@ -19,9 +20,9 @@ export default class Cone {
         this.from = from
         this.model = new Array(16)
 
-        this.to[0] = this.from[0] + Math.random() * 0.01
-        this.to[1] = this.from[1] + Math.random() * 0.01
-        this.to[2] = this.from[2] + Math.random() * 0.01
+        // this.to[0] = this.from[0] + Math.random() * 0.01
+        // this.to[1] = this.from[1] + Math.random() * 0.01
+        // this.to[2] = this.from[2] + Math.random() * 0.01
 
         /** Vertices */
         this.vertices = new Array(this.count * 3 * 3)

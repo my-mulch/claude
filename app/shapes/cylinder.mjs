@@ -4,7 +4,7 @@ export default class Cylinder {
         from = [Math.random(), Math.random(), Math.random()],
         to = [Math.random(), Math.random(), Math.random()],
 
-        count = 50,
+        count = 10,
         radius = 0.01,
         height = 1,
     ) {
