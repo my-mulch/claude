@@ -1,5 +1,5 @@
 
-export default class WebGL {
+export default class Engine {
     constructor(canvas) { this.context = canvas.getContext('webgl') }
 
     session(vertex, fragment) {

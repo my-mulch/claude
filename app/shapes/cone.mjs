@@ -29,35 +29,6 @@ export default class Cone {
         const d = this.density
         const v = this.vertices
 
-        /** Define Forward-Facing */
-        let fx = t[0] - f[0]
-        let fy = t[1] - f[1]
-        let fz = t[2] - f[2]
-
-        /** Normalize Forward-Facing */
-        const fn = 1 / Math.sqrt(fx * fx + fy * fy + fz * fz)
-
-        fx *= fn
-        fy *= fn
-        fz *= fn
-
-        /** Calculate Cross Product of Up and Forward */
-        let sx = u[1] * fz - u[2] * fy
-        let sy = u[2] * fx - u[0] * fz
-        let sz = u[0] * fy - u[1] * fx
-
-        /** Normalize Side-Facing */
-        const sn = 1 / Math.sqrt(sx * sx + sy * sy + sz * sz)
-
-        sx *= sn
-        sy *= sn
-        sz *= sn
-
-        /** Calculate Cross Product of Forward and Side */
-        const ux = fy * sz - fz * sy
-        const uy = fz * sx - fx * sz
-        const uz = fx * sy - fy * sx
-
         /** Populate */
         for (let i = 0, j = 0; i < v.length; i += 9, j++) {
             const v0x = Math.cos((j + 0) * d) * r

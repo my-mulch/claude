@@ -114,7 +114,7 @@ export default class Trackball {
         m[9] = 2 * r[2] * r[3] - 2 * r[1] * r[0]
         m[10] = 1 - 2 * r[1] * r[1] - 2 * r[2] * r[2]
         m[11] = 0
-        
+
         m[12] = 0
         m[13] = 0
         m[14] = 0

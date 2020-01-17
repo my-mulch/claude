@@ -1,8 +1,9 @@
-import WebGL from './webgl.mjs'
+import Shapes from './shapes.mjs'
+import Engine from './engine.mjs'
 import Camera from './camera.mjs'
 import Trackball from './trackball.mjs'
 
-export default class Cow {
+class Cow {
     constructor(canvas = document.getElementById('main')) {
         /** State */
         this.pointer = false
@@ -14,7 +15,7 @@ export default class Cow {
         this.canvas.height = window.innerHeight
 
         /** Peripherals */
-        this.webgl = new WebGL(this.canvas)
+        this.webgl = new Engine(this.canvas)
         this.camera = new Camera(this.canvas.width / this.canvas.height)
         this.trackball = new Trackball()
 
@@ -114,3 +115,5 @@ export default class Cow {
         this.trackball.stop()
     }
 }
+
+export default new Cow()

@@ -20,15 +20,13 @@
     <script type="module">
         import io from './io/index.mjs'
         import bb from './bb/index.mjs'
-        import app from './app/index.mjs'
         import gen from './gen/algebra.mjs'
-        import prim from './prim/index.mjs'
+        import app from './app/index.mjs'
 
         window.io = io
         window.bb = bb
         window.gen = gen
-        window.app = new app()
-        window.prim = prim
+        window.app = app
 
         io
             .txtread('./index.mjs')
