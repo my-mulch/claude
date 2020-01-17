@@ -4,8 +4,13 @@ app.webgl.session(
     await io.txtread('./res/shaders/rgb/shader.frag'),
 )
 
-// const field = bb.tensor(circles).reshape([-1, 3])
+// const vectors = new Float32Array(7 * 3 * 3 * 1e6)
 
+// for (let i = 0; i < 1e6; i++)
+//     vectors.set(new app.shapes.Cone().vertices, i * 7 * 3 * 3)
+
+
+// const field = bb.tensor(vectors).reshape([-1, 3])
 
 // app.plot({
 //     vertices: field,
@@ -13,6 +18,17 @@ app.webgl.session(
 //     sizes: bb.ones(field.header.shape),
 //     mode: app.webgl.context.TRIANGLES
 // })
+
+
+
+const cyl = bb.tensor(new app.shapes.Cylinder([0, 0, 0], [0, 1, 0.0001]).vertices).reshape([-1, 3])
+
+app.plot({
+    vertices: cyl,
+    colors: bb.ones(cyl.header.shape),
+    sizes: bb.ones(cyl.header.shape),
+    mode: app.webgl.context.TRIANGLES
+})
 
 app.plot({
     vertices: bb.tensor([

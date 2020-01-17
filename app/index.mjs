@@ -1,10 +1,12 @@
 import Engine from './engine.mjs'
 import Camera from './camera.mjs'
 import Trackball from './trackball.mjs'
+import Shapes from './shapes/index.mjs'
 
 class Cow {
     constructor(canvas = document.getElementById('main')) {
         /** Scene */
+        this.shapes = Shapes
         this.drawables = []
 
         /** Display */
@@ -99,7 +101,7 @@ class Cow {
 
         /** Cast a Ray using Screen-Space Coordinates */
         const ray = this.camera.cast(this.pointer)
-        
+
         /** Intersection */
         this.trackball.intersect(
             ray, // Direction of casted ray
