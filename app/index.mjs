@@ -1,12 +1,10 @@
-import Shapes from './shapes.mjs'
 import Engine from './engine.mjs'
 import Camera from './camera.mjs'
 import Trackball from './trackball.mjs'
 
 class Cow {
     constructor(canvas = document.getElementById('main')) {
-        /** State */
-        this.pointer = false
+        /** Scene */
         this.drawables = []
 
         /** Display */
@@ -18,6 +16,10 @@ class Cow {
         this.webgl = new Engine(this.canvas)
         this.camera = new Camera(this.canvas.width / this.canvas.height)
         this.trackball = new Trackball()
+
+        /** Event State */
+        this.pointer = new Float32Array(2)
+        this.pointerIsDown = false
 
         /** Event Listeners */
         this.canvas.addEventListener('wheel', this.wheel.bind(this))
@@ -65,54 +67,58 @@ class Cow {
 
     rasterToScreen(event) {
         /** Convert Raster-Space Coordinates to Screen-Space */
-        return [
-            2 * event.x / this.canvas.width - 1,
-            1 - 2 * event.y / this.canvas.height
-        ]
+        this.pointer[0] = 2 * event.x / this.canvas.width - 1
+        this.pointer[1] = 1 - 2 * event.y / this.canvas.height
     }
 
     pointerdown(event) {
         /** Pressed */
-        this.pointer = true
+        this.pointerIsDown = true
+
+        /** Convert Click to Screen-Space Coordinates */
+        this.rasterToScreen(event)
 
         /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(...this.rasterToScreen(event))
+        const ray = this.camera.cast(this.pointer)
 
         /** Intersection */
-        const [p0, p1] = this.trackball.intersect(
+        this.trackball.intersect(
             ray, // Direction of casted ray
-            this.camera.from // Origin of casted ray
+            this.camera.location.from // Origin of casted ray
         )
 
-        this.trackball.start = p0
+        this.trackball.play()
     }
 
     pointermove(event) {
         /** Not Pressed? */
-        if (!this.pointer) return
+        if (!this.pointerIsDown) return
+
+        /** Convert Click to Screen-Space Coordinates */
+        this.rasterToScreen(event)
 
         /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(...this.rasterToScreen(event))
-
+        const ray = this.camera.cast(this.pointer)
+        
         /** Intersection */
-        const [p0, p1] = this.trackball.intersect(
+        this.trackball.intersect(
             ray, // Direction of casted ray
-            this.camera.from // Origin of casted ray
+            this.camera.location.from // Origin of casted ray
         )
 
         /** Track the Mouse-Movement along the Trackball */
-        this.trackball.track(p0)
+        this.trackball.track()
 
         /** Render the Changes */
         this.render()
     }
 
-    pointerup(event) {
+    pointerup() {
         /** Released */
-        this.pointer = false
+        this.pointerIsDown = false
 
         /** Keep the Trackball at the Released Position */
-        this.trackball.stop()
+        this.trackball.pause()
     }
 }
 

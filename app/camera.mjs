@@ -1,4 +1,4 @@
-import { translate, transpose, frame, normalize, transposeMatrixByVector } from './utils.mjs'
+import { translate, frame, normalize, transposeMat3ByVec3 } from './utils.mjs'
 
 export default class Camera {
     constructor(
@@ -14,14 +14,18 @@ export default class Camera {
         from = [3, 1, 3],
     ) {
         /** Vectors */
-        this.to = new Float32Array(to)
-        this.up = new Float32Array(up)
-        this.from = new Float32Array(from)
+        this.location = {
+            to: new Float32Array(to),
+            up: new Float32Array(up),
+            from: new Float32Array(from)
+        }
 
         /** Frame (front-facing, side-facing, up-facing) */
-        this.ff = new Float32Array(3)
-        this.uf = new Float32Array(3)
-        this.sf = new Float32Array(3)
+        this.frame = {
+            up: new Float32Array(3),
+            side: new Float32Array(3),
+            front: new Float32Array(3)
+        }
 
         /** Ray Caster */
         this.ray = new Float32Array(3)
@@ -50,10 +54,10 @@ export default class Camera {
         this.proj[14] = -2 * this.near * this.far * this.depth
     }
 
-    cast(x, y) {
+    cast(pointer) {
         /** Normalized Camera-Space Ray from Clicked Point */
-        this.ray[0] = x * this.tanAngle * this.aspect
-        this.ray[1] = y * this.tanAngle
+        this.ray[0] = pointer[0] * this.tanAngle * this.aspect
+        this.ray[1] = pointer[1] * this.tanAngle
         this.ray[2] = -1
 
         normalize(this.ray)
@@ -65,15 +69,15 @@ export default class Camera {
     look() {
         /** Create Orthonormal Frame */
         frame(
-            this.from, this.to, this.up, // Points
-            this.ff, this.sf, this.uf, // Resulting Frame
+            this.location.from, this.location.to, this.location.up, // Points
+            this.frame.front, this.frame.side, this.frame.up, // Resulting Frame
         )
 
         /** Dummy Variables */
-        const s = this.sf // side
-        const f = this.ff // front
-        const u = this.uf // up
         const v = this.view
+        const u = this.frame.up // up
+        const s = this.frame.side // side
+        const f = this.frame.front // front
 
         /** Invert the Orthonormal Frame */
         v[0] = s[0]; v[4] = s[1]; v[8] = s[2]; v[12] = 0
@@ -82,14 +86,18 @@ export default class Camera {
         v[3] = 0; v[7] = 0; v[11] = 0; v[15] = 1
 
         /** Translate the Orthonormal Frame */
-        translate(-this.from[0], -this.from[1], -this.from[2], v)
+        translate(-this.location.from[0], -this.location.from[1], -this.location.from[2], v)
     }
 
     zoom(direction) {
+        /** Dummy Variables */
+        const t = this.location.to
+        const f = this.location.from
+        
         /** Zoom In or Out Depending on the Sign of Direction */
-        this.from[0] += direction * 0.01 * (this.from[0] - this.to[0])
-        this.from[1] += direction * 0.01 * (this.from[1] - this.to[1])
-        this.from[2] += direction * 0.01 * (this.from[2] - this.to[2])
+        f[0] += direction * 0.01 * (f[0] - t[0])
+        f[1] += direction * 0.01 * (f[1] - t[1])
+        f[2] += direction * 0.01 * (f[2] - t[2])
 
         /** Construct Look-At Matrix from New Vantage Point */
         this.look()
