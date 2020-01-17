@@ -26,6 +26,12 @@ export default class Camera {
             side: new Float32Array(3),
             front: new Float32Array(3)
         }
+        
+        /** Properties */
+        this.far = far
+        this.near = near
+        this.aspect = aspect
+        this.angle = Math.PI * angle / 180 / 2
 
         /** Ray Caster */
         this.ray = new Float32Array(3)
@@ -34,24 +40,9 @@ export default class Camera {
         this.view = new Float32Array(16)
         this.proj = new Float32Array(16)
 
-        /** Compute Look-At */
+        /** Compute View Matrix */
         this.look()
-
-        /** Projection */
-        this.far = far
-        this.near = near
-        this.aspect = aspect
-        this.angle = Math.PI * angle / 180 / 2
-
-        this.depth = 1 / (this.far - this.near)
-        this.tanAngle = Math.tan(this.angle)
-        this.cotAngle = 1 / this.tanAngle
-
-        this.proj[0] = this.cotAngle / this.aspect
-        this.proj[5] = this.cotAngle
-        this.proj[10] = -(this.far + this.near) * this.depth
-        this.proj[11] = -1
-        this.proj[14] = -2 * this.near * this.far * this.depth
+        this.project()
     }
 
     cast(pointer) {
@@ -64,6 +55,18 @@ export default class Camera {
 
         /** Nomalized World-Space Ray via Inverse Camera Transform */
         return transposeMat3ByVec3(this.view, this.ray)
+    }
+
+    project() {
+        this.depth = 1 / (this.far - this.near)
+        this.tanAngle = Math.tan(this.angle)
+        this.cotAngle = 1 / this.tanAngle
+
+        this.proj[0] = this.cotAngle / this.aspect
+        this.proj[5] = this.cotAngle
+        this.proj[10] = -(this.far + this.near) * this.depth
+        this.proj[11] = -1
+        this.proj[14] = -2 * this.near * this.far * this.depth
     }
 
     look() {
@@ -93,7 +96,7 @@ export default class Camera {
         /** Dummy Variables */
         const t = this.location.to
         const f = this.location.from
-        
+
         /** Zoom In or Out Depending on the Sign of Direction */
         f[0] += direction * 0.01 * (f[0] - t[0])
         f[1] += direction * 0.01 * (f[1] - t[1])
