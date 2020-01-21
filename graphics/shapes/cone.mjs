@@ -19,11 +19,7 @@ export default class Cone {
         this.to = to
         this.from = from
         this.model = new Array(16)
-
-        // this.to[0] = this.from[0] + Math.random() * 0.01
-        // this.to[1] = this.from[1] + Math.random() * 0.01
-        // this.to[2] = this.from[2] + Math.random() * 0.01
-
+        
         /** Vertices */
         this.vertices = new Array(this.count * 3 * 3)
 

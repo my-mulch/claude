@@ -2,7 +2,7 @@
 <html lang='en'>
 
 <head>
-    <title>I am a cow</title>
+    <title>i am a cow</title>
     <meta charset='utf-8'>
     <link rel='shortcut icon' type='image/x-icon' href='favicon.ico'>
     <style>
@@ -19,14 +19,14 @@
     <canvas id="main"></canvas>
     <script type="module">
         import io from './io/index.mjs'
-        import bb from './bb/index.mjs'
-        import gen from './gen/algebra.mjs'
         import app from './app/index.mjs'
+        import bb from './tensor/index.mjs'
+        import shapes from './graphics/shapes/index.mjs'
 
         window.io = io
         window.bb = bb
-        window.gen = gen
         window.app = app
+        window.shapes = shapes
 
         io
             .txtread('./index.mjs')

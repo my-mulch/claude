@@ -1,12 +1,10 @@
-import Engine from './engine.mjs'
-import Camera from './camera.mjs'
-import Trackball from './trackball.mjs'
-import Shapes from './shapes/index.mjs'
+import Engine from '../graphics/engine.mjs'
+import Camera from '../graphics/camera.mjs'
+import Trackball from '../graphics/trackball.mjs'
 
 class Cow {
     constructor(canvas = document.getElementById('main')) {
         /** Scene */
-        this.shapes = Shapes
         this.drawables = []
 
         /** Display */
@@ -15,13 +13,12 @@ class Cow {
         this.canvas.height = window.innerHeight
 
         /** Peripherals */
-        this.webgl = new Engine(this.canvas)
+        this.pointer = false
+        this.engine = new Engine(this.canvas)
         this.camera = new Camera(this.canvas.width / this.canvas.height)
         this.trackball = new Trackball()
 
         /** Event State */
-        this.pointer = new Float32Array(2)
-        this.pointerIsDown = false
 
         /** Event Listeners */
         this.canvas.addEventListener('wheel', this.wheel.bind(this))
@@ -32,9 +29,9 @@ class Cow {
 
     plot({ vertices, colors, sizes, mode }) {
         this.drawables.push({
-            sizeBuffer: this.webgl.createBuffer(sizes),
-            colorBuffer: this.webgl.createBuffer(colors),
-            vertexBuffer: this.webgl.createBuffer(vertices),
+            sizeBuffer: this.engine.createBuffer(sizes),
+            colorBuffer: this.engine.createBuffer(colors),
+            vertexBuffer: this.engine.createBuffer(vertices),
 
             drawMode: mode,
             drawCount: vertices.header.shape[0]
@@ -42,18 +39,18 @@ class Cow {
     }
 
     render() {
-        this.webgl.context.clear(this.webgl.context.COLOR_BUFFER_BIT)
+        this.engine.context.clear(this.engine.context.COLOR_BUFFER_BIT)
 
         for (const object of this.drawables) {
-            this.webgl.attributes.a_Color.set(object.colorBuffer)
-            this.webgl.attributes.a_PointSize.set(object.sizeBuffer)
-            this.webgl.attributes.a_Position.set(object.vertexBuffer)
+            this.engine.attributes.a_Color.set(object.colorBuffer)
+            this.engine.attributes.a_PointSize.set(object.sizeBuffer)
+            this.engine.attributes.a_Position.set(object.vertexBuffer)
 
-            this.webgl.uniforms.u_ViewMatrix.set(this.camera.view)
-            this.webgl.uniforms.u_ProjMatrix.set(this.camera.proj)
-            this.webgl.uniforms.u_ModelMatrix.set(this.trackball.model)
+            this.engine.uniforms.u_ViewMatrix.set(this.camera.view)
+            this.engine.uniforms.u_ProjMatrix.set(this.camera.proj)
+            this.engine.uniforms.u_ModelMatrix.set(this.trackball.model)
 
-            this.webgl.context.drawArrays(object.drawMode, 0, object.drawCount)
+            this.engine.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
     }
 
@@ -77,7 +74,7 @@ class Cow {
 
     pointerdown(event) {
         /** Pressed */
-        this.pointerIsDown = true
+        this.pointer = true
 
         /** Convert Click to Screen-Space Coordinates */
         const [x, y] = this.rasterToScreen(event.x, event.y)
@@ -94,7 +91,7 @@ class Cow {
 
     pointermove(event) {
         /** Not Pressed? */
-        if (!this.pointerIsDown) return
+        if (!this.pointer) return
 
         /** Convert Click to Screen-Space Coordinates */
         const [x, y] = this.rasterToScreen(event.x, event.y)
@@ -114,7 +111,7 @@ class Cow {
 
     pointerup() {
         /** Released */
-        this.pointerIsDown = false
+        this.pointer = false
 
         /** Keep the Trackball at the Released Position */
         this.trackball.pause()
