@@ -81,13 +81,6 @@ app.plot({
     mode: app.webgl.context.TRIANGLES
 })
 
-// app.plot({
-//     vertices: samples,
-//     colors: bb.tensor([[1], [1], [0]]).reshape([-1, 3]).repeat({ axes: [0], count: samples.header.shape[0] }),
-//     sizes: bb.ones(samples.header.shape),
-//     mode: app.webgl.context.POINTS
-// })
-
 app.plot({
     vertices: bb.tensor([
         [[0], [0], [-1]],

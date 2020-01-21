@@ -67,10 +67,12 @@ class Cow {
         this.render()
     }
 
-    rasterToScreen(event) {
+    rasterToScreen(x, y) {
         /** Convert Raster-Space Coordinates to Screen-Space */
-        this.pointer[0] = 2 * event.x / this.canvas.width - 1
-        this.pointer[1] = 1 - 2 * event.y / this.canvas.height
+        return [
+            2 * x / this.canvas.width - 1,
+            1 - 2 * y / this.canvas.height,
+        ]
     }
 
     pointerdown(event) {
@@ -78,18 +80,16 @@ class Cow {
         this.pointerIsDown = true
 
         /** Convert Click to Screen-Space Coordinates */
-        this.rasterToScreen(event)
+        const [x, y] = this.rasterToScreen(event.x, event.y)
 
         /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(this.pointer)
+        const ray = this.camera.cast(x, y)
 
-        /** Intersection */
-        this.trackball.intersect(
-            ray, // Direction of casted ray
-            this.camera.location.from // Origin of casted ray
-        )
+        /** Point of Intersection */
+        const point = this.trackball.intersect(ray)
 
-        this.trackball.play()
+        /** Start the Trackball */
+        this.trackball.play(point)
     }
 
     pointermove(event) {
@@ -97,19 +97,16 @@ class Cow {
         if (!this.pointerIsDown) return
 
         /** Convert Click to Screen-Space Coordinates */
-        this.rasterToScreen(event)
+        const [x, y] = this.rasterToScreen(event.x, event.y)
 
         /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(this.pointer)
+        const ray = this.camera.cast(x, y)
 
-        /** Intersection */
-        this.trackball.intersect(
-            ray, // Direction of casted ray
-            this.camera.location.from // Origin of casted ray
-        )
+        /** Point of Intersection */
+        const point = this.trackball.intersect(ray)
 
         /** Track the Mouse-Movement along the Trackball */
-        this.trackball.track()
+        this.trackball.track(point)
 
         /** Render the Changes */
         this.render()

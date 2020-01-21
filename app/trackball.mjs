@@ -1,26 +1,20 @@
-import { normalize, cross, dot, norm, quatMult, quatToRotation } from './utils.mjs'
 
 export default class Trackball {
     constructor(
         radius = 1,
-        center = [0, 0, 0],
+        origin = [0, 0, 0],
     ) {
         /** Properties of the Trackball */
         this.radius = radius
-        this.center = new Float32Array(center)
+        this.origin = new Float32Array(origin)
 
         /** Quaternions for the Trackball */
         this.rotation = new Float32Array([1, 0, 0, 0])
         this.orientation = new Float32Array([1, 0, 0, 0])
         this.intermediate = new Float32Array([1, 0, 0, 0])
 
-        /** Points of Intersection */
-        this.p1 = new Float32Array(3)
-        this.p2 = new Float32Array(3)
+        /** Begin Tracking from Clicked Location */
         this.start = new Float32Array(3)
-
-        /** Axis of Rotation */
-        this.axis = new Float32Array(3)        
 
         /** Model Matrix for the Trackball */
         this.model = new Float32Array([
@@ -31,15 +25,22 @@ export default class Trackball {
         ])
     }
 
-    intersect(ray, origin) {
-        /** Vector in Direction of Ray-Origin */
-        const tx = origin[0] - this.center[0]
-        const ty = origin[1] - this.center[1]
-        const tz = origin[2] - this.center[2]
+    intersect(ray) {
+        /** Dummy Variables */
+        const o = this.origin
+
+        const ox = ray[0]; const dx = ray[3]
+        const oy = ray[1]; const dy = ray[4]
+        const oz = ray[2]; const dz = ray[5]
+
+        /** Origin of Ray Minus Origin of Trackball */
+        const tx = ox - o[0]
+        const ty = oy - o[1]
+        const tz = oz - o[2]
 
         /** Constants A, B, C of Quadratic Polynomial  */
-        const a = ray[0] ** 2 + ray[1] ** 2 + ray[2] ** 2
-        const b = 2 * (ray[0] * tx + ray[1] * ty + ray[2] * tz)
+        const a = dx ** 2 + dy ** 2 + dz ** 2
+        const b = 2 * (dx * tx + dy * ty + dz * tz)
         const c = tx ** 2 + ty ** 2 + tz ** 2 - this.radius ** 2
 
         /** Solve Quadratic Equation */
@@ -56,49 +57,78 @@ export default class Trackball {
         const t1 = q / a
 
         /** Intersection Points */
-        this.p1[0] = ray[0] * t0 + tx
-        this.p1[1] = ray[1] * t0 + ty
-        this.p1[2] = ray[2] * t0 + tz
+        return [
+            /** Near */
+            dx * t0 + tx,
+            dy * t0 + ty,
+            dz * t0 + tz,
 
-        this.p2[0] = ray[0] * t1 + tx
-        this.p2[1] = ray[1] * t1 + ty
-        this.p2[2] = ray[2] * t1 + tz
+            /** Far */
+            dx * t1 + tx,
+            dy * t1 + ty,
+            dz * t1 + tz,
+        ]
     }
 
-    track() {
+    track(point) {
         /** Dummy Variables */
-        const p = this.p1
+        const p = point
         const m = this.model
         const s = this.start
         const r = this.rotation
         const o = this.orientation
         const i = this.intermediate
 
-        /** Normalized Cross Product of Start and Pointer to Create Axis of Rotation */
-        normalize(cross(s, p, this.axis))
+        /** Norm of Start and Pointer */
+        const sn = Math.sqrt(s[0] ** 2 + s[1] ** 2 + s[2] ** 2)
+        const pn = Math.sqrt(p[0] ** 2 + p[1] ** 2 + p[2] ** 2)
+
+        /** Create Unit Axis of Rotation */
+        let ax = s[1] * p[2] - s[2] * p[1]
+        let ay = s[2] * p[0] - s[0] * p[2]
+        let az = s[0] * p[1] - s[1] * p[0]
+
+        const inverseNorm = 1 / Math.sqrt(ax ** 2 + ay ** 2 + az ** 2)
+
+        ax *= inverseNorm
+        ay *= inverseNorm
+        az *= inverseNorm
 
         /** Angle between Start and Pointer */
-        const angle = Math.acos(dot(s, p) / (norm(s) * norm(p)))
+        const angle = Math.acos((s[0] * p[0] + s[1] * p[1] + s[2] * p[2]) / (sn * pn))
 
         /** Small Angles Occasionally Divide by Zero */
         if (isNaN(angle)) return
 
         /** Construct Quaternion to Represent Rotation */
         i[0] = Math.cos(angle / 2)
-        i[1] = Math.sin(angle / 2) * this.axis[0]
-        i[2] = Math.sin(angle / 2) * this.axis[1]
-        i[3] = Math.sin(angle / 2) * this.axis[2]
+        i[1] = Math.sin(angle / 2) * ax
+        i[2] = Math.sin(angle / 2) * ay
+        i[3] = Math.sin(angle / 2) * az
 
         /** Apply Rotation via Quaternion Multiplication */
-        quatMult(i, o, r)
+        r[0] = i[0] * o[0] - i[1] * o[1] - i[2] * o[2] - i[3] * o[3]
+        r[1] = i[1] * o[0] + i[0] * o[1] + i[2] * o[3] - i[3] * o[2]
+        r[2] = i[0] * o[2] - i[1] * o[3] + i[2] * o[0] + i[3] * o[1]
+        r[3] = i[0] * o[3] + i[1] * o[2] - i[2] * o[1] + i[3] * o[0]
 
         /** Transform Quat To Model Matrix */
-        quatToRotation(r, m)
+        m[0] = 1 - 2 * r[2] * r[2] - 2 * r[3] * r[3]
+        m[1] = 2 * r[1] * r[2] + 2 * r[3] * r[0]
+        m[2] = 2 * r[1] * r[3] - 2 * r[2] * r[0]
+        
+        m[4] = 2 * r[1] * r[2] - 2 * r[3] * r[0]
+        m[5] = 1 - 2 * r[1] * r[1] - 2 * r[3] * r[3]
+        m[6] = 2 * r[2] * r[3] + 2 * r[1] * r[0]
+        
+        m[8] = 2 * r[1] * r[3] + 2 * r[2] * r[0]
+        m[9] = 2 * r[2] * r[3] - 2 * r[1] * r[0]
+        m[10] = 1 - 2 * r[1] * r[1] - 2 * r[2] * r[2]
     }
 
-    play() {
+    play(point) {
         /** Dummy Variables */
-        const p = this.p1
+        const p = point
         const s = this.start
 
         s[0] = p[0]
