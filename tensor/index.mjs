@@ -13,35 +13,35 @@ export default class Tensor {
         SYMBOL_FROM_ID: { 0: '', 1: 'i', 2: 'j', 3: 'k' },
     }
 
-    static Int8 = { size: 1, array: Int8Array }
-    static Int16 = { size: 1, array: Int16Array }
-    static Int32 = { size: 1, array: Int32Array }
-    static Uint8 = { size: 1, array: Uint8Array }
-    static Uint16 = { size: 1, array: Uint16Array }
-    static Uint32 = { size: 1, array: Uint32Array }
-    static Float32 = { size: 1, array: Float32Array }
-    static Float64 = { size: 1, array: Float64Array }
-    static Uint8Clamped = { size: 1, array: Uint8ClampedArray }
+    static Int8 = new (class Int8 { constructor() { this.size = 1; this.array = Int8Array } })()
+    static Int16 = new (class Int16 { constructor() { this.size = 1; this.array = Int16Array } })()
+    static Int32 = new (class Int32 { constructor() { this.size = 1; this.array = Int32Array } })()
+    static Uint8 = new (class Uint8 { constructor() { this.size = 1; this.array = Uint8Array } })()
+    static Uint16 = new (class Uint16 { constructor() { this.size = 1; this.array = Uint16Array } })()
+    static Uint32 = new (class Uint32 { constructor() { this.size = 1; this.array = Uint32Array } })()
+    static Float32 = new (class Float32 { constructor() { this.size = 1; this.array = Float32Array } })()
+    static Float64 = new (class Float64 { constructor() { this.size = 1; this.array = Float64Array } })()
+    static Uint8Clamped = new (class Uint8Clamped { constructor() { this.size = 1; this.array = Uint8ClampedArray } })()
 
-    static ComplexInt8 = { size: 2, array: Int8Array }
-    static ComplexInt16 = { size: 2, array: Int16Array }
-    static ComplexInt32 = { size: 2, array: Int32Array }
-    static ComplexUint8 = { size: 2, array: Uint8Array }
-    static ComplexUint16 = { size: 2, array: Uint16Array }
-    static ComplexUint32 = { size: 2, array: Uint32Array }
-    static ComplexFloat32 = { size: 2, array: Float32Array }
-    static ComplexFloat64 = { size: 2, array: Float64Array }
-    static ComplexUint8Clamped = { size: 2, array: Uint8ClampedArray }
+    static ComplexInt8 = new (class ComplexInt8 { constructor() { this.size = 2; this.array = Int8Array } })()
+    static ComplexInt16 = new (class ComplexInt16 { constructor() { this.size = 2; this.array = Int16Array } })()
+    static ComplexInt32 = new (class ComplexInt32 { constructor() { this.size = 2; this.array = Int32Array } })()
+    static ComplexUint8 = new (class ComplexUint8 { constructor() { this.size = 2; this.array = Uint8Array } })()
+    static ComplexUint16 = new (class ComplexUint16 { constructor() { this.size = 2; this.array = Uint16Array } })()
+    static ComplexUint32 = new (class ComplexUint32 { constructor() { this.size = 2; this.array = Uint32Array } })()
+    static ComplexFloat32 = new (class ComplexFloat32 { constructor() { this.size = 2; this.array = Float32Array } })()
+    static ComplexFloat64 = new (class ComplexFloat64 { constructor() { this.size = 2; this.array = Float64Array } })()
+    static ComplexUint8Clamped = new (class ComplexUint8Clamped { constructor() { this.size = 2; this.array = Uint8ClampedArray } })()
 
-    static QuatInt8 = { size: 4, array: Int8Array }
-    static QuatInt16 = { size: 4, array: Int16Array }
-    static QuatInt32 = { size: 4, array: Int32Array }
-    static QuatUint8 = { size: 4, array: Uint8Array }
-    static QuatUint16 = { size: 4, array: Uint16Array }
-    static QuatUint32 = { size: 4, array: Uint32Array }
-    static QuatFloat32 = { size: 4, array: Float32Array }
-    static QuatFloat64 = { size: 4, array: Float64Array }
-    static QuatUint8Clamped = { size: 4, array: Uint8ClampedArray }
+    static QuatInt8 = new (class QuatInt8 { constructor() { this.size = 4; this.array = Int8Array } })()
+    static QuatInt16 = new (class QuatInt16 { constructor() { this.size = 4; this.array = Int16Array } })()
+    static QuatInt32 = new (class QuatInt32 { constructor() { this.size = 4; this.array = Int32Array } })()
+    static QuatUint8 = new (class QuatUint8 { constructor() { this.size = 4; this.array = Uint8Array } })()
+    static QuatUint16 = new (class QuatUint16 { constructor() { this.size = 4; this.array = Uint16Array } })()
+    static QuatUint32 = new (class QuatUint32 { constructor() { this.size = 4; this.array = Uint32Array } })()
+    static QuatFloat32 = new (class QuatFloat32 { constructor() { this.size = 4; this.array = Float32Array } })()
+    static QuatFloat64 = new (class QuatFloat64 { constructor() { this.size = 4; this.array = Float64Array } })()
+    static QuatUint8Clamped = new (class QuatUint8Clamped { constructor() { this.size = 4; this.array = Uint8ClampedArray } })()
 
     static parseRaw(data) {
         if (data === undefined)
@@ -86,12 +86,12 @@ export default class Tensor {
 
         if (data.constructor === Array) {
             const [shape, type] = Tensor.parseRaw(data)
-            const count = shape.reduce(function (a, b) { return a * b }, 1)
+            const size = shape.reduce(function (a, b) { return a * b }, 1)
 
             if (shape.length <= 1)
                 return new Tensor(new type.array(data), new Header(type, shape))
 
-            const flatData = Tensor.flattenRaw(data, new type.array(count * type.size))
+            const flatData = Tensor.flattenRaw(data, new type.array(size * type.size))
 
             return new Tensor(flatData, new Header(type, shape))
         }
@@ -104,9 +104,9 @@ export default class Tensor {
             throw "Attempting to create tensor with undefined shape"
 
         const type = Tensor.Float32
-        const count = shape.reduce(function (a, b) { return a * b }, 1)
+        const size = shape.reduce(function (a, b) { return a * b }, 1)
 
-        return new Tensor(new type.array(count * type.size), new Header(type, shape))
+        return new Tensor(new type.array(size * type.size), new Header(type, shape))
     }
 
     static ones(...shape) {
@@ -125,9 +125,9 @@ export default class Tensor {
             throw "You must specify when to stop the range"
 
         const shape = [Math.round((stop - start) / step)]
-        const count = shape[0]
+        const size = shape[0]
         const type = Tensor.Float32
-        const data = new type.array(count * type.size)
+        const data = new type.array(size * type.size)
 
         for (let i = start, j = 0; i < stop; i += step, j++)
             data[j] = i
@@ -139,11 +139,11 @@ export default class Tensor {
         if (start === undefined || stop === undefined)
             throw "You must specify start and stop"
 
-        const count = num
+        const size = num
         const shape = [num]
         const type = Tensor.Float32
         const step = (stop - start) / (num - 1)
-        const data = new type.array(count * type.size)
+        const data = new type.array(size * type.size)
 
         for (let i = start, j = 0; i <= stop; i += step, j++)
             data[j] = i
@@ -200,11 +200,11 @@ export default class Tensor {
         if (type.size === this.header.type.size)
             return this
 
-        if (this.header.count === 1)
+        if (this.header.size === 1)
             return this
 
         const raw = this.toRawFlat()
-        const data = new type.array(this.header.count * type.size)
+        const data = new type.array(this.header.size * type.size)
 
         const minSize = Math.min(type.size, this.header.type.size)
 
@@ -230,7 +230,7 @@ export default class Tensor {
     }
 
     ravel() {
-        return Tensor.tensor(this.toRaw(), this.header.type).reshape([-1])
+        return Tensor.tensor(this.toRaw(), this.header.type).reshape(-1)
     }
 
     slice(...region) {

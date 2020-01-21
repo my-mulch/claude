@@ -21,12 +21,17 @@
         import io from './io/index.mjs'
         import app from './app/index.mjs'
         import bb from './tensor/index.mjs'
-        import shapes from './graphics/shapes/index.mjs'
+
+        import Cone from './graphics/shapes/cone.mjs'
+        import Cylinder from './graphics/shapes/cylinder.mjs'
 
         window.io = io
         window.bb = bb
-        window.app = app
-        window.shapes = shapes
+        
+        window.app = new app()
+        
+        window.Cone = Cone
+        window.Cylinder = Cylinder
 
         io
             .txtread('./index.mjs')

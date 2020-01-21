@@ -3,7 +3,7 @@ export default class Header {
     constructor(type, shape, strides, offset, contig) {
         this.type = type
         this.shape = shape
-        this.count = this.shape.reduce(function (a, b) { return a * b }, 1)
+        this.size = this.shape.reduce(function (a, b) { return a * b }, 1)
 
         this.offset = offset !== undefined ? offset : 0
         this.contig = contig !== undefined ? contig : true
@@ -51,7 +51,7 @@ export default class Header {
         const product = shape.reduce(function (a, b) { return a * b }, 1)
 
         for (let i = 0; i < shape.length; i++)
-            newShape[i] = shape[i] < 0 ? -this.count / product : shape[i]
+            newShape[i] = shape[i] < 0 ? -this.size / product : shape[i]
 
         return newShape
     }

@@ -2,7 +2,7 @@ import Engine from '../graphics/engine.mjs'
 import Camera from '../graphics/camera.mjs'
 import Trackball from '../graphics/trackball.mjs'
 
-class Cow {
+export default class Cow {
     constructor(canvas = document.getElementById('main')) {
         /** Scene */
         this.drawables = []
@@ -17,8 +17,6 @@ class Cow {
         this.engine = new Engine(this.canvas)
         this.camera = new Camera(this.canvas.width / this.canvas.height)
         this.trackball = new Trackball()
-
-        /** Event State */
 
         /** Event Listeners */
         this.canvas.addEventListener('wheel', this.wheel.bind(this))
@@ -117,5 +115,3 @@ class Cow {
         this.trackball.pause()
     }
 }
-
-export default new Cow()
