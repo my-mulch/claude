@@ -4,7 +4,16 @@ app.engine.session(
     await io.txtread('./resources/shaders/rgb/shader.frag'),
 )
 
-const cone = bb.tensor(new Cylinder().vertices).reshape(-1, 3)
+const cylinder = bb.tensor(new Cylinder().vertices).reshape(-1, 3)
+
+app.plot({
+    vertices: cylinder,
+    colors: bb.ones(...cylinder.header.shape),
+    sizes: bb.ones(...cylinder.header.shape),
+    mode: app.engine.context.TRIANGLES
+})
+
+const cone = bb.tensor(new Cone([1, 0, 0], [0.5, 0, 0]).vertices).reshape(-1, 3)
 
 app.plot({
     vertices: cone,
