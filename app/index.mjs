@@ -1,12 +1,10 @@
-import bb from '../bb/index.mjs'
-import WebGL from './webgl.mjs'
-import Camera from './camera.mjs'
-import Trackball from './trackball.mjs'
+import Engine from '../graphics/engine.mjs'
+import Camera from '../graphics/camera.mjs'
+import Trackball from '../graphics/trackball.mjs'
 
-export default class Cow {
+class Cow {
     constructor(canvas = document.getElementById('main')) {
-        /** State */
-        this.pointer = false
+        /** Scene */
         this.drawables = []
 
         /** Display */
@@ -15,9 +13,12 @@ export default class Cow {
         this.canvas.height = window.innerHeight
 
         /** Peripherals */
-        this.webgl = new WebGL(this.canvas)
+        this.pointer = false
+        this.engine = new Engine(this.canvas)
         this.camera = new Camera(this.canvas.width / this.canvas.height)
         this.trackball = new Trackball()
+
+        /** Event State */
 
         /** Event Listeners */
         this.canvas.addEventListener('wheel', this.wheel.bind(this))
@@ -27,14 +28,10 @@ export default class Cow {
     }
 
     plot({ vertices, colors, sizes, mode }) {
-        if (!mode) mode = this.webgl.context.POINTS
-        if (!sizes) sizes = bb.ones(vertices.header.shape)
-        if (!colors) colors = vertices
-
         this.drawables.push({
-            sizeBuffer: this.webgl.createBuffer(sizes),
-            colorBuffer: this.webgl.createBuffer(colors),
-            vertexBuffer: this.webgl.createBuffer(vertices),
+            sizeBuffer: this.engine.createBuffer(sizes),
+            colorBuffer: this.engine.createBuffer(colors),
+            vertexBuffer: this.engine.createBuffer(vertices),
 
             drawMode: mode,
             drawCount: vertices.header.shape[0]
@@ -42,18 +39,18 @@ export default class Cow {
     }
 
     render() {
-        this.webgl.context.clear(this.webgl.context.COLOR_BUFFER_BIT)
+        this.engine.context.clear(this.engine.context.COLOR_BUFFER_BIT)
 
         for (const object of this.drawables) {
-            this.webgl.attributes.a_Color.set(object.colorBuffer)
-            this.webgl.attributes.a_PointSize.set(object.sizeBuffer)
-            this.webgl.attributes.a_Position.set(object.vertexBuffer)
+            this.engine.attributes.a_Color.set(object.colorBuffer)
+            this.engine.attributes.a_PointSize.set(object.sizeBuffer)
+            this.engine.attributes.a_Position.set(object.vertexBuffer)
 
-            this.webgl.uniforms.u_ViewMatrix.set(this.camera.view)
-            this.webgl.uniforms.u_ProjMatrix.set(this.camera.proj)
-            this.webgl.uniforms.u_ModelMatrix.set(this.trackball.model)
+            this.engine.uniforms.u_ViewMatrix.set(this.camera.view)
+            this.engine.uniforms.u_ProjMatrix.set(this.camera.proj)
+            this.engine.uniforms.u_ModelMatrix.set(this.trackball.model)
 
-            this.webgl.context.drawArrays(object.drawMode, 0, object.drawCount)
+            this.engine.context.drawArrays(object.drawMode, 0, object.drawCount)
         }
     }
 
@@ -67,10 +64,11 @@ export default class Cow {
         this.render()
     }
 
-    rasterToScreen(event) {
+    rasterToScreen(x, y) {
+        /** Convert Raster-Space Coordinates to Screen-Space */
         return [
-            2 * event.x / this.canvas.width - 1,
-            1 - 2 * event.y / this.canvas.height
+            2 * x / this.canvas.width - 1,
+            1 - 2 * y / this.canvas.height,
         ]
     }
 
@@ -78,43 +76,46 @@ export default class Cow {
         /** Pressed */
         this.pointer = true
 
+        /** Convert Click to Screen-Space Coordinates */
+        const [x, y] = this.rasterToScreen(event.x, event.y)
+
         /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(...this.rasterToScreen(event))
+        const ray = this.camera.cast(x, y)
 
-        /** Intersection */
-        const [p0, p1] = this.trackball.intersect(
-            ray, // Direction of casted ray
-            this.camera.from // Origin of casted ray
-        )
+        /** Point of Intersection */
+        const point = this.trackball.intersect(ray)
 
-        this.trackball.start = p0
+        /** Start the Trackball */
+        this.trackball.play(point)
     }
 
     pointermove(event) {
         /** Not Pressed? */
         if (!this.pointer) return
 
-        /** Cast a Ray using Screen-Space Coordinates */
-        const ray = this.camera.cast(...this.rasterToScreen(event))
+        /** Convert Click to Screen-Space Coordinates */
+        const [x, y] = this.rasterToScreen(event.x, event.y)
 
-        /** Intersection */
-        const [p0, p1] = this.trackball.intersect(
-            ray, // Direction of casted ray
-            this.camera.from // Origin of casted ray
-        )
+        /** Cast a Ray using Screen-Space Coordinates */
+        const ray = this.camera.cast(x, y)
+
+        /** Point of Intersection */
+        const point = this.trackball.intersect(ray)
 
         /** Track the Mouse-Movement along the Trackball */
-        this.trackball.track(p0)
+        this.trackball.track(point)
 
         /** Render the Changes */
         this.render()
     }
 
-    pointerup(event) {
+    pointerup() {
         /** Released */
         this.pointer = false
 
         /** Keep the Trackball at the Released Position */
-        this.trackball.stop()
+        this.trackball.pause()
     }
 }
+
+export default new Cow()
