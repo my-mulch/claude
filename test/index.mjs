@@ -16,8 +16,8 @@ export default class Jest {
             toEqual: function (otherStuff) {
                 Jest.spec = Jest.spec + 1 || 1
 
-                if (stuff.header) stuff = stuff.toPretty()
-                if (otherStuff.header) otherStuff = otherStuff.toPretty()
+                if (stuff.header) stuff = stuff.toString()
+                if (otherStuff.header) otherStuff = otherStuff.toString()
 
                 stuff = stuff.constructor !== String
                     ? JSON.stringify(stuff)
@@ -27,7 +27,7 @@ export default class Jest {
                     ? JSON.stringify(otherStuff)
                     : otherStuff
 
-                if (stuff == otherStuff)
+                if (JSON.parse(stuff).toString() === JSON.parse(otherStuff).toString())
                     console.log(PASS, Jest.spec, 'Passed!')
                 else
                     console.log(FAIL, Jest.spec, [

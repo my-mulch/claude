@@ -99,21 +99,21 @@ export default class Tensor {
         throw `You cannot create a tensor from type: ${data.constructor}. Pass either raw or typed array`
     }
 
-    static zeros(...shape) {
+    static zeros(shape, type) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
-        const type = Tensor.Float32
+        type = type || Tensor.Float32
         const size = shape.reduce(function (a, b) { return a * b }, 1)
 
         return new Tensor(new type.array(size * type.size), new Header(type, shape))
     }
 
-    static ones(...shape) {
+    static ones(shape, type) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
-        const tensor = Tensor.zeros(...shape)
+        const tensor = Tensor.zeros(shape, type)
 
         tensor.data.fill(1)
 
@@ -151,11 +151,11 @@ export default class Tensor {
         return new Tensor(data, new Header(type, shape))
     }
 
-    static rand(...shape) {
+    static rand(shape, type) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
-        const tensor = Tensor.zeros(...shape)
+        const tensor = Tensor.zeros(shape, type)
 
         for (let i = 0; i < tensor.data.length; i++)
             tensor.data[i] = Math.random()
@@ -178,11 +178,11 @@ export default class Tensor {
         return tensor
     }
 
-    static eye(...shape) {
+    static eye(shape, type) {
         if (shape === undefined)
             throw "Attempting to create tensor with undefined shape"
 
-        const tensor = Tensor.zeros(...shape)
+        const tensor = Tensor.zeros(shape, type)
 
         const diagonal = tensor.header.strides.reduce(function (a, b) { return a + b })
         const numDiags = Math.min(...tensor.header.shape)
@@ -191,6 +191,24 @@ export default class Tensor {
             tensor.data[i] = 1
 
         return tensor
+    }
+
+    static vstack(...tensors) {
+        const stack = Tensor.zeros([
+            tensors.reduce(function (stackHeight, tensor) {
+                return stackHeight + tensor.header.shape[0]
+            }, 0),
+            ...tensors[0].header.shape.slice(1)
+        ], tensors[0].header.type)
+
+        let marker = 0
+
+        for (const tensor of tensors) {
+            stack.data.set(tensor.data, marker)
+            marker += tensor.data.length
+        }
+
+        return stack
     }
 
     astype(type) {
@@ -203,7 +221,7 @@ export default class Tensor {
         if (this.header.size === 1)
             return this
 
-        const raw = this.toRawFlat()
+        const raw = this.toRaw().flat(Number.POSITIVE_INFINITY)
         const data = new type.array(this.header.size * type.size)
 
         const minSize = Math.min(type.size, this.header.type.size)
@@ -243,7 +261,7 @@ export default class Tensor {
 
     reshape(...shape) {
         if (!this.header.contig)
-            return Tensor.tensor(this.toRawFlat(), this.header.type).reshape(...shape)
+            return Tensor.tensor(this.toRaw(), this.header.type).reshape(...shape)
 
         return new Tensor(this.data, this.header.reshape(shape))
     }
@@ -257,47 +275,37 @@ export default class Tensor {
         }, this)
     }
 
-    toStringAtIndex(index, string = '') {
-        for (let i = 0; i < this.header.type.size; i++) {
-            const sign = Math.sign(this.data[index + i]) < 0 ? '-' : '+'
-            const number = Math.abs(this.data[index + i])
-
-            string += `${sign}${number.toFixed(Tensor.config.PRECISION)}${Tensor.config.SYMBOL_FROM_ID[i]}`
-        }
-
-        if (!string)
-            return '0'
-
-        if (string.startsWith('+'))
-            return string.slice(1)
-
-        return string
-    }
-
-    toRawAtIndex(index) {
-        const result = []
-
-        for (let i = 0; i < this.header.type.size; i++)
-            result.push(this.data[index + i])
-
-        return result
-    }
-
     toRaw() {
-        return this.visit(this.toRawAtIndex.bind(this))
-    }
+        return this.visit(function (index) {
+            const result = []
 
-    toRawFlat() {
-        return this.toRaw().flat(Number.POSITIVE_INFINITY)
-    }
+            for (let i = 0; i < this.header.type.size; i++)
+                result.push(this.data[index + i])
 
-    toPretty() {
-        return this.visit(this.toStringAtIndex.bind(this))
+            return result
+        }.bind(this))
     }
 
     toString() {
         return JSON
-            .stringify(this.toPretty())
+            .stringify(this.visit(function (index) {
+                let string = ''
+
+                for (let i = 0; i < this.header.type.size; i++)
+                    string += [
+                        Math.sign(this.data[index + i]) < 0 ? '-' : '+',
+                        Math.abs(this.data[index + i]).toFixed(Tensor.config.PRECISION),
+                        Tensor.config.SYMBOL_FROM_ID[i]
+                    ].join('')
+
+                if (!string)
+                    return '0'
+
+                if (string.startsWith('+'))
+                    return string.slice(1)
+
+                return string
+            }.bind(this)))
             .replace(Tensor.config.ARRAY_SPACER, Tensor.config.ARRAY_REPLACER)
     }
 }
