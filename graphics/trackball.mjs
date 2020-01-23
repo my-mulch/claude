@@ -1,7 +1,7 @@
 
 export default class Trackball {
     constructor(
-        radius = 1,
+        radius = 2,
         origin = [0, 0, 0],
     ) {
         /** Properties of the Trackball */

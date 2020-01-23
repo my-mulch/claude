@@ -193,6 +193,33 @@ export default class Tensor {
         return tensor
     }
 
+    static mesh(...arrays) {
+        return bb.tensor(new Float32Array(
+            (function meshHelp(arrays, point = [], total = []) {
+                if (!arrays.length)
+                    return total.push(...point)
+
+                for (const element of arrays[0]) {
+                    point.push(element)
+                    meshHelp(arrays.slice(1), point, total)
+                    point.pop()
+                }
+
+                return total
+            })(arrays)
+        ))
+    }
+
+    static tile(array, reps) {
+        const data = new Float32Array(array.length * reps)
+
+        for (let i = 0; i < data.length; i += array.length)
+            for (let j = 0; j < array.length; j++)
+                data[i + j] = array[j]
+        
+        return Tensor.tensor(data)
+    }
+
     static vstack(...tensors) {
         const stack = Tensor.zeros([
             tensors.reduce(function (stackHeight, tensor) {
@@ -221,7 +248,7 @@ export default class Tensor {
         if (this.header.size === 1)
             return this
 
-        const raw = this.toRaw().flat(Number.POSITIVE_INFINITY)
+        const raw = this.toRawArray().flat(Number.POSITIVE_INFINITY)
         const data = new type.array(this.header.size * type.size)
 
         const minSize = Math.min(type.size, this.header.type.size)
@@ -248,7 +275,7 @@ export default class Tensor {
     }
 
     ravel() {
-        return Tensor.tensor(this.toRaw(), this.header.type).reshape(-1)
+        return Tensor.tensor(this.toRawArray(), this.header.type).reshape(-1)
     }
 
     slice(...region) {
@@ -261,7 +288,7 @@ export default class Tensor {
 
     reshape(...shape) {
         if (!this.header.contig)
-            return Tensor.tensor(this.toRaw(), this.header.type).reshape(...shape)
+            return Tensor.tensor(this.toRawArray(), this.header.type).reshape(...shape)
 
         return new Tensor(this.data, this.header.reshape(shape))
     }
@@ -275,7 +302,7 @@ export default class Tensor {
         }, this)
     }
 
-    toRaw() {
+    toRawArray() {
         return this.visit(function (index) {
             const result = []
 
@@ -306,6 +333,8 @@ export default class Tensor {
 
                 return string
             }.bind(this)))
-            .replace(Tensor.config.ARRAY_SPACER, Tensor.config.ARRAY_REPLACER)
+            .replace(
+                Tensor.config.ARRAY_SPACER,
+                Tensor.config.ARRAY_REPLACER)
     }
 }
