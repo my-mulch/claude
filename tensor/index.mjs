@@ -163,14 +163,14 @@ export default class Tensor {
         return tensor
     }
 
-    static randrange(low, high, shape) {
+    static randint(low, high, shape) {
         if (low === undefined || high === undefined)
             throw "You must specify start and stop"
 
         if (shape === undefined)
             throw "Attempting to create randrange tensor with undefined shape"
 
-        const tensor = Tensor.zeros(...shape)
+        const tensor = Tensor.zeros(shape)
 
         for (let i = 0; i < tensor.data.length; i++)
             tensor.data[i] = low + Math.floor(Math.random() * (high - low))

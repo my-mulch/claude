@@ -6,6 +6,13 @@ export default class IO {
         return response.text()
     }
 
+    static async byteread(path){
+        const response = await fetch(path)
+        const buffer = await response.arrayBuffer()
+        
+        return buffer
+    }
+
     static async audioread(path) {
         const context = new AudioContext()
 
