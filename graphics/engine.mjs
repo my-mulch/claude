@@ -84,7 +84,7 @@ export default class Engine {
     createBuffer(tensor) {
         const buffer = this.context.createBuffer()
 
-        const numberType = this.mapType(tensor.header.type.array)
+        const numberType = this.mapType(tensor.data.constructor.__proto__)
         const renderType = this.context.STATIC_DRAW
         const bufferType = this.context.ARRAY_BUFFER
 
@@ -97,8 +97,8 @@ export default class Engine {
             count: tensor.header.shape[0],
             type: numberType,
             normalize: false,
-            offset: tensor.header.offset * tensor.data.BYTES_PER_ELEMENT,
-            stride: tensor.header.strides[0] * tensor.data.BYTES_PER_ELEMENT
+            offset: 0,
+            stride: tensor.header.strides[0]
         }
     }
 

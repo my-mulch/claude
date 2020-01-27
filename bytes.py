@@ -1,46 +1,39 @@
 import numpy as np
+from sklearn.datasets import fetch_openml # MNIST data
 
-goals = np.array([1.1, -2.3]).reshape(2, 1)
-inputs = np.array([0.2])
-weights = np.array([-20., -20.]).reshape(2, 1)
+### load MNIST data from https://www.openml.org/d/554
+X, y = fetch_openml('mnist_784', version=1, return_X_y=True)
 
-alpha = 0.1
-
-# Visualize Error Space
-X, Y = np.mgrid[-40:40:1000j, -40:40:1000j]
-
-grid = np.vstack([X.ravel(), Y.ravel()])
-errors = np.linalg.norm((grid * inputs - goals) ** 2, axis=0)
-
-plot = np.vstack((
-    X.reshape(1, -1),
-    errors.reshape(1, -1),
-    Y.reshape(1, -1),
-)).T.astype(np.float32)
-
-f = open('./errors', 'wb')
-f.write(plot.tobytes())
-f.close()
-
-guesses = np.zeros((1111, 3), dtype=np.float32)
+# The most basic neural network - a matrix multiplication
+goals = np.array([1.1, -2.3, 6., 2.3]).reshape(4, 1)
+inputs = np.array([0.2, -0.2, 1.1]).reshape(3, 1)
+weights = np.random.randn(4, 3)
+alpha = 0.01
 
 # Learning
-for i in range(1111):
-    pred = weights * inputs
-    delta = pred - goals
+for i in range(1262):
+    pred = weights.dot(inputs)
+    deltas = pred - goals
 
-    error = delta ** 2
+    error = deltas ** 2
 
-    guesses[i] = np.array([weights[0], np.linalg.norm(error), weights[1]])
-
-    if not i % 100:
+    if not i % 1000:
         print("----------{}------------".format(i))
         print("pred{}".format(pred.tolist()))
         print("goals{}".format(goals.tolist()))
 
-    grad = 2 * inputs * delta
-    weights -= grad * alpha
+    # weights[0] -= alpha * 2 * inputs[:, 0] * deltas[0]
+    # weights[1] -= alpha * 2 * inputs[:, 0] * deltas[1]
+    # weights[2] -= alpha * 2 * inputs[:, 0] * deltas[2]
+    # weights[3] -= alpha * 2 * inputs[:, 0] * deltas[3]
 
-f = open('./guesses', 'wb')
-f.write(guesses.tobytes())
-f.close()
+    # weights[:, 0] -= alpha * 2 * deltas[:, 0] * inputs[0]
+    # weights[:, 1] -= alpha * 2 * deltas[:, 0] * inputs[1]
+    # weights[:, 2] -= alpha * 2 * deltas[:, 0] * inputs[2]
+
+    weights -= alpha * 2 * deltas.dot(inputs.T)
+
+
+# f = open('./guesses', 'wb')
+# f.write(guesses.tobytes())
+# f.close()
