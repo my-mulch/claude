@@ -30,15 +30,15 @@ app.engine.session(
 // })
 
 
-app.plot({
-    vertices: await bb.array([
-        [0, 0, -2], [0, 0, 2],
-        [0, -2, 0], [0, 2, 0],
-        [-2, 0, 0], [2, 0, 0],
-    ], bb.float32),
-    colors: await bb.ones([6, 3], bb.float32),
-    sizes: await bb.ones([6, 1], bb.float32),
-    mode: app.engine.context.LINES,
-})
+// app.plot({
+//     vertices: await bb.array([
+//         [0, 0, -2], [0, 0, 2],
+//         [0, -2, 0], [0, 2, 0],
+//         [-2, 0, 0], [2, 0, 0],
+//     ], bb.float32),
+//     colors: await bb.ones([6, 3], bb.float32),
+//     sizes: await bb.ones([6, 1], bb.float32),
+//     mode: app.engine.context.POINTS,
+// })
 
-app.render()
+// app.render()

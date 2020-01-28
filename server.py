@@ -1,4 +1,3 @@
-import time
 from flask import Flask, request, make_response
 from flask_cors import CORS
 
@@ -11,15 +10,15 @@ CORS(app)
 cache = {}
 
 
-def cache_and_serve(array):
-    addr, _ = array.__array_interface__['data']
+def make_array_response(array):
+    address, _ = array.__array_interface__['data']
 
-    cache[addr] = array
+    cache[address] = array
 
     return make_response(array.tobytes(), {
         'Access-Control-Expose-Headers': 'metadata',
         'metadata': json.dumps({
-            'addr': addr,
+            'address': address,
             'size': array.size,
             'shape': array.shape,
             'dtype': str(array.dtype),
@@ -28,61 +27,45 @@ def cache_and_serve(array):
     })
 
 
-@app.route("/array", methods=["GET"])
-def array():
+def lookup_arrays(args):
+    for i, arg in enumerate(args):
+        if isinstance(arg, dict) and arg.get('address'):
+            args[i] = cache[arg['address']]
+
+    return args
+
+
+@app.route("/instance", methods=["GET"])
+def instance_fields():
     args = json.loads(request.headers.get('args'))
+    this = json.loads(request.headers.get('this'))
+    field = json.loads(request.headers.get('field'))
 
-    array = np.array(object=args.get('object'), dtype=args.get('dtype'),
-                     copy=args.get('copy'), order=args.get('order'),
-                     subok=args.get('subok'), ndmin=args.get('ndmin'))
+    clean_args = lookup_arrays(args)
 
-    return cache_and_serve(array)
+    array = cache[this.get('address')]
+    attribute = getattr(array, field)
+
+    result = attribute(*clean_args) if callable(attribute) else attribute
+
+    if isinstance(result, np.ndarray):
+        return make_array_response(result)
+
+    return attribute
 
 
-@app.route("/reshape", methods=["GET"])
-def reshape():
+@app.route("/static", methods=["GET"])
+def static_fields():
     args = json.loads(request.headers.get('args'))
+    field = json.loads(request.headers.get('field'))
 
-    array = cache[args.get('header')['addr']]
-    array = array.reshape(*args.get('shape'))
+    clean_args = lookup_arrays(args)
 
-    return cache_and_serve(array)
+    attribute = getattr(np, field)
 
+    result = attribute(*clean_args) if callable(attribute) else attribute
 
-@app.route("/dot", methods=["GET"])
-def dot():
-    args = json.loads(request.headers.get('args'))
+    if isinstance(result, np.ndarray):
+        return make_array_response(result)
 
-    array = np.dot(a=cache[args.get('a')['addr']],
-                   b=cache[args.get('b')['addr']])
-
-    return cache_and_serve(array)
-
-
-@app.route("/ones", methods=["GET"])
-def ones():
-    args = json.loads(request.headers.get('args'))
-
-    array = np.ones(shape=args.get('shape'),
-                    dtype=args.get('dtype'),
-                    order=args.get('order'))
-
-    return cache_and_serve(array)
-
-
-@app.route("/randn", methods=["GET"])
-def randn():
-    args = json.loads(request.headers.get('args'))
-
-    array = np.random.randn(*args.get('dims'))
-
-    return cache_and_serve(array)
-
-
-@app.route("/toString", methods=["GET"])
-def toString():
-    args = json.loads(request.headers.get('args'))
-
-    array = cache[args.get('addr')]
-
-    return np.array_repr(array)
+    return result
