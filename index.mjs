@@ -1,52 +1,116 @@
 
-app.engine.session(
-    await io.txtread('./resources/shaders/rgb/shader.vert'),
-    await io.txtread('./resources/shaders/rgb/shader.frag'),
-)
+export default class Cow {
+    constructor(
+        canvas = document.getElementById('main')
+    ) {
+        /** Scene */
+        this.drawables = []
 
+        /** Display */
+        this.canvas = canvas
+        this.canvas.width = window.innerWidth
+        this.canvas.height = window.innerHeight
 
-app.plot({
-    vertices: bb.tensor([
-        [[0], [0], [-1]],
-        [[0], [0], [1]],
+        /** Peripherals */
+        this.pointer = false
+        this.engine = new Engine(this.canvas)
+        this.camera = new Camera(this.canvas.width / this.canvas.height)
+        this.trackball = new Trackball()
 
-        [[0], [1], [0]],
-        [[0], [-1], [0]],
+        /** Event Listeners */
+        this.canvas.addEventListener('wheel', this.wheel.bind(this))
+        this.canvas.addEventListener('pointerup', this.pointerup.bind(this))
+        this.canvas.addEventListener('pointermove', this.pointermove.bind(this))
+        this.canvas.addEventListener('pointerdown', this.pointerdown.bind(this))
+    }
 
-        [[-1], [0], [0]],
-        [[1], [0], [0]],
-    ]),
-    colors: bb.tensor([
-        [[1], [1], [1]],
-        [[1], [1], [1]],
+    plot({ vertices, colors, sizes, mode }) {
+        this.drawables.push({
+            sizeBuffer: this.engine.createBuffer(sizes),
+            colorBuffer: this.engine.createBuffer(colors),
+            vertexBuffer: this.engine.createBuffer(vertices),
 
-        [[1], [1], [1]],
-        [[1], [1], [1]],
+            drawMode: mode,
+            drawCount: vertices.header.shape[0]
+        })
+    }
 
-        [[1], [1], [1]],
-        [[1], [1], [1]],
-    ]),
-    sizes: bb.ones([6, 1]),
-    mode: app.engine.context.LINES,
-})
+    render() {
+        this.engine.context.clear(this.engine.context.COLOR_BUFFER_BIT)
 
+        for (const object of this.drawables) {
+            this.engine.attributes.a_Color.set(object.colorBuffer)
+            this.engine.attributes.a_PointSize.set(object.sizeBuffer)
+            this.engine.attributes.a_Position.set(object.vertexBuffer)
 
-const cylinder = bb.tensor(new Cylinder().vertices).reshape(-1, 3)
+            this.engine.uniforms.u_ViewMatrix.set(this.camera.view)
+            this.engine.uniforms.u_ProjMatrix.set(this.camera.proj)
+            this.engine.uniforms.u_ModelMatrix.set(this.trackball.model)
 
-app.plot({
-    vertices: cylinder,
-    colors: bb.vstack(bb.ones([1, cylinder.header.shape[0]]), bb.zeros([2, cylinder.header.shape[0]])).T().reshape(-1, 3),
-    sizes: bb.ones(cylinder.header.shape),
-    mode: app.engine.context.TRIANGLES
-})
+            this.engine.context.drawArrays(object.drawMode, 0, object.drawCount)
+        }
+    }
 
-const cone = bb.tensor(new Cone([1, 0, 0], [0.5, 0, 0]).vertices).reshape(-1, 3)
+    wheel(event) {
+        if (!event.ctrlKey) return
 
-app.plot({
-    vertices: cone,
-    colors: bb.vstack(bb.zeros([2, cone.header.shape[0]]), bb.ones([1, cone.header.shape[0]])).T().reshape(-1, 3),
-    sizes: bb.ones(cone.header.shape),
-    mode: app.engine.context.TRIANGLES
-})
+        event.preventDefault()
 
-app.render()
+        this.camera.zoom(event.deltaY)
+
+        this.render()
+    }
+
+    rasterToScreen(x, y) {
+        /** Convert Raster-Space Coordinates to Screen-Space */
+        return [
+            2 * x / this.canvas.width - 1,
+            1 - 2 * y / this.canvas.height,
+        ]
+    }
+
+    pointerdown(event) {
+        /** Pressed */
+        this.pointer = true
+
+        /** Convert Click to Screen-Space Coordinates */
+        const [x, y] = this.rasterToScreen(event.x, event.y)
+
+        /** Cast a Ray using Screen-Space Coordinates */
+        const ray = this.camera.cast(x, y)
+
+        /** Point of Intersection */
+        const point = this.trackball.intersect(ray)
+
+        /** Start the Trackball */
+        this.trackball.play(point)
+    }
+
+    pointermove(event) {
+        /** Not Pressed? */
+        if (!this.pointer) return
+
+        /** Convert Click to Screen-Space Coordinates */
+        const [x, y] = this.rasterToScreen(event.x, event.y)
+
+        /** Cast a Ray using Screen-Space Coordinates */
+        const ray = this.camera.cast(x, y)
+
+        /** Point of Intersection */
+        const point = this.trackball.intersect(ray)
+
+        /** Track the Mouse-Movement along the Trackball */
+        this.trackball.track(point)
+
+        /** Render the Changes */
+        this.render()
+    }
+
+    pointerup() {
+        /** Released */
+        this.pointer = false
+
+        /** Keep the Trackball at the Released Position */
+        this.trackball.pause()
+    }
+}
