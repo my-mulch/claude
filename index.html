@@ -16,21 +16,11 @@
 </head>
 
 <body>
-    <canvas id="main"></canvas>
     <script type="module">
-        import np from '../jumpy/index.mjs'
-        import mn from '../monet/index.mjs'
+        import main from './index.mjs'
 
-        window.np = np
-        window.mn = mn
-        
-        io
-            .txtread('./index.mjs')
-            .then(function (source) {
-                return new (async function () { })
-                    .constructor(source)
-                    .call(window)
-            })
+        main.call(window)
+
     </script>
 </body>
 
