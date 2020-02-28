@@ -1,10 +1,10 @@
 
 export default class Sketch {
-    constructor(canvas, vertexSource, fragmentSource) {
+    constructor(canvas, { vertex, fragment }) {
         /** Properties */
         this.context = canvas.getContext('webgl')
-        this.vertexSource = vertexSource
-        this.fragmentSource = fragmentSource
+        this.vertexSource = vertex
+        this.fragmentSource = fragment
 
         /** Shaders */
         this.vertexShader = this.createShader(this.context.VERTEX_SHADER, this.vertexSource)
@@ -59,11 +59,15 @@ export default class Sketch {
         const variableCount = this.context.getProgramParameter(this.program, type)
 
         for (var i = 0; i < variableCount; i++) {
-            const variableInfo = this.context[`getActive${identifier}`](this.program, i)
-            const variableLocation = this.context[`get${identifier}Location`](this.program, variableInfo.name)
+            const getVariable = this[`create${identifier}`]
+            const getVariableInfo = this.context[`getActive${identifier}`]
+            const getVariableLocation = this.context[`get${identifier}Location`]
 
-            variables[variableInfo.name] = Object.assign(variableInfo, { variableLocation })
-            this[variableInfo.name] = this[`create${identifier}`](variableInfo.type, variableLocation)
+            const info = getVariableInfo.call(this.context, this.program, i)
+            const location = getVariableLocation.call(this.context, this.program, info.name)
+
+            this[info.name] = getVariable.call(this, info.type, location)
+            variables[info.name] = Object.assign(info, { location })
         }
 
         return variables
