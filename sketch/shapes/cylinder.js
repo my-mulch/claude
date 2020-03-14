@@ -1,4 +1,4 @@
-import Shape from './interface.mjs'
+import Shape from './interface.js'
 
 export default class Cylinder extends Shape {
     constructor(

@@ -10,7 +10,7 @@ export default class Camera {
         /** Positioning */
         up = [0, 1, 0],
         to = [0, 0, 0],
-        from = [3, 1, 3],
+        from = [3, 3, 3],
     ) {
         /** Vectors in R3 */
         this.to = new Float32Array(to)

@@ -23,7 +23,11 @@ export default class Sketch {
         this.context.useProgram(this.program)
     }
 
-    buffer({ target, style, array }) {
+    buffer({
+        target = this.context.ARRAY_BUFFER,
+        style = this.context.STATIC_DRAW,
+        array
+    }) {
         /** Create the Buffer */
         const vertexBuffer = this.context.createBuffer()
 
@@ -40,6 +44,9 @@ export default class Sketch {
     draw({ mode, count }) {
         /** Clear Canvas */
         this.context.clear(this.context.COLOR_BUFFER_BIT)
+
+        /** Enable Depth Testing */
+        this.context.enable(this.context.DEPTH_TEST)
 
         /** Draw the Vertices */
         this.context.drawArrays(mode, 0, count)
@@ -90,7 +97,13 @@ export default class Sketch {
     }
 
     createAttrib(_, location) {
-        return (function ({ size, type, offset, stride, buffer }) {
+        return (function ({
+            buffer,
+            size,
+            type = this.context.FLOAT,
+            offset = 0,
+            stride = 0,
+        }) {
             this.context.bindBuffer(buffer.target, buffer.data)
             this.context.enableVertexAttribArray(location)
             this.context.vertexAttribPointer(location, size, type, false, stride, offset)

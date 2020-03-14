@@ -1,5 +1,5 @@
-import Camera from './camera.mjs'
-import Trackball from './trackball.mjs'
+import Camera from './camera.js'
+import Trackball from './trackball.js'
 
 export default class Scene {
     constructor() {
