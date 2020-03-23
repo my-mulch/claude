@@ -1,4 +1,4 @@
-import Shape from './interface.js'
+import Shape from './index.js'
 
 export default class Cone extends Shape {
     constructor(
@@ -8,7 +8,7 @@ export default class Cone extends Shape {
     ) {
         /** Constructor */
         super(to, from)
-        
+
         /** Properties */
         this.radius = radius
         this.vertices = new Float32Array(Shape.count * 3 * 3)

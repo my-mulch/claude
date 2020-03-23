@@ -1,61 +1,48 @@
-import Camera from 'ansel'
-import Renderer from 'guten'
-import Trackball from 'engelbart'
 
-import Shaders from './shade.js'
+export default class TrackView {
+    static shaders = {
+        fragment: [
+            'precision mediump float;',
+            'varying vec4 v_Color;',
+            'void main() { gl_FragColor = v_Color; }'
+        ].join('\n'),
+        vertex: [
+            'attribute float a_PointSize;',
+            'attribute vec4 a_Position;',
+            'attribute vec4 a_Color;',
 
-export default class TrackScene {
-    constructor({ positions, sizes, colors }) {
+            'uniform mat4 u_ViewMatrix;',
+            'uniform mat4 u_ProjMatrix;',
+            'uniform mat4 u_ModelMatrix;',
+
+            'varying vec4 v_Color;',
+
+            'void main() {',
+            '  gl_PointSize = a_PointSize;',
+            '  gl_Position = u_ProjMatrix * u_ViewMatrix * u_ModelMatrix * a_Position;',
+            '  v_Color = a_Color;',
+            '}',
+        ].join('\n')
+    }
+
+    constructor(listeners) {
         /** Display */
         this.canvas = document.createElement('canvas')
 
-        /** Tools */
+        /** Pointer */
         this.pointer = false
-        this.camera = new Camera({})
-        this.trackball = new Trackball({})
-
-        this.renderer = new Renderer({
-            /** Setup */
-            vertex: Shaders.vertex,
-            fragment: Shaders.fragment,
-            context: this.canvas.context('webgl'),
-
-            /** Data */
-            sizes,
-            colors,
-            positions,
-        })
-
-
-
-        const sizeBuffer = sketch.buffer({ array: size })
-        const colorBuffer = sketch.buffer({ array: color })
-        const positionBuffer = sketch.buffer({ array: image })
-
 
         /** Event Listeners */
+        for (const [name, handler] of Object.entries(listeners)) {
+            this[name] = handler.bind(this)
+            this.canvas.addEventListener(name, this[name])
+        }
+
         this.canvas.addEventListener(this.wheel.name, this.wheel.bind(this))
-        this.canvas.addEventListener(this.resize.name, this.resize.bind(this))
         this.canvas.addEventListener(this.pointerup.name, this.pointerup.bind(this))
         this.canvas.addEventListener(this.pointermove.name, this.pointermove.bind(this))
         this.canvas.addEventListener(this.pointerdown.name, this.pointerdown.bind(this))
     }
-
-    render() {
-        sketch.animate(function () {
-            sketch.a_Color({ buffer: colorBuffer, size: 3 })
-            sketch.a_PointSize({ buffer: sizeBuffer, size: 1 })
-            sketch.a_Position({ buffer: positionBuffer, size: 3 })
-
-            sketch.u_ProjMatrix(scene.camera.proj)
-            sketch.u_ViewMatrix(scene.camera.view)
-            sketch.u_ModelMatrix(scene.trackball.model)
-
-            sketch.draw({ mode: sketch.context.POINTS, count: pixels })
-        })
-    }
-
-    resize(event) { }
 
     wheel(event) {
         if (!event.ctrlKey) return
@@ -63,6 +50,8 @@ export default class TrackScene {
         event.preventDefault()
 
         this.camera.zoom(event.deltaY)
+
+        this.render()
     }
 
     rasterToScreen(x, y) {
@@ -78,7 +67,7 @@ export default class TrackScene {
         this.pointer = true
 
         /** Convert Click to Screen-Space Coordinates */
-        const [x, y] = this.rasterToScreen(event.x, event.y)
+        const [x, y] = this.rasterToScreen(event.offsetX, event.offsetY)
 
         /** Cast a Ray using Screen-Space Coordinates */
         const ray = this.camera.cast(x, y)
@@ -95,7 +84,7 @@ export default class TrackScene {
         if (!this.pointer) return
 
         /** Convert Click to Screen-Space Coordinates */
-        const [x, y] = this.rasterToScreen(event.x, event.y)
+        const [x, y] = this.rasterToScreen(event.offsetX, event.offsetY)
 
         /** Cast a Ray using Screen-Space Coordinates */
         const ray = this.camera.cast(x, y)
@@ -105,6 +94,9 @@ export default class TrackScene {
 
         /** Track the Mouse-Movement along the Trackball */
         this.trackball.track(point)
+
+        /** Render */
+        this.render()
     }
 
     pointerup() {
