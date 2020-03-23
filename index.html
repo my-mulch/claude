@@ -31,6 +31,8 @@
         import TrackView from './components/track.js'
 
         (async function main() {
+            window.io = io
+
             const claude = new Claude({
                 shared: {
                     image: await io.imread('./assets/img/sea.jpg'),
@@ -44,10 +46,47 @@
                             this.context.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height)
                         },
                         pointermove: function (event) {
-                            console.log(
-                                this.shared.image.bitmap.width * event.offsetX / this.canvas.offsetWidth,
-                                this.shared.image.bitmap.height * event.offsetY / this.canvas.offsetHeight,
-                            )
+                            const bitmap = this.shared.image.bitmap
+                            const xpix = Math.floor(bitmap.width * event.offsetX / this.canvas.offsetWidth)
+                            const ypix = Math.floor(bitmap.height * event.offsetY / this.canvas.offsetHeight)
+
+                            const renderer = this.layout[0][1].renderer
+
+                            const convWidth = 15
+                            const convHeight = 15
+
+                            const relConvWidth = Math.floor(convWidth / 2)
+                            const relConvHeight = Math.floor(convHeight / 2)
+
+                            const pixels = this.shared.image.pixels
+                            let positions = [], colors, sizes
+
+                            for (let rh = -relConvHeight; rh <= relConvHeight; rh++) {
+                                for (let cw = -relConvWidth; cw <= relConvWidth; cw++) {
+                                    const rindex = ypix + rh
+                                    const cindex = xpix + cw
+                                    const pindex = rindex * bitmap.width * 3 + cindex * 3
+
+                                    positions.push(
+                                        pixels[pindex + 0],
+                                        pixels[pindex + 1],
+                                        pixels[pindex + 2]
+                                    )
+                                }
+                            }
+
+                            colors = new Float32Array(positions.slice())
+                            positions = new Float32Array(positions.map(function (p) { return p - 0.5 }))
+                            sizes = new Float32Array(positions.length / 3).fill(20)
+
+
+                            this.shared.buffers = {
+                                sizes: renderer.buffer({ array: sizes }),
+                                colors: renderer.buffer({ array: colors }),
+                                positions: renderer.buffer({ array: positions }),
+                            }
+
+                            this.layout[0][1].render()
                         }
                     }),
                     new TrackView({
@@ -64,37 +103,19 @@
                                 context: this.canvas.getContext('webgl'),
                             })
 
-                            const positions = this.shared.image.pixels
-                            const colors = positions.slice()
-                            const sizes = new Float32Array(positions.length / 3).fill(1)
-
-                            for (let i = 0; i < positions.length; i += 3) {
-                                positions[i + 0] -= 0.5
-                                positions[i + 1] -= 0.5
-                                positions[i + 2] -= 0.5
-                            }
-
-                            this.buffers = {
-                                sizes: this.renderer.buffer({ array: sizes }),
-                                colors: this.renderer.buffer({ array: colors }),
-                                positions: this.renderer.buffer({ array: positions }),
-                            }
-
                             this.camera.project()
                             this.camera.look()
-
-                            this.render()
                         },
                         render: function () {
-                            this.renderer.a_Color({ buffer: this.buffers.colors, size: 3 })
-                            this.renderer.a_PointSize({ buffer: this.buffers.sizes, size: 1 })
-                            this.renderer.a_Position({ buffer: this.buffers.positions, size: 3 })
+                            this.renderer.a_Color({ buffer: this.shared.buffers.colors, size: 3 })
+                            this.renderer.a_PointSize({ buffer: this.shared.buffers.sizes, size: 1 })
+                            this.renderer.a_Position({ buffer: this.shared.buffers.positions, size: 3 })
 
                             this.renderer.u_ProjMatrix(this.camera.proj)
                             this.renderer.u_ViewMatrix(this.camera.view)
                             this.renderer.u_ModelMatrix(this.trackball.model)
 
-                            this.renderer.draw({ mode: this.renderer.context.POINTS, count: this.shared.image.pixels.length / 3 })
+                            this.renderer.draw({ mode: this.renderer.context.POINTS, count: 15 ** 2 })
                         }
                     })
                 ]],
