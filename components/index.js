@@ -10,7 +10,10 @@ export default class Component {
         this.attributes = attributes
 
         /** Style */
-        Object.assign(this.canvas.style, this.attributes)
+        Object.assign(this.canvas.style, this.attributes, {
+            width: '100%',
+            height: '100%'
+        })
 
         /** Event Listeners */
         for (const [key, value] of Object.entries(this.attributes)) {
