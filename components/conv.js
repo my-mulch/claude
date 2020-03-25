@@ -11,17 +11,12 @@ export default class ConvView extends Component {
         this.region = new Float32Array(this.mask[0] * this.mask[1] * 3)
 
         /** Display */
-        this.canvas = document.createElement('canvas')
         this.canvas.width = this.image.bitmap.width
         this.canvas.height = this.image.bitmap.height
         this.context = this.canvas.getContext('2d')
         this.context.drawImage(this.image.bitmap, 0, 0)
     }
-
-    resize() {
-
-    }
-
+    
     convolve(x, y) {
         let i = 0
 
@@ -39,11 +34,10 @@ export default class ConvView extends Component {
             }
         }
 
-        console.log(this.region)
         return this.region
     }
 
-    pointerdown(event) {
+    pointermove(event) {
         const bitmap = this.image.bitmap
 
         const x = Math.floor(bitmap.width * event.offsetX / this.canvas.offsetWidth)

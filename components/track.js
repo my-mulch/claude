@@ -35,7 +35,6 @@ export default class TrackView extends Component {
         super()
 
         /** Display */
-        this.canvas = document.createElement('canvas')
         this.canvas.width = window.innerWidth
         this.canvas.height = window.innerHeight
         this.context = this.canvas.getContext('webgl')
@@ -57,15 +56,11 @@ export default class TrackView extends Component {
         this.canvas.addEventListener(this.pointerdown.name, this.pointerdown.bind(this))
     }
 
-    resize() {
-
-    }
-
     render(region) {
         if (region) {
             const colors = region.slice()
             const positions = region
-            const sizes = new Float32Array(positions.length / 3).fill(1)
+            const sizes = new Float32Array(positions.length / 3).fill(10)
 
             for (let i = 0; i < region.length; i++)
                 positions[i] -= 0.5
@@ -79,7 +74,7 @@ export default class TrackView extends Component {
         this.renderer.u_ViewMatrix(this.camera.view)
         this.renderer.u_ModelMatrix(this.trackball.model)
 
-        this.renderer.draw({ mode: this.renderer.context.POINTS, count: 25 * 25 })
+        this.renderer.draw({ mode: this.renderer.context.POINTS, count: 75 * 75 })
     }
 
     wheel(event) {

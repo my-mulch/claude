@@ -13,7 +13,7 @@
             height: 100%;
             width: 100%;
             display: grid;
-            background-color: black;
+            background-color: white;
         }
     </style>
 </head>
@@ -23,19 +23,27 @@
         import io from './tools/io.js'
         import Claude from './app/index.js'
 
+        import ZoomView from './components/zoom.js'
         import ConvView from './components/conv.js'
         import TrackView from './components/track.js'
 
         async function main() {
             new Claude({
-                layout: [['a', 'b']],
-                pipes: [['a', 'pointerdown', 'b', 'render']],
+                layout: [
+                    ['a', 'c'],
+                    ['a', 'b']
+                ],
+                pipes: [
+                    ['a', 'pointermove', 'b', 'render'],
+                    ['a', 'pointermove', 'c', 'render']
+                ],
                 components: {
                     a: new ConvView({
-                        mask: [25, 25],
-                        image: await io.imread('./assets/img/sun.jpg'),
+                        mask: [75, 75],
+                        image: await io.imread('./assets/img/card.jpg'),
                     }),
                     b: new TrackView({}),
+                    c: new ZoomView({})
                 },
             })
         }
