@@ -1,3 +1,6 @@
+import Camera from '../tools/camera.js'
+import Renderer from '../tools/renderer.js'
+import Trackball from '../tools/trackball.js'
 
 export default class TrackView {
     static shaders = {
@@ -25,23 +28,56 @@ export default class TrackView {
         ].join('\n')
     }
 
-    constructor(listeners) {
+    constructor(attributes) {
         /** Display */
         this.canvas = document.createElement('canvas')
 
         /** Pointer */
         this.pointer = false
+        this.attributes = attributes
+
+        /** Style */
+        Object.assign(this.canvas.style, this.attributes, {
+            width: '100%',
+            height: '100%',
+        })
+
+        /** Tools */
+        this.camera = new Camera({})
+        this.trackball = new Trackball({})
+        this.renderer = new Renderer({
+            vertex: TrackView.shaders.vertex,
+            fragment: TrackView.shaders.fragment,
+            context: this.canvas.getContext('webgl'),
+        })
 
         /** Event Listeners */
-        for (const [name, handler] of Object.entries(listeners)) {
-            this[name] = handler.bind(this)
-            this.canvas.addEventListener(name, this[name])
-        }
-
         this.canvas.addEventListener(this.wheel.name, this.wheel.bind(this))
         this.canvas.addEventListener(this.pointerup.name, this.pointerup.bind(this))
         this.canvas.addEventListener(this.pointermove.name, this.pointermove.bind(this))
         this.canvas.addEventListener(this.pointerdown.name, this.pointerdown.bind(this))
+    }
+
+    render(region) {
+        if (region) {
+            const colors = region.slice()
+            const positions = region
+            const sizes = new Float32Array(positions.length / 3).fill(20)
+
+            for (let i = 0; i < region.length; i++)
+                positions[i] -= 0.5
+
+            this.renderer.a_Color({ buffer: this.renderer.buffer({ array: colors }), size: 3 })
+            this.renderer.a_PointSize({ buffer: this.renderer.buffer({ array: sizes }), size: 1 })
+            this.renderer.a_Position({ buffer: this.renderer.buffer({ array: positions }), size: 3 })
+        }
+
+
+        this.renderer.u_ProjMatrix(this.camera.proj)
+        this.renderer.u_ViewMatrix(this.camera.view)
+        this.renderer.u_ModelMatrix(this.trackball.model)
+
+        this.renderer.draw({ mode: this.renderer.context.POINTS, count: region.length / 3 })
     }
 
     wheel(event) {

@@ -26,6 +26,9 @@ export default class Camera {
         /** Matrices to Describe the Scene */
         this.view = new Float32Array(16)
         this.proj = new Float32Array(16)
+
+        this.project()
+        this.look()
     }
 
     cast(x, y) {

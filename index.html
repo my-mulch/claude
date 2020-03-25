@@ -13,7 +13,7 @@
             height: 100%;
             width: 100%;
             display: grid;
-            background-color: black
+            background-color: black;
         }
     </style>
 </head>
@@ -21,29 +21,26 @@
 <body>
     <script type="module">
         import io from './tools/io.js'
-        import Camera from './tools/camera.js'
-        import Renderer from './tools/renderer.js'
-        import Trackball from './tools/trackball.js'
-
         import Claude from './app/index.js'
-        import Component from './components/index.js'
+
+        import ConvView from './components/conv.js'
         import TrackView from './components/track.js'
 
-        new Claude({
-            layout: `
-                "a b"
-            `,
-            components: [
-                new Component({
-                    gridArea: 'a',
-                    backgroundColor: 'brown',
-                }),
-                new Component({
-                    gridArea: 'b',
-                    backgroundColor: 'pink',
-                }),
-            ]
-        })
+        async function main() {
+            new Claude({
+                layout: [['a', 'b']],
+                pipes: [['a', 'pointermove', 'b', 'render']],
+                components: {
+                    a: new ConvView({
+                        mask: [25, 25],
+                        image: await io.imread('./assets/img/sun.jpg'),
+                    }),
+                    b: new TrackView({}),
+                },
+            })
+        }
+
+        main()
 
     </script>
 </body>

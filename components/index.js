@@ -10,18 +10,9 @@ export default class Component {
         this.attributes = attributes
 
         /** Style */
-        Object.assign(this.canvas.style, this.attributes, {
+        Object.assign(this.canvas.style, {
             width: '100%',
             height: '100%'
         })
-
-        /** Event Listeners */
-        for (const [key, value] of Object.entries(this.attributes)) {
-            if (value.constructor !== Function)
-                continue
-
-            this[key] = value.bind(this)
-            this.canvas.addEventListener(key, value.bind(this))
-        }
     }
 }

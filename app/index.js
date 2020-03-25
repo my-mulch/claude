@@ -1,14 +1,43 @@
 
 export default class Claude {
-    constructor({ components, shared, layout }) {
-        this.shared = shared
+    static convertLayout(layout) {
+        return layout.map(function (row) {
+            return `"${row.join(' ')}"`
+        }).join('\n')
+    }
+
+    static repeat(count) {
+        return `repeat(${count}, 1fr)`
+    }
+
+    constructor({ components, layout, pipes }) {
+        this.pipes = pipes
         this.layout = layout
         this.components = components
 
-        document.body.style.gridTemplateAreas = this.layout
+        document.body.style.gridTemplateRows = Claude.repeat(this.layout.length)
+        document.body.style.gridTemplateColumns = Claude.repeat(this.layout[0].length)
+        document.body.style.gridTemplateAreas = Claude.convertLayout(this.layout)
 
-        for (const component of this.components)
+        for (const [id, component] of Object.entries(this.components)) {
+            component.canvas.style.gridArea = id
             document.body.append(component.canvas)
+        }
+
+        for (const [fromId, fromMethodName, toId, toMethodName] of this.pipes) {
+            const toComponent = this.components[toId]
+            const fromComponent = this.components[fromId]
+
+            const toMethod = toComponent[toMethodName]
+            const fromMethod = fromComponent[fromMethodName]
+
+            fromComponent.canvas.addEventListener(fromMethodName, function (event) {
+                const result = fromMethod.call(fromComponent, event)
+                toMethod.call(toComponent, result)
+            })
+        }
     }
+
+
 }
 
