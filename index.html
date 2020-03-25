@@ -29,7 +29,7 @@
         async function main() {
             new Claude({
                 layout: [['a', 'b']],
-                pipes: [['a', 'pointermove', 'b', 'render']],
+                pipes: [['a', 'pointerdown', 'b', 'render']],
                 components: {
                     a: new ConvView({
                         mask: [25, 25],

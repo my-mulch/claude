@@ -2,7 +2,9 @@ import Camera from '../tools/camera.js'
 import Renderer from '../tools/renderer.js'
 import Trackball from '../tools/trackball.js'
 
-export default class TrackView {
+import Component from './index.js'
+
+export default class TrackView extends Component {
     static shaders = {
         fragment: [
             'precision mediump float;',
@@ -28,27 +30,24 @@ export default class TrackView {
         ].join('\n')
     }
 
-    constructor(attributes) {
+    constructor({ }) {
+        /** Super */
+        super()
+
         /** Display */
         this.canvas = document.createElement('canvas')
-
-        /** Pointer */
-        this.pointer = false
-        this.attributes = attributes
-
-        /** Style */
-        Object.assign(this.canvas.style, this.attributes, {
-            width: '100%',
-            height: '100%',
-        })
+        this.canvas.width = window.innerWidth
+        this.canvas.height = window.innerHeight
+        this.context = this.canvas.getContext('webgl')
 
         /** Tools */
-        this.camera = new Camera({})
+        this.pointer = false
+        this.camera = new Camera({  })
         this.trackball = new Trackball({})
         this.renderer = new Renderer({
             vertex: TrackView.shaders.vertex,
             fragment: TrackView.shaders.fragment,
-            context: this.canvas.getContext('webgl'),
+            context: this.context,
         })
 
         /** Event Listeners */
@@ -58,11 +57,15 @@ export default class TrackView {
         this.canvas.addEventListener(this.pointerdown.name, this.pointerdown.bind(this))
     }
 
+    resize() {
+
+    }
+
     render(region) {
         if (region) {
             const colors = region.slice()
             const positions = region
-            const sizes = new Float32Array(positions.length / 3).fill(20)
+            const sizes = new Float32Array(positions.length / 3).fill(1)
 
             for (let i = 0; i < region.length; i++)
                 positions[i] -= 0.5
@@ -72,12 +75,11 @@ export default class TrackView {
             this.renderer.a_Position({ buffer: this.renderer.buffer({ array: positions }), size: 3 })
         }
 
-
         this.renderer.u_ProjMatrix(this.camera.proj)
         this.renderer.u_ViewMatrix(this.camera.view)
         this.renderer.u_ModelMatrix(this.trackball.model)
 
-        this.renderer.draw({ mode: this.renderer.context.POINTS, count: region.length / 3 })
+        this.renderer.draw({ mode: this.renderer.context.POINTS, count: 25 * 25 })
     }
 
     wheel(event) {

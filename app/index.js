@@ -10,6 +10,8 @@ export default class Claude {
         return `repeat(${count}, 1fr)`
     }
 
+    static FULL = '100%'
+
     constructor({ components, layout, pipes }) {
         this.pipes = pipes
         this.layout = layout
@@ -20,7 +22,9 @@ export default class Claude {
         document.body.style.gridTemplateAreas = Claude.convertLayout(this.layout)
 
         for (const [id, component] of Object.entries(this.components)) {
-            component.canvas.style.gridArea = id
+            component.style({ gridArea: id, width: Claude.FULL, height: Claude.FULL })
+            component.resize()
+
             document.body.append(component.canvas)
         }
 

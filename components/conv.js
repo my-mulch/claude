@@ -1,61 +1,53 @@
+import Component from './index.js'
 
-export default class ConvView {
-    constructor(attributes) {
-        /** Display */
-        this.canvas = document.createElement('canvas')
-        this.context = this.canvas.getContext('2d')
+export default class ConvView extends Component {
+    constructor({ mask, image }) {
+        /** Super */
+        super()
 
         /** State */
-        this.attributes = attributes
+        this.mask = mask
+        this.image = image
+        this.region = new Float32Array(this.mask[0] * this.mask[1] * 3)
 
-        /** Conv */
-        this.convWidth = this.attributes.mask[0]
-        this.convHeight = this.attributes.mask[1]
-        this.relConvWidth = Math.floor(this.convWidth / 2)
-        this.relConvHeight = Math.floor(this.convHeight / 2)
+        /** Display */
+        this.canvas = document.createElement('canvas')
+        this.canvas.width = this.image.bitmap.width
+        this.canvas.height = this.image.bitmap.height
+        this.context = this.canvas.getContext('2d')
+        this.context.drawImage(this.image.bitmap, 0, 0)
+    }
 
-        /** Style */
-        Object.assign(this.canvas.style, {
-            width: '100%',
-            height: '100%',
-            cursor: `url('http://localhost:3000/Users/trumanpurnell/Pictures/conv25.png'), auto`
-        })
+    resize() {
 
-        /** Draw */
-        const bitmap = this.attributes.image.bitmap
-
-        this.canvas.width = bitmap.width
-        this.canvas.height = bitmap.height
-        this.context.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height)
     }
 
     convolve(x, y) {
-        const region = []
-        const pixels = this.attributes.image.pixels
-        const bitmap = this.attributes.image.bitmap
+        let i = 0
 
-        for (let rh = -this.relConvHeight; rh <= this.relConvHeight; rh++) {
-            for (let cw = -this.relConvWidth; cw <= this.relConvWidth; cw++) {
+        for (let rh = 0; rh < this.mask[0]; rh++) {
+            for (let cw = 0; cw < this.mask[1]; cw++) {
                 const cindex = x + cw
                 const rindex = y + rh
-                const pindex = rindex * bitmap.width * 3 + cindex * 3
+                const pindex = rindex * this.image.bitmap.width * 3 + cindex * 3
 
-                region.push(
-                    pixels[pindex + 0],
-                    pixels[pindex + 1],
-                    pixels[pindex + 2]
-                )
+                this.region[i + 0] = this.image.pixels[pindex + 0]
+                this.region[i + 1] = this.image.pixels[pindex + 1]
+                this.region[i + 2] = this.image.pixels[pindex + 2]
+
+                i += 3
             }
         }
 
-        return new Float32Array(region)
+        console.log(this.region)
+        return this.region
     }
 
-    pointermove({ offsetX, offsetY }) {
-        const bitmap = this.attributes.image.bitmap
+    pointerdown(event) {
+        const bitmap = this.image.bitmap
 
-        const x = Math.floor(bitmap.width * offsetX / this.canvas.offsetWidth)
-        const y = Math.floor(bitmap.height * offsetY / this.canvas.offsetHeight)
+        const x = Math.floor(bitmap.width * event.offsetX / this.canvas.offsetWidth)
+        const y = Math.floor(bitmap.height * event.offsetY / this.canvas.offsetHeight)
 
         return this.convolve(x, y)
     }
