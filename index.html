@@ -23,33 +23,23 @@
         import io from './tools/io.js'
         import Claude from './app/index.js'
 
-        import ZoomView from './components/zoom.js'
-        import ConvView from './components/conv.js'
-        import TrackView from './components/track.js'
+        import FourierView from './components/audio/fourier.js'
 
         async function main() {
             new Claude({
                 layout: [
-                    ['a', 'c'],
                     ['a', 'b']
                 ],
-                pipes: [
-                    ['a', 'pointermove', 'b', 'render'],
-                    ['a', 'pointermove', 'c', 'render']
-                ],
+                pipes: [],
                 components: {
-                    a: new ConvView({
-                        mask: [75, 75],
-                        image: await io.imread('./assets/img/card.jpg'),
-                    }),
-                    b: new TrackView({}),
-                    c: new ZoomView({})
+                    a: new FourierView({
+                        audio: await io.wavread('http://localhost:3000/Users/trumanpurnell/Music/PinkPanther60.wav')
+                    })
                 },
             })
         }
 
         main()
-
     </script>
 </body>
 

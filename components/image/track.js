@@ -1,8 +1,8 @@
-import Camera from '../tools/camera.js'
-import Renderer from '../tools/renderer.js'
-import Trackball from '../tools/trackball.js'
+import Camera from '../../tools/camera.js'
+import Renderer from '../../tools/renderer.js'
+import Trackball from '../../tools/trackball.js'
 
-import Component from './index.js'
+import Component from './index.js.js'
 
 export default class TrackView extends Component {
     static shaders = {

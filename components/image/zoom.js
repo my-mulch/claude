@@ -1,4 +1,4 @@
-import Component from './index.js'
+import Component from './index.js.js'
 
 export default class ZoomView extends Component {
     constructor({ }) {
