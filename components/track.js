@@ -1,10 +1,10 @@
-import Camera from '../../tools/camera.js'
-import Renderer from '../../tools/renderer.js'
-import Trackball from '../../tools/trackball.js'
+import Component from './index.js'
 
-import Component from './index.js.js'
+import Camera from '../tools/camera.js'
+import Renderer from '../tools/renderer.js'
+import Trackball from '../tools/trackball.js'
 
-export default class TrackView extends Component {
+export default class TrackballView extends Component {
     static shaders = {
         fragment: [
             'precision mediump float;',
@@ -30,7 +30,7 @@ export default class TrackView extends Component {
         ].join('\n')
     }
 
-    constructor({ }) {
+    constructor() {
         /** Super */
         super()
 
@@ -41,11 +41,11 @@ export default class TrackView extends Component {
 
         /** Tools */
         this.pointer = false
-        this.camera = new Camera({  })
+        this.camera = new Camera({})
         this.trackball = new Trackball({})
         this.renderer = new Renderer({
-            vertex: TrackView.shaders.vertex,
-            fragment: TrackView.shaders.fragment,
+            vertex: TrackballView.shaders.vertex,
+            fragment: TrackballView.shaders.fragment,
             context: this.context,
         })
 
@@ -56,26 +56,7 @@ export default class TrackView extends Component {
         this.canvas.addEventListener(this.pointerdown.name, this.pointerdown.bind(this))
     }
 
-    render(region) {
-        if (region) {
-            const colors = region.slice()
-            const positions = region
-            const sizes = new Float32Array(positions.length / 3).fill(10)
-
-            for (let i = 0; i < region.length; i++)
-                positions[i] -= 0.5
-
-            this.renderer.a_Color({ buffer: this.renderer.buffer({ array: colors }), size: 3 })
-            this.renderer.a_PointSize({ buffer: this.renderer.buffer({ array: sizes }), size: 1 })
-            this.renderer.a_Position({ buffer: this.renderer.buffer({ array: positions }), size: 3 })
-        }
-
-        this.renderer.u_ProjMatrix(this.camera.proj)
-        this.renderer.u_ViewMatrix(this.camera.view)
-        this.renderer.u_ModelMatrix(this.trackball.model)
-
-        this.renderer.draw({ mode: this.renderer.context.POINTS, count: 75 * 75 })
-    }
+    render() { /** Implemented by Subclass */ }
 
     wheel(event) {
         if (!event.ctrlKey) return

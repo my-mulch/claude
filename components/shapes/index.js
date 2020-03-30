@@ -1,9 +1,14 @@
 
-export default class Shape {
-    static count = 25
-    static density = Math.PI * 2 / (Shape.count - 1)
+export default class Shape extends Float32Array {
+    constructor({
+        type,
+        to = [1, 0, 0],
+        from = [0, 0, 0],
+        up = [Math.random() / 10, 1, Math.random() / 10],
+    }) {
+        /** Super */
+        super(type.size)
 
-    constructor(to = [1, 0, 0], from = [0, 0, 0], up = [0, 1.0000000001, 0]) {
         /** Orientation */
         this.to = to
         this.up = up

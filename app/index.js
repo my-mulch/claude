@@ -12,7 +12,7 @@ export default class Claude {
 
     static FULL = '100%'
 
-    constructor({ components, layout, pipes }) {
+    constructor({ components, layout, pipes = [] }) {
         this.pipes = pipes
         this.layout = layout
         this.components = components

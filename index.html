@@ -13,7 +13,7 @@
             height: 100%;
             width: 100%;
             display: grid;
-            background-color: white;
+            background-color: black;
         }
     </style>
 </head>
@@ -23,17 +23,25 @@
         import io from './tools/io.js'
         import Claude from './app/index.js'
 
-        import FourierView from './components/audio/fourier.js'
+        import VectorView from './components/math/vector.js'
 
         async function main() {
             new Claude({
                 layout: [
                     ['a', 'b']
                 ],
-                pipes: [],
                 components: {
-                    a: new FourierView({
-                        audio: await io.wavread('http://localhost:3000/Users/trumanpurnell/Music/PinkPanther60.wav')
+                    a: new VectorView({
+                        basis: [
+                            [3, 4, 1],
+                            [-1, 2, 3],
+                        ]
+                    }),
+                    b: new VectorView({
+                        basis: [
+                            [3, 4, 1],
+                            [-1, 2, 3],
+                        ]
                     })
                 },
             })
