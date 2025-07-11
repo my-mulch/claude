@@ -4,7 +4,7 @@ Claude is a graphics engine built atop webgl. It was motivated by matplotlib's h
 
 In its current state, Claude is intended to be forked or clone. All functionality can then be implemented from index.js at the top of its directory tree. Below is an example of an image plotted in pixel space (axes R, G, and B values).
 
-The results can be seen [here](https://bb-labs.github.io/claude/) or [here](https://trumanpurnell.github.io/). Drag the points with your mouse. 
+The results can be seen [here](https://my-mulch.github.io/claude/) or [here](https://trumanpurnell.github.io/). Drag the points with your mouse. 
 
 ```js
 import io from './io/index.js'
